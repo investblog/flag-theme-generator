@@ -1,10 +1,13 @@
+import { createMiniBrowser } from '@shared/components/mini-browser';
 import { PALETTES } from '@shared/data/palettes';
 import { getRegions } from '@shared/services/locale';
 import { addRecentPalette, autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
-import type { FlagPalette, ThemeMode } from '@shared/types/theme';
+import type { MessageResponse } from '@shared/types/messages';
+import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { REQUIRED_PAIRS } from '@shared/types/theme';
 import { contrast } from '@shared/utils/contrast';
 import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
+import { getFlagSvg } from '@shared/utils/flags';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const MODE_NAMES: Record<string, string> = {
@@ -12,6 +15,13 @@ const MODE_NAMES: Record<string, string> = {
   DARK: 'D',
   LIGHT: 'L',
 };
+
+const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
+  { mode: 'AMOLED', msgKey: 'modeAmoled' },
+  { mode: 'DARK', msgKey: 'modeDark' },
+  { mode: 'LIGHT', msgKey: 'modeLight' },
+  { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
+];
 
 function msg(key: string): string {
   try {
@@ -26,6 +36,19 @@ function msg(key: string): string {
 let searchQuery = '';
 let activeRegion = '';
 let currentStrictness = 0.7;
+let canApplyTheme = false;
+let selectedPalette: FlagPalette | null = null;
+let selectedMode: ThemeMode = 'DOMINANT_ONLY';
+let listEl: HTMLElement | null = null;
+
+async function checkThemeApi(): Promise<boolean> {
+  try {
+    const resp = (await browser.runtime.sendMessage({ type: 'HAS_THEME_API' })) as MessageResponse | undefined;
+    return resp?.ok === true;
+  } catch {
+    return false;
+  }
+}
 
 async function init(): Promise<void> {
   const app = document.getElementById('app');
@@ -37,17 +60,29 @@ async function init(): Promise<void> {
     /* use default */
   }
 
+  try {
+    const [savedCode, savedMode] = await Promise.all([currentPaletteCode.getValue(), currentMode.getValue()]);
+    if (savedMode) selectedMode = savedMode;
+    if (savedCode) {
+      selectedPalette = PALETTES.find((p) => p.countryCode === savedCode) ?? null;
+    }
+  } catch {
+    /* storage unavailable */
+  }
+
+  canApplyTheme = await checkThemeApi();
+
   app.innerHTML = '';
-  app.className = 'gallery';
+  app.className = 'sidepanel';
 
   // Header
   const header = document.createElement('header');
-  header.className = 'gallery__header';
+  header.className = 'sp-header';
   const title = document.createElement('h1');
-  title.className = 'gallery__title';
-  title.textContent = msg('btnOpenGallery');
+  title.className = 'sp-header__title';
+  title.textContent = msg('extName');
   const settingsBtn = document.createElement('button');
-  settingsBtn.className = 'gallery__settings-btn';
+  settingsBtn.className = 'sp-header__settings';
   settingsBtn.textContent = '\u2699';
   settingsBtn.title = 'Settings';
   settingsBtn.addEventListener('click', openSettingsDrawer);
@@ -55,41 +90,35 @@ async function init(): Promise<void> {
   header.appendChild(settingsBtn);
   app.appendChild(header);
 
-  // Toolbar: search + region filters
-  const toolbar = document.createElement('div');
-  toolbar.className = 'gallery__toolbar';
-
+  // Search
   const search = document.createElement('input');
-  search.className = 'gallery__search';
+  search.className = 'sp-search';
   search.type = 'search';
   search.placeholder = 'Search countries...';
   search.addEventListener('input', () => {
     searchQuery = search.value.trim().toLowerCase();
-    renderGrid(grid);
+    renderList();
   });
-  toolbar.appendChild(search);
+  app.appendChild(search);
 
+  // Region filters
   const filters = document.createElement('div');
-  filters.className = 'gallery__filters';
-
-  // "All" chip
+  filters.className = 'sp-filters';
   const allChip = createFilterChip('All', '', filters);
   allChip.classList.add('filter-chip--active');
   filters.appendChild(allChip);
-
   for (const region of getRegions()) {
     filters.appendChild(createFilterChip(region, region, filters));
   }
-  toolbar.appendChild(filters);
-  app.appendChild(toolbar);
+  app.appendChild(filters);
 
-  // Card grid
-  const grid = document.createElement('div');
-  grid.className = 'gallery__grid';
-  grid.id = 'gallery-grid';
-  app.appendChild(grid);
+  // Palette list
+  listEl = document.createElement('div');
+  listEl.className = 'sp-list';
+  listEl.id = 'sp-list';
+  app.appendChild(listEl);
 
-  renderGrid(grid);
+  renderList();
 }
 
 function createFilterChip(label: string, region: string, container: HTMLElement): HTMLElement {
@@ -103,15 +132,15 @@ function createFilterChip(label: string, region: string, container: HTMLElement)
     for (const c of container.querySelectorAll('.filter-chip')) {
       c.classList.toggle('filter-chip--active', (c as HTMLElement).dataset.region === region);
     }
-    const grid = document.getElementById('gallery-grid');
-    if (grid) renderGrid(grid);
+    renderList();
   });
 
   return chip;
 }
 
-function renderGrid(grid: HTMLElement): void {
-  grid.innerHTML = '';
+function renderList(): void {
+  if (!listEl) return;
+  listEl.innerHTML = '';
 
   const filtered = PALETTES.filter((p) => {
     if (activeRegion && p.region !== activeRegion) return false;
@@ -124,49 +153,48 @@ function renderGrid(grid: HTMLElement): void {
 
   if (filtered.length === 0) {
     const empty = document.createElement('div');
-    empty.className = 'gallery__empty';
+    empty.className = 'sp-empty';
     empty.textContent = 'No palettes match your search.';
-    grid.appendChild(empty);
+    listEl.appendChild(empty);
     return;
   }
 
   for (const palette of filtered) {
-    grid.appendChild(createPaletteCard(palette));
+    const isSelected = selectedPalette?.countryCode === palette.countryCode;
+    listEl.appendChild(createPaletteCard(palette, isSelected));
+    if (isSelected) {
+      listEl.appendChild(createDetailSection(palette));
+    }
   }
 }
 
-function createPaletteCard(palette: FlagPalette): HTMLElement {
+function createPaletteCard(palette: FlagPalette, isSelected: boolean): HTMLElement {
   const card = document.createElement('div');
-  card.className = 'palette-card';
+  card.className = `sp-card${isSelected ? ' sp-card--selected' : ''}`;
 
-  // Header: name + code
-  const header = document.createElement('div');
-  header.className = 'palette-card__header';
-  const name = document.createElement('span');
-  name.className = 'palette-card__name';
+  // Flag
+  const flag = document.createElement('div');
+  flag.className = 'sp-card__flag';
+  flag.innerHTML = getFlagSvg(palette.countryCode) ?? '';
+  card.appendChild(flag);
+
+  // Info
+  const info = document.createElement('div');
+  info.className = 'sp-card__info';
+  const name = document.createElement('div');
+  name.className = 'sp-card__name';
   name.textContent = palette.name_en;
-  const code = document.createElement('span');
-  code.className = 'palette-card__code';
+  const code = document.createElement('div');
+  code.className = 'sp-card__code';
   code.textContent = palette.countryCode;
-  header.appendChild(name);
-  header.appendChild(code);
-  card.appendChild(header);
-
-  // Swatches
-  const swatches = document.createElement('div');
-  swatches.className = 'palette-card__swatches';
-  for (const color of palette.flagColors) {
-    const s = document.createElement('div');
-    s.className = 'palette-card__swatch';
-    s.style.backgroundColor = color;
-    swatches.appendChild(s);
-  }
-  card.appendChild(swatches);
+  info.appendChild(name);
+  info.appendChild(code);
+  card.appendChild(info);
 
   // Mode badges
   const report = evaluateCompatibility(palette, currentStrictness);
   const modes = document.createElement('div');
-  modes.className = 'palette-card__modes';
+  modes.className = 'sp-card__modes';
   for (const [key, label] of Object.entries(MODE_NAMES)) {
     const badge = document.createElement('span');
     badge.className = 'mode-badge';
@@ -178,211 +206,204 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   }
   card.appendChild(modes);
 
-  // Actions
-  const actions = document.createElement('div');
-  actions.className = 'palette-card__actions';
-
-  const applyBtn = document.createElement('button');
-  applyBtn.className = 'btn btn--primary';
-  applyBtn.textContent = msg('btnApply');
-  applyBtn.addEventListener('click', () => applyPalette(palette));
-
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'btn btn--secondary';
-  exportBtn.textContent = 'Export';
-  exportBtn.addEventListener('click', () => openExportDrawer(palette));
-
-  actions.appendChild(applyBtn);
-  actions.appendChild(exportBtn);
-  card.appendChild(actions);
+  card.addEventListener('click', () => {
+    if (selectedPalette?.countryCode === palette.countryCode) {
+      selectedPalette = null;
+    } else {
+      selectedPalette = palette;
+      // Auto-select best mode for this palette
+      const r = evaluateCompatibility(palette, currentStrictness);
+      if (selectedMode !== 'DOMINANT_ONLY' && !r.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
+        if (r.supports.DARK) selectedMode = 'DARK';
+        else if (r.supports.AMOLED) selectedMode = 'AMOLED';
+        else if (r.supports.LIGHT) selectedMode = 'LIGHT';
+        else selectedMode = 'DOMINANT_ONLY';
+      }
+    }
+    renderList();
+  });
 
   return card;
 }
 
-async function applyPalette(palette: FlagPalette): Promise<void> {
-  let mode: ThemeMode = 'DOMINANT_ONLY';
-  try {
-    mode = await currentMode.getValue();
-  } catch {
-    /* use default */
-  }
+function createDetailSection(palette: FlagPalette): HTMLElement {
+  const detail = document.createElement('div');
+  detail.className = 'sp-detail';
 
-  // If current mode isn't supported, fall back to best available
   const report = evaluateCompatibility(palette, currentStrictness);
-  if (mode !== 'DOMINANT_ONLY' && !report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) {
-    if (report.supports.DARK) mode = 'DARK';
-    else if (report.supports.AMOLED) mode = 'AMOLED';
-    else if (report.supports.LIGHT) mode = 'LIGHT';
-    else mode = 'DOMINANT_ONLY';
-  }
 
-  await currentPaletteCode.setValue(palette.countryCode);
-  await currentMode.setValue(mode);
-  await addRecentPalette(palette.countryCode);
+  // Mode picker
+  const modeTitle = document.createElement('div');
+  modeTitle.className = 'sp-section-title';
+  modeTitle.textContent = msg('welcomeChooseMode');
+  detail.appendChild(modeTitle);
 
-  try {
-    await browser.runtime.sendMessage({
-      type: 'APPLY_THEME',
-      paletteCode: palette.countryCode,
-      mode,
-      strictness: currentStrictness,
+  const modes = document.createElement('div');
+  modes.className = 'sp-modes';
+  for (const { mode, msgKey } of MODE_KEYS) {
+    const btn = document.createElement('button');
+    btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
+    btn.textContent = msg(msgKey);
+
+    const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
+    if (!isSupported) {
+      btn.disabled = true;
+    }
+
+    btn.addEventListener('click', () => {
+      if (!isSupported) return;
+      selectedMode = mode;
+      renderList();
     });
-  } catch {
-    /* background not ready */
+    modes.appendChild(btn);
   }
+  detail.appendChild(modes);
+
+  // Mini-browser preview
+  const previewTitle = document.createElement('div');
+  previewTitle.className = 'sp-section-title';
+  previewTitle.textContent = msg('welcomePreview');
+  detail.appendChild(previewTitle);
+
+  const tokens = generateTokens(palette, selectedMode, currentStrictness);
+
+  const previewContainer = document.createElement('div');
+  previewContainer.className = 'sp-preview';
+  previewContainer.appendChild(createMiniBrowser(tokens));
+  detail.appendChild(previewContainer);
+
+  // Actions: Apply + Reset
+  const actions = document.createElement('div');
+  actions.className = 'sp-actions';
+
+  const applyBtn = document.createElement('button');
+  if (canApplyTheme) {
+    applyBtn.className = 'btn btn--primary';
+    applyBtn.textContent = msg('btnApply');
+    applyBtn.addEventListener('click', () => handleApply(palette, applyBtn));
+  } else {
+    applyBtn.className = 'btn btn--ghost';
+    applyBtn.textContent = msg('themeUnavailable');
+    applyBtn.disabled = true;
+  }
+
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'btn btn--ghost';
+  resetBtn.textContent = msg('btnReset');
+  resetBtn.disabled = !canApplyTheme;
+  resetBtn.addEventListener('click', handleReset);
+
+  actions.appendChild(applyBtn);
+  actions.appendChild(resetBtn);
+  detail.appendChild(actions);
+
+  // Export section
+  detail.appendChild(createExportSection(palette, tokens));
+
+  // WCAG summary
+  const wcagTitle = document.createElement('div');
+  wcagTitle.className = 'sp-section-title';
+  wcagTitle.textContent = 'WCAG Contrast';
+  detail.appendChild(wcagTitle);
+  detail.appendChild(createWcagSummary(tokens));
+
+  return detail;
 }
 
 /* ============================================
-   Export Drawer
+   Export Section (inline tabbed)
    ============================================ */
 
-function pickExportMode(palette: FlagPalette): ThemeMode {
-  const report = evaluateCompatibility(palette, currentStrictness);
-  if (report.supports.DARK) return 'DARK';
-  if (report.supports.AMOLED) return 'AMOLED';
-  if (report.supports.LIGHT) return 'LIGHT';
-  return 'DOMINANT_ONLY';
-}
+type ExportTab = 'css' | 'tailwind' | 'json';
 
-function openExportDrawer(palette: FlagPalette): void {
-  // Remove existing drawer if any
-  document.querySelector('.drawer')?.remove();
-
-  const mode = pickExportMode(palette);
-  const tokens = generateTokens(palette, mode, currentStrictness);
-
-  const drawer = document.createElement('aside');
-  drawer.className = 'drawer';
-
-  // Overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'drawer__overlay';
-  overlay.addEventListener('click', () => drawer.remove());
-  drawer.appendChild(overlay);
-
-  // Panel
-  const panel = document.createElement('div');
-  panel.className = 'drawer__panel';
-
-  // Header
-  const header = document.createElement('header');
-  header.className = 'drawer__header';
-  const title = document.createElement('h2');
-  title.className = 'drawer__header-title';
-  title.textContent = `Export — ${palette.name_en}`;
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'drawer__close';
-  closeBtn.textContent = '\u00d7';
-  closeBtn.addEventListener('click', () => drawer.remove());
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-  panel.appendChild(header);
-
-  // Body
-  const body = document.createElement('div');
-  body.className = 'drawer__body';
-
-  // CSS section
-  body.appendChild(createCodeSection('CSS Variables', exportCSS(tokens)));
-
-  // Tailwind section
-  body.appendChild(createCodeSection('Tailwind Config', exportTailwind(tokens)));
-
-  // JSON section
-  const jsonContent = exportJSON(tokens, palette.countryCode, mode, currentStrictness);
-  body.appendChild(createCodeSection('JSON Tokens', jsonContent));
-
-  // Download tokens.json button
-  const downloadSection = document.createElement('div');
-  downloadSection.className = 'drawer__section';
-  const downloadBtn = document.createElement('button');
-  downloadBtn.className = 'btn btn--secondary drawer__download-btn';
-  downloadBtn.textContent = 'Download tokens.json';
-  downloadBtn.addEventListener('click', () => {
-    const blob = new Blob([jsonContent], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tokens-${palette.countryCode.toLowerCase()}-${mode.toLowerCase()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-  downloadSection.appendChild(downloadBtn);
-  body.appendChild(downloadSection);
-
-  // WCAG summary
-  body.appendChild(createWcagSummary(tokens));
-
-  // Promo block per spec §13.1
-  const promo = document.createElement('div');
-  promo.className = 'drawer__promo';
-  const promoText = document.createElement('p');
-  promoText.className = 'drawer__promo-text';
-  promoText.textContent = 'Unified Colors for Webmasters';
-  const promoLink = document.createElement('a');
-  promoLink.className = 'drawer__promo-link';
-  promoLink.href = 'https://301.st';
-  promoLink.target = '_blank';
-  promoLink.rel = 'noopener';
-  promoLink.textContent = 'Open';
-  promo.appendChild(promoText);
-  promo.appendChild(promoLink);
-  body.appendChild(promo);
-
-  panel.appendChild(body);
-  drawer.appendChild(panel);
-  document.body.appendChild(drawer);
-}
-
-function createCodeSection(title: string, code: string): HTMLElement {
+function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLElement {
   const section = document.createElement('div');
-  section.className = 'drawer__section';
+  section.className = 'sp-export';
 
-  const heading = document.createElement('h3');
-  heading.className = 'drawer__section-title';
-  heading.textContent = title;
-  section.appendChild(heading);
+  const title = document.createElement('div');
+  title.className = 'sp-section-title';
+  title.textContent = 'Export';
+  section.appendChild(title);
 
-  const block = document.createElement('div');
-  block.className = 'drawer__code-block';
-  block.textContent = code;
+  const tabs = document.createElement('div');
+  tabs.className = 'sp-export__tabs';
+
+  const codeBlock = document.createElement('div');
+  codeBlock.className = 'sp-export__code';
 
   const copyBtn = document.createElement('button');
-  copyBtn.className = 'drawer__copy-btn';
+  copyBtn.className = 'sp-export__copy';
   copyBtn.textContent = 'Copy';
+
+  let activeTab: ExportTab = 'css';
+
+  function getCode(tab: ExportTab): string {
+    switch (tab) {
+      case 'css':
+        return exportCSS(tokens);
+      case 'tailwind':
+        return exportTailwind(tokens);
+      case 'json':
+        return exportJSON(tokens, palette.countryCode, selectedMode, currentStrictness);
+    }
+  }
+
+  function renderTab(tab: ExportTab): void {
+    activeTab = tab;
+    codeBlock.textContent = getCode(tab);
+    codeBlock.appendChild(copyBtn);
+
+    for (const t of tabs.querySelectorAll('.sp-export__tab')) {
+      t.classList.toggle('sp-export__tab--active', (t as HTMLElement).dataset.tab === tab);
+    }
+  }
+
+  for (const [key, label] of [
+    ['css', 'CSS'],
+    ['tailwind', 'Tailwind'],
+    ['json', 'JSON'],
+  ] as [ExportTab, string][]) {
+    const tabBtn = document.createElement('button');
+    tabBtn.className = `sp-export__tab${key === activeTab ? ' sp-export__tab--active' : ''}`;
+    tabBtn.dataset.tab = key;
+    tabBtn.textContent = label;
+    tabBtn.addEventListener('click', () => renderTab(key));
+    tabs.appendChild(tabBtn);
+  }
+
+  section.appendChild(tabs);
+
   copyBtn.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(getCode(activeTab));
       copyBtn.textContent = 'Copied!';
-      copyBtn.classList.add('drawer__copy-btn--copied');
+      copyBtn.classList.add('sp-export__copy--copied');
       setTimeout(() => {
         copyBtn.textContent = 'Copy';
-        copyBtn.classList.remove('drawer__copy-btn--copied');
+        copyBtn.classList.remove('sp-export__copy--copied');
       }, 1500);
     } catch {
       /* clipboard unavailable */
     }
   });
-  block.appendChild(copyBtn);
-  section.appendChild(block);
+
+  codeBlock.textContent = getCode(activeTab);
+  codeBlock.appendChild(copyBtn);
+  section.appendChild(codeBlock);
 
   return section;
 }
 
-function createWcagSummary(tokens: import('@shared/types/theme').ThemeTokens): HTMLElement {
-  const section = document.createElement('div');
-  section.className = 'drawer__section';
+/* ============================================
+   WCAG Summary Table
+   ============================================ */
 
-  const heading = document.createElement('h3');
-  heading.className = 'drawer__section-title';
-  heading.textContent = 'WCAG Contrast Summary';
-  section.appendChild(heading);
-
+function createWcagSummary(tokens: ThemeTokens): HTMLElement {
   const table = document.createElement('table');
   table.className = 'wcag-summary';
 
   const thead = document.createElement('thead');
-  thead.innerHTML = '<tr><th>Pair</th><th>Ratio</th><th>Required</th><th>Status</th></tr>';
+  thead.innerHTML = '<tr><th>Pair</th><th>Ratio</th><th>Req</th><th></th></tr>';
   table.appendChild(thead);
 
   const tbody = document.createElement('tbody');
@@ -408,9 +429,66 @@ function createWcagSummary(tokens: import('@shared/types/theme').ThemeTokens): H
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
-  section.appendChild(table);
 
-  return section;
+  return table;
+}
+
+/* ============================================
+   Apply / Reset Handlers
+   ============================================ */
+
+async function handleApply(palette: FlagPalette, btn: HTMLButtonElement): Promise<void> {
+  try {
+    await currentPaletteCode.setValue(palette.countryCode);
+    await currentMode.setValue(selectedMode);
+    await strictness.setValue(currentStrictness);
+    await addRecentPalette(palette.countryCode);
+  } catch {
+    // Storage may be unavailable
+  }
+
+  let response: MessageResponse | undefined;
+  try {
+    response = (await browser.runtime.sendMessage({
+      type: 'APPLY_THEME',
+      paletteCode: palette.countryCode,
+      mode: selectedMode,
+      strictness: currentStrictness,
+    })) as MessageResponse | undefined;
+  } catch {
+    response = { ok: false, error: 'Theme API unavailable' };
+  }
+
+  const origText = btn.textContent;
+  if (!response || response.ok) {
+    btn.textContent = msg('themeApplied');
+    setTimeout(() => {
+      btn.textContent = origText;
+    }, 1500);
+  } else {
+    btn.textContent = msg('themeUnavailable');
+    btn.classList.replace('btn--primary', 'btn--ghost');
+    setTimeout(() => {
+      btn.textContent = origText;
+      btn.classList.replace('btn--ghost', 'btn--primary');
+    }, 3000);
+  }
+}
+
+async function handleReset(): Promise<void> {
+  selectedPalette = null;
+  selectedMode = 'DOMINANT_ONLY';
+
+  await currentPaletteCode.setValue(null);
+  await currentMode.setValue('DOMINANT_ONLY');
+
+  try {
+    await browser.runtime.sendMessage({ type: 'RESET_THEME' });
+  } catch {
+    /* background not ready */
+  }
+
+  renderList();
 }
 
 /* ============================================
@@ -483,8 +561,7 @@ function openSettingsDrawer(): void {
   slider.addEventListener('change', async () => {
     currentStrictness = Number.parseFloat(slider.value);
     await strictness.setValue(currentStrictness);
-    const grid = document.getElementById('gallery-grid');
-    if (grid) renderGrid(grid);
+    renderList();
   });
 
   sliderRow.appendChild(slider);
@@ -538,7 +615,7 @@ function openSettingsDrawer(): void {
 
   body.appendChild(autoSection);
 
-  // Promo per spec §13.1
+  // Promo per spec
   const promo = document.createElement('div');
   promo.className = 'drawer__promo';
   const promoText = document.createElement('p');

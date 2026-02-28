@@ -1,8 +1,13 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'wxt';
 
 export default defineConfig({
   srcDir: 'src',
   outDir: 'dist',
+
+  alias: {
+    '@shared': resolve(__dirname, 'src/shared'),
+  },
 
   manifest: ({ browser }) => ({
     name: '__MSG_extName__',
@@ -14,7 +19,7 @@ export default defineConfig({
 
     ...(browser === 'chrome' && { minimum_chrome_version: '116' }),
 
-    permissions: browser === 'firefox' ? ['storage'] : ['storage', 'theme'],
+    permissions: browser === 'firefox' ? ['storage', 'theme'] : ['storage', 'sidePanel'],
 
     optional_permissions: ['downloads'],
 

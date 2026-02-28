@@ -2,8 +2,10 @@ import { createMiniBrowser } from '@shared/components/mini-browser';
 import { PALETTES } from '@shared/data/palettes';
 import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
+import type { MessageResponse } from '@shared/types/messages';
 import type { FlagPalette, ThemeMode } from '@shared/types/theme';
 import { exportCSS } from '@shared/utils/export';
+import { getFlagSvg } from '@shared/utils/flags';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
@@ -28,6 +30,16 @@ function msg(key: string, ...subs: string[]): string {
 let selectedPalette: FlagPalette | null = null;
 let selectedMode: ThemeMode = 'DOMINANT_ONLY';
 let currentStrictness = 0.7;
+let themeApiAvailable = false;
+
+async function checkThemeApi(): Promise<boolean> {
+  try {
+    const resp = (await browser.runtime.sendMessage({ type: 'HAS_THEME_API' })) as MessageResponse | undefined;
+    return resp?.ok === true;
+  } catch {
+    return false;
+  }
+}
 
 function init(): void {
   const app = document.getElementById('app');
@@ -99,7 +111,7 @@ function init(): void {
   const exportRow = document.createElement('div');
   exportRow.className = 'welcome__section';
   const exportBtn = document.createElement('button');
-  exportBtn.className = 'btn btn--secondary';
+  exportBtn.className = 'btn btn--ghost';
   exportBtn.id = 'btn-export';
   exportBtn.textContent = 'Export CSS';
   exportBtn.disabled = true;
@@ -132,15 +144,16 @@ function init(): void {
   applyBtn.addEventListener('click', handleApply);
 
   const resetBtn = document.createElement('button');
-  resetBtn.className = 'btn btn--secondary';
+  resetBtn.className = 'btn btn--ghost';
+  resetBtn.id = 'btn-reset';
   resetBtn.textContent = msg('btnReset');
   resetBtn.addEventListener('click', handleReset);
 
   const galleryLink = document.createElement('button');
-  galleryLink.className = 'btn btn--secondary';
-  galleryLink.textContent = msg('btnOpenGallery');
+  galleryLink.className = 'btn btn--ghost';
+  galleryLink.textContent = msg('btnBrowsePalettes');
   galleryLink.addEventListener('click', () => {
-    browser.tabs.create({ url: browser.runtime.getURL('/gallery.html') });
+    browser.runtime.sendMessage({ type: 'OPEN_SIDEPANEL' });
   });
 
   btnRow.appendChild(applyBtn);
@@ -176,6 +189,17 @@ function init(): void {
   loadSavedState(grid);
   updateModeGrid();
   updatePreview();
+
+  // Check if theme API is available (Firefox only)
+  checkThemeApi().then((available) => {
+    themeApiAvailable = available;
+    if (!available) {
+      applyBtn.textContent = msg('themeUnavailable');
+      applyBtn.disabled = true;
+      applyBtn.classList.replace('btn--primary', 'btn--ghost');
+      resetBtn.disabled = true;
+    }
+  });
 }
 
 function createSection(labelMsgKey: string): HTMLElement {
@@ -193,20 +217,15 @@ function createCountryCard(palette: FlagPalette, grid: HTMLElement): HTMLElement
   card.className = 'country-card';
   card.dataset.code = palette.countryCode;
 
-  const swatches = document.createElement('div');
-  swatches.className = 'country-card__swatches';
-  for (const color of palette.flagColors.slice(0, 4)) {
-    const swatch = document.createElement('div');
-    swatch.className = 'country-card__swatch';
-    swatch.style.backgroundColor = color;
-    swatches.appendChild(swatch);
-  }
+  const flag = document.createElement('div');
+  flag.className = 'country-card__flag';
+  flag.innerHTML = getFlagSvg(palette.countryCode) ?? '';
 
   const name = document.createElement('span');
   name.className = 'country-card__name';
   name.textContent = palette.name_en;
 
-  card.appendChild(swatches);
+  card.appendChild(flag);
   card.appendChild(name);
 
   card.addEventListener('click', () => {
@@ -228,7 +247,7 @@ function selectPalette(palette: FlagPalette, grid: HTMLElement): void {
   updatePreview();
 
   const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
-  if (applyBtn) applyBtn.disabled = false;
+  if (applyBtn && themeApiAvailable) applyBtn.disabled = false;
 
   const exportBtnEl = document.getElementById('btn-export') as HTMLButtonElement | null;
   if (exportBtnEl) exportBtnEl.disabled = false;
@@ -285,11 +304,16 @@ function updatePreview(): void {
 async function handleApply(): Promise<void> {
   if (!selectedPalette) return;
 
-  await currentPaletteCode.setValue(selectedPalette.countryCode);
-  await currentMode.setValue(selectedMode);
-  await strictness.setValue(currentStrictness);
+  const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
 
-  // Send message to background to apply theme
+  try {
+    await currentPaletteCode.setValue(selectedPalette.countryCode);
+    await currentMode.setValue(selectedMode);
+    await strictness.setValue(currentStrictness);
+  } catch {
+    // Storage may be unavailable in dev
+  }
+
   try {
     await browser.runtime.sendMessage({
       type: 'APPLY_THEME',
@@ -298,7 +322,15 @@ async function handleApply(): Promise<void> {
       strictness: currentStrictness,
     });
   } catch {
-    /* background not ready */
+    // background not ready
+  }
+
+  if (applyBtn) {
+    const origText = applyBtn.textContent;
+    applyBtn.textContent = msg('themeApplied');
+    setTimeout(() => {
+      applyBtn.textContent = origText;
+    }, 1500);
   }
 }
 

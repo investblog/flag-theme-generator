@@ -69,6 +69,10 @@
     "message": "Explore Gallery",
     "description": "Link to gallery page"
   },
+  "btnBrowsePalettes": {
+    "message": "Browse Palettes",
+    "description": "Button to open side panel with palette browser"
+  },
   "autoByLocale": {
     "message": "Auto-select by locale",
     "description": "Toggle label for auto locale"
@@ -96,5 +100,13 @@
   "tokenLink": {
     "message": "Link",
     "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Theme applied!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Export only — theme API unavailable",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   }
 }

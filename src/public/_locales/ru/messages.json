@@ -69,6 +69,10 @@
     "message": "Открыть галерею",
     "description": "Link to gallery page"
   },
+  "btnBrowsePalettes": {
+    "message": "Палитры",
+    "description": "Button to open side panel with palette browser"
+  },
   "autoByLocale": {
     "message": "Авто по локали",
     "description": "Toggle label for auto locale"
@@ -96,5 +100,13 @@
   "tokenLink": {
     "message": "Ссылка",
     "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Тема применена!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Только экспорт — API тем недоступен",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   }
 }

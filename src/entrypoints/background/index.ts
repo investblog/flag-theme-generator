@@ -5,7 +5,10 @@ import type { ExtensionMessage, MessageResponse } from '@shared/types/messages';
 import type { ThemeTokens } from '@shared/types/theme';
 import { generateTokens } from '@shared/utils/tokens';
 
-/** Check whether the browser.theme API is available (Chrome/Edge yes, Firefox maybe not). */
+/**
+ * browser.theme.update() is Firefox-only (MV2, requires "theme" permission).
+ * Chrome/Edge MV3 do not have this API — Apply is disabled, Export only.
+ */
 function hasThemeApi(): boolean {
   try {
     return typeof browser.theme?.update === 'function';
@@ -136,6 +139,11 @@ async function autoApplyByLocale(): Promise<void> {
 }
 
 export default defineBackground(() => {
+  // Chrome Side Panel: open on action click instead of popup
+  if (globalThis.chrome?.sidePanel) {
+    globalThis.chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+  }
+
   browser.runtime.onInstalled.addListener(({ reason }) => {
     if (reason === 'install') {
       browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
@@ -147,7 +155,8 @@ export default defineBackground(() => {
   // Re-apply saved theme on browser startup
   reapplySavedTheme();
 
-  browser.runtime.onMessage.addListener(async (raw: unknown): Promise<MessageResponse | undefined> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  browser.runtime.onMessage.addListener(async (raw: unknown, sender: any): Promise<MessageResponse | undefined> => {
     const message = raw as ExtensionMessage;
     if (!message || typeof message !== 'object' || !('type' in message)) return undefined;
 
@@ -156,6 +165,13 @@ export default defineBackground(() => {
         return applyTheme(message.paletteCode, message.mode, message.strictness);
       case 'RESET_THEME':
         return resetTheme();
+      case 'HAS_THEME_API':
+        return { ok: hasThemeApi() };
+      case 'OPEN_SIDEPANEL':
+        if (globalThis.chrome?.sidePanel) {
+          await globalThis.chrome.sidePanel.open({ windowId: sender.tab?.windowId });
+        }
+        return { ok: true };
       default:
         return undefined;
     }

@@ -1,3 +1,4 @@
+import { createMiniBrowser } from '@shared/components/mini-browser';
 import { PALETTES } from '@shared/data/palettes';
 import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
@@ -10,14 +11,6 @@ const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
   { mode: 'DARK', msgKey: 'modeDark' },
   { mode: 'LIGHT', msgKey: 'modeLight' },
   { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
-];
-
-const TOKEN_DISPLAY: { key: string; msgKey: string }[] = [
-  { key: 'bg', msgKey: 'tokenBg' },
-  { key: 'surface', msgKey: 'tokenSurface' },
-  { key: 'text', msgKey: 'tokenText' },
-  { key: 'accent', msgKey: 'tokenAccent' },
-  { key: 'link', msgKey: 'tokenLink' },
 ];
 
 /** Safe i18n helper — returns key if browser.i18n unavailable. */
@@ -286,29 +279,7 @@ function updatePreview(): void {
   container.innerHTML = '';
 
   const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
-
-  for (const { key, msgKey } of TOKEN_DISPLAY) {
-    const hex = tokens[key as keyof typeof tokens];
-    const swatch = document.createElement('div');
-    swatch.className = 'token-swatch';
-
-    const colorBox = document.createElement('div');
-    colorBox.className = 'token-swatch__color';
-    colorBox.style.backgroundColor = hex;
-
-    const label = document.createElement('span');
-    label.className = 'token-swatch__label';
-    label.textContent = msg(msgKey);
-
-    const hexLabel = document.createElement('span');
-    hexLabel.className = 'token-swatch__hex';
-    hexLabel.textContent = hex;
-
-    swatch.appendChild(colorBox);
-    swatch.appendChild(label);
-    swatch.appendChild(hexLabel);
-    container.appendChild(swatch);
-  }
+  container.appendChild(createMiniBrowser(tokens));
 }
 
 async function handleApply(): Promise<void> {

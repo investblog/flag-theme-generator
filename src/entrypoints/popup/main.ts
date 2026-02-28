@@ -1,6 +1,7 @@
 import { getPaletteByCode } from '@shared/data/palettes';
 import {
   addRecentPalette,
+  autoByLocale,
   currentMode,
   currentPaletteCode,
   recentPalettes,
@@ -122,6 +123,28 @@ async function init(): Promise<void> {
   actions.appendChild(applyBtn);
   actions.appendChild(resetBtn);
   app.appendChild(actions);
+
+  // Auto-by-locale toggle
+  const toggleRow = document.createElement('div');
+  toggleRow.className = 'popup__toggle';
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.id = 'auto-locale';
+  checkbox.addEventListener('change', () => {
+    autoByLocale.setValue(checkbox.checked);
+  });
+  const toggleLabel = document.createElement('label');
+  toggleLabel.className = 'popup__toggle-label';
+  toggleLabel.htmlFor = 'auto-locale';
+  toggleLabel.textContent = msg('autoByLocale');
+  toggleRow.appendChild(checkbox);
+  toggleRow.appendChild(toggleLabel);
+  app.appendChild(toggleRow);
+
+  // Load auto-locale saved state
+  autoByLocale.getValue().then((v) => {
+    checkbox.checked = v;
+  });
 
   // Recent palettes
   if (recent.length > 0) {

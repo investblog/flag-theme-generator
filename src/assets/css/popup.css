@@ -97,6 +97,23 @@
 }
 
 /* ============================================
+   Auto-by-Locale Toggle
+   ============================================ */
+
+.popup__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.popup__toggle-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ============================================
    Recent Palettes
    ============================================ */
 

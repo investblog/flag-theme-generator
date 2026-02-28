@@ -1,6 +1,6 @@
 import { PALETTES } from '@shared/data/palettes';
 import { getRegions } from '@shared/services/locale';
-import { addRecentPalette, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
+import { addRecentPalette, autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { FlagPalette, ThemeMode } from '@shared/types/theme';
 import { REQUIRED_PAIRS } from '@shared/types/theme';
 import { contrast } from '@shared/utils/contrast';
@@ -46,7 +46,13 @@ async function init(): Promise<void> {
   const title = document.createElement('h1');
   title.className = 'gallery__title';
   title.textContent = msg('btnOpenGallery');
+  const settingsBtn = document.createElement('button');
+  settingsBtn.className = 'gallery__settings-btn';
+  settingsBtn.textContent = '\u2699';
+  settingsBtn.title = 'Settings';
+  settingsBtn.addEventListener('click', openSettingsDrawer);
   header.appendChild(title);
+  header.appendChild(settingsBtn);
   app.appendChild(header);
 
   // Toolbar: search + region filters
@@ -386,6 +392,152 @@ function createWcagSummary(tokens: import('@shared/types/theme').ThemeTokens): H
   section.appendChild(table);
 
   return section;
+}
+
+/* ============================================
+   Settings Drawer
+   ============================================ */
+
+function openSettingsDrawer(): void {
+  document.querySelector('.drawer')?.remove();
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'drawer__overlay';
+  overlay.addEventListener('click', () => drawer.remove());
+  drawer.appendChild(overlay);
+
+  const panel = document.createElement('div');
+  panel.className = 'drawer__panel';
+
+  // Header
+  const header = document.createElement('header');
+  header.className = 'drawer__header';
+  const title = document.createElement('h2');
+  title.className = 'drawer__header-title';
+  title.textContent = 'Settings';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'drawer__close';
+  closeBtn.textContent = '\u00d7';
+  closeBtn.addEventListener('click', () => drawer.remove());
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'drawer__body';
+
+  // Strictness slider
+  const strictSection = document.createElement('div');
+  strictSection.className = 'drawer__section';
+  const strictTitle = document.createElement('h3');
+  strictTitle.className = 'drawer__section-title';
+  strictTitle.textContent = 'Color Strictness';
+  strictSection.appendChild(strictTitle);
+
+  const strictDesc = document.createElement('p');
+  strictDesc.className = 'settings__desc';
+  strictDesc.textContent = 'Controls how much flag colors can be adjusted to meet contrast requirements.';
+  strictSection.appendChild(strictDesc);
+
+  const sliderRow = document.createElement('div');
+  sliderRow.className = 'settings__slider-row';
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.className = 'settings__slider';
+  slider.min = '0';
+  slider.max = '1';
+  slider.step = '0.05';
+  slider.value = String(currentStrictness);
+  const sliderValue = document.createElement('span');
+  sliderValue.className = 'settings__slider-value';
+  sliderValue.textContent = `${Math.round(currentStrictness * 100)}%`;
+
+  slider.addEventListener('input', () => {
+    const val = Number.parseFloat(slider.value);
+    sliderValue.textContent = `${Math.round(val * 100)}%`;
+  });
+
+  slider.addEventListener('change', async () => {
+    currentStrictness = Number.parseFloat(slider.value);
+    await strictness.setValue(currentStrictness);
+    const grid = document.getElementById('gallery-grid');
+    if (grid) renderGrid(grid);
+  });
+
+  sliderRow.appendChild(slider);
+  sliderRow.appendChild(sliderValue);
+  strictSection.appendChild(sliderRow);
+
+  const strictLabels = document.createElement('div');
+  strictLabels.className = 'settings__slider-labels';
+  const relaxedLabel = document.createElement('span');
+  relaxedLabel.textContent = 'Relaxed';
+  const strictLabel = document.createElement('span');
+  strictLabel.textContent = 'Strict';
+  strictLabels.appendChild(relaxedLabel);
+  strictLabels.appendChild(strictLabel);
+  strictSection.appendChild(strictLabels);
+
+  body.appendChild(strictSection);
+
+  // Auto-by-locale toggle
+  const autoSection = document.createElement('div');
+  autoSection.className = 'drawer__section';
+  const autoTitle = document.createElement('h3');
+  autoTitle.className = 'drawer__section-title';
+  autoTitle.textContent = 'Auto by Locale';
+  autoSection.appendChild(autoTitle);
+
+  const autoRow = document.createElement('div');
+  autoRow.className = 'settings__toggle-row';
+  const autoCheckbox = document.createElement('input');
+  autoCheckbox.type = 'checkbox';
+  autoCheckbox.id = 'settings-auto-locale';
+  const autoLabel = document.createElement('label');
+  autoLabel.htmlFor = 'settings-auto-locale';
+  autoLabel.className = 'settings__toggle-label';
+  autoLabel.textContent = msg('autoByLocale');
+  autoRow.appendChild(autoCheckbox);
+  autoRow.appendChild(autoLabel);
+  autoSection.appendChild(autoRow);
+
+  const autoHint = document.createElement('p');
+  autoHint.className = 'settings__desc';
+  autoHint.textContent = msg('autoByLocaleHint');
+  autoSection.appendChild(autoHint);
+
+  autoByLocale.getValue().then((v) => {
+    autoCheckbox.checked = v;
+  });
+  autoCheckbox.addEventListener('change', () => {
+    autoByLocale.setValue(autoCheckbox.checked);
+  });
+
+  body.appendChild(autoSection);
+
+  // Promo per spec §13.1
+  const promo = document.createElement('div');
+  promo.className = 'drawer__promo';
+  const promoText = document.createElement('p');
+  promoText.className = 'drawer__promo-text';
+  promoText.textContent = 'Unified Colors for Webmasters';
+  const promoLink = document.createElement('a');
+  promoLink.className = 'drawer__promo-link';
+  promoLink.href = 'https://301.st';
+  promoLink.target = '_blank';
+  promoLink.rel = 'noopener';
+  promoLink.textContent = 'Open';
+  promo.appendChild(promoText);
+  promo.appendChild(promoLink);
+  body.appendChild(promo);
+
+  panel.appendChild(body);
+  drawer.appendChild(panel);
+  document.body.appendChild(drawer);
 }
 
 init();

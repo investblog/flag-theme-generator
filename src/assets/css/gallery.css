@@ -13,6 +13,9 @@
 }
 
 .gallery__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: var(--space-4);
 }
 
@@ -393,4 +396,73 @@
 
 .drawer__promo-link:hover {
   text-decoration: underline;
+}
+
+/* ============================================
+   Settings Button
+   ============================================ */
+
+.gallery__settings-btn {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-pill);
+  color: var(--text-muted);
+  font-size: var(--fs-lg);
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  line-height: 1;
+}
+
+.gallery__settings-btn:hover {
+  color: var(--text-main);
+  border-color: var(--primary);
+}
+
+/* ============================================
+   Settings Drawer Controls
+   ============================================ */
+
+.settings__desc {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-2);
+  line-height: 1.5;
+}
+
+.settings__slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.settings__slider {
+  flex: 1;
+  accent-color: var(--primary);
+}
+
+.settings__slider-value {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.settings__slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: var(--text-subtle);
+  margin-top: var(--space-1);
+}
+
+.settings__toggle-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings__toggle-label {
+  font-size: var(--fs-sm);
+  cursor: pointer;
 }

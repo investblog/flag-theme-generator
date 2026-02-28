@@ -2,6 +2,7 @@ import { PALETTES } from '@shared/data/palettes';
 import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { FlagPalette, ThemeMode } from '@shared/types/theme';
+import { exportCSS } from '@shared/utils/export';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
@@ -100,6 +101,28 @@ function init(): void {
   previewContainer.id = 'token-preview';
   previewSection.appendChild(previewContainer);
   app.appendChild(previewSection);
+
+  // Export button (for webmasters — works without applying)
+  const exportRow = document.createElement('div');
+  exportRow.className = 'welcome__section';
+  const exportBtn = document.createElement('button');
+  exportBtn.className = 'btn btn--secondary';
+  exportBtn.id = 'btn-export';
+  exportBtn.textContent = 'Export CSS';
+  exportBtn.disabled = true;
+  exportBtn.addEventListener('click', () => {
+    if (!selectedPalette) return;
+    const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
+    const css = exportCSS(tokens);
+    navigator.clipboard.writeText(css).then(() => {
+      exportBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        exportBtn.textContent = 'Export CSS';
+      }, 1500);
+    });
+  });
+  exportRow.appendChild(exportBtn);
+  app.appendChild(exportRow);
 
   // Actions
   const actions = document.createElement('div');
@@ -213,6 +236,9 @@ function selectPalette(palette: FlagPalette, grid: HTMLElement): void {
 
   const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
   if (applyBtn) applyBtn.disabled = false;
+
+  const exportBtnEl = document.getElementById('btn-export') as HTMLButtonElement | null;
+  if (exportBtnEl) exportBtnEl.disabled = false;
 }
 
 function updateModeGrid(): void {
@@ -301,7 +327,7 @@ async function handleApply(): Promise<void> {
       strictness: currentStrictness,
     });
   } catch {
-    // Background handler not yet implemented — state saved anyway
+    /* background not ready */
   }
 }
 
@@ -312,7 +338,7 @@ async function handleReset(): Promise<void> {
   try {
     await browser.runtime.sendMessage({ type: 'RESET_THEME' });
   } catch {
-    // Background handler not yet implemented
+    /* background not ready */
   }
 }
 

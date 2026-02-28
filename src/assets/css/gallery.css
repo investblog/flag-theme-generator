@@ -215,3 +215,182 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================
+   Export Drawer
+   ============================================ */
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer[hidden] {
+  display: none;
+}
+
+.drawer__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.drawer__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 200ms ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.drawer__header-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  margin: 0;
+}
+
+.drawer__close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--fs-xl);
+  cursor: pointer;
+  padding: var(--space-1);
+  line-height: 1;
+}
+
+.drawer__close:hover {
+  color: var(--text-main);
+}
+
+.drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+.drawer__section {
+  margin-bottom: var(--space-4);
+}
+
+.drawer__section-title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.drawer__code-block {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  font-family: monospace;
+  font-size: var(--fs-xs);
+  white-space: pre;
+  overflow-x: auto;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.drawer__copy-btn {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-xs);
+  background: var(--bg-soft);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.drawer__copy-btn:hover {
+  color: var(--text-main);
+  border-color: var(--primary);
+}
+
+.drawer__copy-btn.drawer__copy-btn--copied {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+/* ============================================
+   WCAG Summary Table
+   ============================================ */
+
+.wcag-summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-xs);
+}
+
+.wcag-summary th,
+.wcag-summary td {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.wcag-summary th {
+  color: var(--text-muted);
+  font-weight: var(--fw-medium);
+}
+
+.wcag-summary__pass {
+  color: var(--success);
+}
+
+.wcag-summary__fail {
+  color: var(--danger);
+}
+
+/* ============================================
+   Promo Block
+   ============================================ */
+
+.drawer__promo {
+  padding: var(--space-3);
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.drawer__promo-text {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.drawer__promo-link {
+  font-size: var(--fs-xs);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-semibold);
+}
+
+.drawer__promo-link:hover {
+  text-decoration: underline;
+}

@@ -2,7 +2,10 @@ import { PALETTES } from '@shared/data/palettes';
 import { getRegions } from '@shared/services/locale';
 import { addRecentPalette, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { FlagPalette, ThemeMode } from '@shared/types/theme';
-import { evaluateCompatibility } from '@shared/utils/tokens';
+import { REQUIRED_PAIRS } from '@shared/types/theme';
+import { contrast } from '@shared/utils/contrast';
+import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
+import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const MODE_NAMES: Record<string, string> = {
   AMOLED: 'A',
@@ -181,9 +184,7 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   const exportBtn = document.createElement('button');
   exportBtn.className = 'btn btn--secondary';
   exportBtn.textContent = 'Export';
-  exportBtn.addEventListener('click', () => {
-    // Export drawer will be implemented in a later track
-  });
+  exportBtn.addEventListener('click', () => openExportDrawer(palette));
 
   actions.appendChild(applyBtn);
   actions.appendChild(exportBtn);
@@ -223,6 +224,168 @@ async function applyPalette(palette: FlagPalette): Promise<void> {
   } catch {
     /* background not ready */
   }
+}
+
+/* ============================================
+   Export Drawer
+   ============================================ */
+
+function pickExportMode(palette: FlagPalette): ThemeMode {
+  const report = evaluateCompatibility(palette, currentStrictness);
+  if (report.supports.DARK) return 'DARK';
+  if (report.supports.AMOLED) return 'AMOLED';
+  if (report.supports.LIGHT) return 'LIGHT';
+  return 'DOMINANT_ONLY';
+}
+
+function openExportDrawer(palette: FlagPalette): void {
+  // Remove existing drawer if any
+  document.querySelector('.drawer')?.remove();
+
+  const mode = pickExportMode(palette);
+  const tokens = generateTokens(palette, mode, currentStrictness);
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+
+  // Overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'drawer__overlay';
+  overlay.addEventListener('click', () => drawer.remove());
+  drawer.appendChild(overlay);
+
+  // Panel
+  const panel = document.createElement('div');
+  panel.className = 'drawer__panel';
+
+  // Header
+  const header = document.createElement('header');
+  header.className = 'drawer__header';
+  const title = document.createElement('h2');
+  title.className = 'drawer__header-title';
+  title.textContent = `Export — ${palette.name_en}`;
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'drawer__close';
+  closeBtn.textContent = '\u00d7';
+  closeBtn.addEventListener('click', () => drawer.remove());
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'drawer__body';
+
+  // CSS section
+  body.appendChild(createCodeSection('CSS Variables', exportCSS(tokens)));
+
+  // Tailwind section
+  body.appendChild(createCodeSection('Tailwind Config', exportTailwind(tokens)));
+
+  // JSON section
+  body.appendChild(createCodeSection('JSON Tokens', exportJSON(tokens, palette.countryCode, mode, currentStrictness)));
+
+  // WCAG summary
+  body.appendChild(createWcagSummary(tokens));
+
+  // Promo block per spec §13.1
+  const promo = document.createElement('div');
+  promo.className = 'drawer__promo';
+  const promoText = document.createElement('p');
+  promoText.className = 'drawer__promo-text';
+  promoText.textContent = 'Unified Colors for Webmasters';
+  const promoLink = document.createElement('a');
+  promoLink.className = 'drawer__promo-link';
+  promoLink.href = 'https://301.st';
+  promoLink.target = '_blank';
+  promoLink.rel = 'noopener';
+  promoLink.textContent = 'Open';
+  promo.appendChild(promoText);
+  promo.appendChild(promoLink);
+  body.appendChild(promo);
+
+  panel.appendChild(body);
+  drawer.appendChild(panel);
+  document.body.appendChild(drawer);
+}
+
+function createCodeSection(title: string, code: string): HTMLElement {
+  const section = document.createElement('div');
+  section.className = 'drawer__section';
+
+  const heading = document.createElement('h3');
+  heading.className = 'drawer__section-title';
+  heading.textContent = title;
+  section.appendChild(heading);
+
+  const block = document.createElement('div');
+  block.className = 'drawer__code-block';
+  block.textContent = code;
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'drawer__copy-btn';
+  copyBtn.textContent = 'Copy';
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('drawer__copy-btn--copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('drawer__copy-btn--copied');
+      }, 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  });
+  block.appendChild(copyBtn);
+  section.appendChild(block);
+
+  return section;
+}
+
+function createWcagSummary(tokens: import('@shared/types/theme').ThemeTokens): HTMLElement {
+  const section = document.createElement('div');
+  section.className = 'drawer__section';
+
+  const heading = document.createElement('h3');
+  heading.className = 'drawer__section-title';
+  heading.textContent = 'WCAG Contrast Summary';
+  section.appendChild(heading);
+
+  const table = document.createElement('table');
+  table.className = 'wcag-summary';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Pair</th><th>Ratio</th><th>Required</th><th>Status</th></tr>';
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for (const pair of REQUIRED_PAIRS) {
+    const ratio = contrast(tokens[pair.a], tokens[pair.b]);
+    const passes = ratio >= pair.threshold;
+    const tr = document.createElement('tr');
+
+    const tdPair = document.createElement('td');
+    tdPair.textContent = pair.label;
+    const tdRatio = document.createElement('td');
+    tdRatio.textContent = ratio.toFixed(2);
+    const tdRequired = document.createElement('td');
+    tdRequired.textContent = `${pair.threshold}:1`;
+    const tdStatus = document.createElement('td');
+    tdStatus.className = passes ? 'wcag-summary__pass' : 'wcag-summary__fail';
+    tdStatus.textContent = passes ? 'Pass' : 'Fail';
+
+    tr.appendChild(tdPair);
+    tr.appendChild(tdRatio);
+    tr.appendChild(tdRequired);
+    tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  section.appendChild(table);
+
+  return section;
 }
 
 init();

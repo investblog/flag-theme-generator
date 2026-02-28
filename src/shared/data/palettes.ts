@@ -175,8 +175,13 @@ export function getPaletteByCode(code: string): FlagPalette | undefined {
   return PALETTES.find((p) => p.countryCode === code);
 }
 
-/** Find palettes matching a BCP 47 locale tag (prefix match). */
+/** Find palettes matching a BCP 47 locale tag (bidirectional prefix match). */
 export function getPalettesByLocale(locale: string): FlagPalette[] {
   const lower = locale.toLowerCase();
-  return PALETTES.filter((p) => p.recommendedLocales.some((l) => lower.startsWith(l.toLowerCase())));
+  return PALETTES.filter((p) =>
+    p.recommendedLocales.some((l) => {
+      const rl = l.toLowerCase();
+      return lower.startsWith(rl) || rl.startsWith(lower);
+    }),
+  );
 }

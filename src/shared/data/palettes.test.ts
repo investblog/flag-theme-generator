@@ -1,0 +1,109 @@
+import { describe, expect, it } from 'vitest';
+import { REQUIRED_PAIRS } from '../types/theme';
+import { contrast } from '../utils/contrast';
+import { evaluateCompatibility, generateTokens } from '../utils/tokens';
+import { getPaletteByCode, getPalettesByLocale, PALETTES } from './palettes';
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const WAVE1_CODES = [
+  'IN',
+  'CN',
+  'US',
+  'ID',
+  'PK',
+  'NG',
+  'BR',
+  'BD',
+  'RU',
+  'ET',
+  'MX',
+  'JP',
+  'EG',
+  'PH',
+  'CD',
+  'VN',
+  'IR',
+  'TR',
+  'DE',
+  'TH',
+];
+
+describe('PALETTES data integrity', () => {
+  it('contains exactly 20 countries', () => {
+    expect(PALETTES).toHaveLength(20);
+  });
+
+  it('includes all Wave 1 country codes', () => {
+    const codes = PALETTES.map((p) => p.countryCode);
+    for (const code of WAVE1_CODES) {
+      expect(codes).toContain(code);
+    }
+  });
+
+  it('has unique country codes', () => {
+    const codes = PALETTES.map((p) => p.countryCode);
+    expect(new Set(codes).size).toBe(codes.length);
+  });
+
+  it('each palette has 2–6 valid hex colors', () => {
+    for (const p of PALETTES) {
+      expect(p.flagColors.length).toBeGreaterThanOrEqual(2);
+      expect(p.flagColors.length).toBeLessThanOrEqual(6);
+      for (const c of p.flagColors) {
+        expect(c).toMatch(HEX_RE);
+      }
+    }
+  });
+
+  it('each palette has non-empty names and at least one locale', () => {
+    for (const p of PALETTES) {
+      expect(p.name_en.length).toBeGreaterThan(0);
+      expect(p.name_ru.length).toBeGreaterThan(0);
+      expect(p.recommendedLocales.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+});
+
+describe('palette lookups', () => {
+  it('getPaletteByCode returns correct palette', () => {
+    const us = getPaletteByCode('US');
+    expect(us?.name_en).toBe('United States');
+  });
+
+  it('getPaletteByCode returns undefined for unknown code', () => {
+    expect(getPaletteByCode('ZZ')).toBeUndefined();
+  });
+
+  it('getPalettesByLocale finds palettes by prefix match', () => {
+    const results = getPalettesByLocale('en-US');
+    expect(results.some((p) => p.countryCode === 'US')).toBe(true);
+  });
+
+  it('getPalettesByLocale is case-insensitive', () => {
+    const results = getPalettesByLocale('PT-BR');
+    expect(results.some((p) => p.countryCode === 'BR')).toBe(true);
+  });
+});
+
+describe('pipeline smoke test — all palettes', () => {
+  it('every palette generates valid DOMINANT_ONLY tokens passing all pairs', () => {
+    for (const palette of PALETTES) {
+      const tokens = generateTokens(palette, 'DOMINANT_ONLY', 0.7);
+      for (const pair of REQUIRED_PAIRS) {
+        const ratio = contrast(tokens[pair.a], tokens[pair.b]);
+        expect(ratio, `${palette.countryCode} ${pair.label}`).toBeGreaterThanOrEqual(pair.threshold);
+      }
+    }
+  });
+
+  it('every palette produces a well-formed compatibility report', () => {
+    for (const palette of PALETTES) {
+      const report = evaluateCompatibility(palette, 0.7);
+      expect(report.supports).toHaveProperty('AMOLED');
+      expect(report.supports).toHaveProperty('DARK');
+      expect(report.supports).toHaveProperty('LIGHT');
+      expect(report.metrics).toBeDefined();
+      expect(report.adjustments).toBeDefined();
+    }
+  });
+});

@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Генератор тем по флагам",
+    "description": "Extension display name"
+  },
+  "extDescription": {
+    "message": "Генерация тем для браузера на основе цветовых палитр флагов с проверкой контрастности WCAG.",
+    "description": "Extension description for the browser store listing"
+  }
+}

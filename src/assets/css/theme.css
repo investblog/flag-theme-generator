@@ -1,0 +1,92 @@
+/* ============================================
+   Design Tokens — Flag Theme Generator
+   ============================================ */
+
+:root,
+[data-theme='light'] {
+  /* Backgrounds */
+  --bg: #ffffff;
+  --bg-elevated: #f8f9fa;
+  --bg-soft: #f1f3f5;
+  --panel: #ffffff;
+
+  /* Text */
+  --text-main: #1a1a2e;
+  --text-muted: #6c757d;
+  --text-subtle: #adb5bd;
+
+  /* Borders */
+  --border-subtle: #e9ecef;
+  --border-strong: #ced4da;
+
+  /* Semantic */
+  --primary: #4361ee;
+  --success: #2d9a3e;
+  --danger: #dc3545;
+  --warning: #f59f00;
+  --info: #0dcaf0;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --inline-gap: 8px;
+  --stack-gap: 12px;
+
+  /* Radius */
+  --r-pill: 999px;
+  --r-field: 0.75rem;
+  --radius: 0.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px rgb(0 0 0 / 0.1);
+
+  /* Typography */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Transitions */
+  --transition-fast: 120ms ease;
+  --transition-md: 160ms ease;
+
+  /* Z-index */
+  --z-dropdown: 20;
+  --z-drawer: 1000;
+  --z-modal: 2000;
+  --z-tooltip: 2200;
+}
+
+[data-theme='dark'] {
+  /* Backgrounds */
+  --bg: #1a1a2e;
+  --bg-elevated: #22223a;
+  --bg-soft: #2a2a42;
+  --panel: #22223a;
+
+  /* Text */
+  --text-main: #e8e8ed;
+  --text-muted: #a0a0b0;
+  --text-subtle: #6c6c7e;
+
+  /* Borders */
+  --border-subtle: #33334a;
+  --border-strong: #4a4a60;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 6px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px rgb(0 0 0 / 0.4);
+}

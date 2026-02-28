@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+
+# WXT
+.wxt/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Zip files (for store submission)
+*.zip
+
+# Temp
+temp/
+
+# Claude Code local settings & instructions
+.claude/
+CLAUDE.md

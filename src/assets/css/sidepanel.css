@@ -262,12 +262,58 @@
 }
 
 /* ============================================
-   Preview Container
+   Token Grid
    ============================================ */
 
-.sp-preview {
+.sp-tokens {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.sp-token {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius, 0.5rem);
-  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.sp-token:hover {
+  border-color: var(--primary);
+}
+
+.sp-token__swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+}
+
+.sp-token__label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
+.sp-token__hex {
+  font-family: monospace;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.sp-token.text-ok .sp-token__swatch {
+  border-color: var(--ok);
 }
 
 /* ============================================
@@ -340,14 +386,17 @@
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
   background: var(--bg-soft);
   color: var(--text-muted);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-pill);
   cursor: pointer;
   transition: color var(--transition-fast), border-color var(--transition-fast);
+  line-height: 0;
 }
 
 .sp-export__copy:hover {
@@ -355,9 +404,9 @@
   border-color: var(--primary);
 }
 
-.sp-export__copy.sp-export__copy--copied {
-  color: var(--success);
-  border-color: var(--success);
+.sp-export__copy.text-ok {
+  color: var(--ok);
+  border-color: var(--ok);
 }
 
 /* ============================================

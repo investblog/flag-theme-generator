@@ -1,4 +1,3 @@
-import { createMiniBrowser } from '@shared/components/mini-browser';
 import { PALETTES } from '@shared/data/palettes';
 import { getRegions } from '@shared/services/locale';
 import { addRecentPalette, autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
@@ -259,18 +258,15 @@ function createDetailSection(palette: FlagPalette): HTMLElement {
   }
   detail.appendChild(modes);
 
-  // Mini-browser preview
-  const previewTitle = document.createElement('div');
-  previewTitle.className = 'sp-section-title';
-  previewTitle.textContent = msg('welcomePreview');
-  detail.appendChild(previewTitle);
-
+  // Token grid
   const tokens = generateTokens(palette, selectedMode, currentStrictness);
 
-  const previewContainer = document.createElement('div');
-  previewContainer.className = 'sp-preview';
-  previewContainer.appendChild(createMiniBrowser(tokens));
-  detail.appendChild(previewContainer);
+  const tokensTitle = document.createElement('div');
+  tokensTitle.className = 'sp-section-title';
+  tokensTitle.textContent = msg('welcomePreview');
+  detail.appendChild(tokensTitle);
+
+  detail.appendChild(createTokenGrid(tokens));
 
   // Actions: Apply + Reset
   const actions = document.createElement('div');
@@ -311,6 +307,66 @@ function createDetailSection(palette: FlagPalette): HTMLElement {
 }
 
 /* ============================================
+   Token Grid
+   ============================================ */
+
+const TOKEN_LABELS: { key: keyof ThemeTokens; label: string }[] = [
+  { key: 'bg', label: 'BG' },
+  { key: 'surface', label: 'Surface' },
+  { key: 'text', label: 'Text' },
+  { key: 'mutedText', label: 'Muted' },
+  { key: 'border', label: 'Border' },
+  { key: 'accent', label: 'Accent' },
+  { key: 'accent2', label: 'Accent 2' },
+  { key: 'accentText', label: 'Acc. Text' },
+  { key: 'link', label: 'Link' },
+  { key: 'focusRing', label: 'Focus' },
+];
+
+function createTokenGrid(tokens: ThemeTokens): HTMLElement {
+  const grid = document.createElement('div');
+  grid.className = 'sp-tokens';
+
+  for (const { key, label } of TOKEN_LABELS) {
+    const hex = tokens[key];
+    const card = document.createElement('button');
+    card.className = 'sp-token';
+    card.title = `Copy ${hex}`;
+
+    const swatch = document.createElement('span');
+    swatch.className = 'sp-token__swatch';
+    swatch.style.background = hex;
+
+    const lbl = document.createElement('span');
+    lbl.className = 'sp-token__label';
+    lbl.textContent = label;
+
+    const val = document.createElement('span');
+    val.className = 'sp-token__hex';
+    val.textContent = hex;
+
+    card.appendChild(swatch);
+    card.appendChild(lbl);
+    card.appendChild(val);
+
+    card.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(hex);
+        card.classList.add('text-ok');
+        setTimeout(() => card.classList.remove('text-ok'), 2000);
+      } catch {
+        /* clipboard unavailable */
+      }
+    });
+
+    grid.appendChild(card);
+  }
+
+  return grid;
+}
+
+/* ============================================
    Export Section (inline tabbed)
    ============================================ */
 
@@ -333,7 +389,9 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
 
   const copyBtn = document.createElement('button');
   copyBtn.className = 'sp-export__copy';
-  copyBtn.textContent = 'Copy';
+  copyBtn.title = 'Copy';
+  copyBtn.innerHTML =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 
   let activeTab: ExportTab = 'css';
 
@@ -376,12 +434,8 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
   copyBtn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(getCode(activeTab));
-      copyBtn.textContent = 'Copied!';
-      copyBtn.classList.add('sp-export__copy--copied');
-      setTimeout(() => {
-        copyBtn.textContent = 'Copy';
-        copyBtn.classList.remove('sp-export__copy--copied');
-      }, 1500);
+      copyBtn.classList.add('text-ok');
+      setTimeout(() => copyBtn.classList.remove('text-ok'), 2000);
     } catch {
       /* clipboard unavailable */
     }

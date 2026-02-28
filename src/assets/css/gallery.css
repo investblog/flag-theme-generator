@@ -466,3 +466,24 @@
   font-size: var(--fs-sm);
   cursor: pointer;
 }
+
+/* ============================================
+   Download Button
+   ============================================ */
+
+.drawer__download-btn {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  background: var(--bg-soft);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.drawer__download-btn:hover {
+  border-color: var(--primary);
+}

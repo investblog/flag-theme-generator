@@ -1,4 +1,6 @@
 import { getPaletteByCode } from '@shared/data/palettes';
+import { getRecommendedPalette } from '@shared/services/locale';
+import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { ExtensionMessage, MessageResponse } from '@shared/types/messages';
 import type { ThemeTokens } from '@shared/types/theme';
 import { generateTokens } from '@shared/utils/tokens';
@@ -90,12 +92,60 @@ async function resetTheme(): Promise<MessageResponse> {
   }
 }
 
+/** Re-apply saved theme on browser startup (if a palette is set). */
+async function reapplySavedTheme(): Promise<void> {
+  if (!hasThemeApi()) return;
+
+  try {
+    const code = await currentPaletteCode.getValue();
+    if (!code) return;
+
+    const palette = getPaletteByCode(code);
+    if (!palette) return;
+
+    const mode = await currentMode.getValue();
+    const s = await strictness.getValue();
+    await applyTheme(code, mode, s);
+  } catch {
+    /* storage or theme API error — silently skip */
+  }
+}
+
+/** Auto-select and apply palette based on browser locale (when enabled). */
+async function autoApplyByLocale(): Promise<void> {
+  if (!hasThemeApi()) return;
+
+  try {
+    const enabled = await autoByLocale.getValue();
+    if (!enabled) return;
+
+    // Only auto-apply if no palette is currently set
+    const existingCode = await currentPaletteCode.getValue();
+    if (existingCode) return;
+
+    const locale = browser.i18n.getUILanguage();
+    const recommended = getRecommendedPalette(locale);
+    if (!recommended) return;
+
+    const s = await strictness.getValue();
+    await currentPaletteCode.setValue(recommended.countryCode);
+    await applyTheme(recommended.countryCode, 'DOMINANT_ONLY', s);
+  } catch {
+    /* locale detection or storage error — silently skip */
+  }
+}
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(({ reason }) => {
     if (reason === 'install') {
       browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
     }
+    // On install or update, try auto-apply if enabled
+    autoApplyByLocale();
   });
+
+  // Re-apply saved theme on browser startup
+  reapplySavedTheme();
 
   browser.runtime.onMessage.addListener(async (raw: unknown): Promise<MessageResponse | undefined> => {
     const message = raw as ExtensionMessage;

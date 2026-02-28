@@ -289,7 +289,26 @@ function openExportDrawer(palette: FlagPalette): void {
   body.appendChild(createCodeSection('Tailwind Config', exportTailwind(tokens)));
 
   // JSON section
-  body.appendChild(createCodeSection('JSON Tokens', exportJSON(tokens, palette.countryCode, mode, currentStrictness)));
+  const jsonContent = exportJSON(tokens, palette.countryCode, mode, currentStrictness);
+  body.appendChild(createCodeSection('JSON Tokens', jsonContent));
+
+  // Download tokens.json button
+  const downloadSection = document.createElement('div');
+  downloadSection.className = 'drawer__section';
+  const downloadBtn = document.createElement('button');
+  downloadBtn.className = 'btn btn--secondary drawer__download-btn';
+  downloadBtn.textContent = 'Download tokens.json';
+  downloadBtn.addEventListener('click', () => {
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tokens-${palette.countryCode.toLowerCase()}-${mode.toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+  downloadSection.appendChild(downloadBtn);
+  body.appendChild(downloadSection);
 
   // WCAG summary
   body.appendChild(createWcagSummary(tokens));

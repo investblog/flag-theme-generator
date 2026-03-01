@@ -73,6 +73,10 @@
     "message": "Browse Palettes",
     "description": "Button to open side panel with palette browser"
   },
+  "sidepanelHint": {
+    "message": "Click the extension icon in the toolbar to open the side panel",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
   "autoByLocale": {
     "message": "Auto-select by locale",
     "description": "Toggle label for auto locale"

@@ -73,6 +73,10 @@
     "message": "Палитры",
     "description": "Button to open side panel with palette browser"
   },
+  "sidepanelHint": {
+    "message": "Нажмите иконку расширения на панели инструментов",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
   "autoByLocale": {
     "message": "Авто по локали",
     "description": "Toggle label for auto locale"

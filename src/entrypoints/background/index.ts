@@ -167,11 +167,6 @@ export default defineBackground(() => {
         return resetTheme();
       case 'HAS_THEME_API':
         return { ok: hasThemeApi() };
-      case 'OPEN_SIDEPANEL':
-        if (globalThis.chrome?.sidePanel) {
-          await globalThis.chrome.sidePanel.open({ windowId: sender.tab?.windowId });
-        }
-        return { ok: true };
       default:
         return undefined;
     }

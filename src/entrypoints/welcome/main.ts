@@ -1,12 +1,25 @@
-import { createMiniBrowser } from '@shared/components/mini-browser';
 import { PALETTES } from '@shared/data/palettes';
 import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { MessageResponse } from '@shared/types/messages';
-import type { FlagPalette, ThemeMode } from '@shared/types/theme';
+import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { exportCSS } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
+
+/** Token cards — each shows its hex on the competing background color. */
+const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeTokens; fg: keyof ThemeTokens }[] = [
+  { key: 'bg', label: 'BG', bg: 'bg', fg: 'text' },
+  { key: 'surface', label: 'Surface', bg: 'surface', fg: 'text' },
+  { key: 'text', label: 'Text', bg: 'bg', fg: 'text' },
+  { key: 'mutedText', label: 'Muted', bg: 'bg', fg: 'mutedText' },
+  { key: 'border', label: 'Border', bg: 'bg', fg: 'border' },
+  { key: 'accent', label: 'Accent', bg: 'bg', fg: 'accent' },
+  { key: 'accent2', label: 'Accent 2', bg: 'bg', fg: 'accent2' },
+  { key: 'accentText', label: 'Acc. Text', bg: 'accent', fg: 'accentText' },
+  { key: 'link', label: 'Link', bg: 'bg', fg: 'link' },
+  { key: 'focusRing', label: 'Focus', bg: 'surface', fg: 'focusRing' },
+];
 
 const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
   { mode: 'AMOLED', msgKey: 'modeAmoled' },
@@ -251,7 +264,12 @@ function init(): void {
   galleryLink.className = 'btn btn--ghost';
   galleryLink.textContent = msg('btnBrowsePalettes');
   galleryLink.addEventListener('click', () => {
-    browser.runtime.sendMessage({ type: 'OPEN_SIDEPANEL' });
+    galleryLink.textContent = msg('sidepanelHint');
+    galleryLink.classList.add('text-ok');
+    setTimeout(() => {
+      galleryLink.textContent = msg('btnBrowsePalettes');
+      galleryLink.classList.remove('text-ok');
+    }, 3000);
   });
 
   btnRow.appendChild(applyBtn);
@@ -396,7 +414,31 @@ function updatePreview(): void {
   container.innerHTML = '';
 
   const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
-  container.appendChild(createMiniBrowser(tokens));
+
+  const grid = document.createElement('div');
+  grid.className = 'token-grid';
+
+  for (const { key, label, bg, fg } of TOKEN_CARDS) {
+    const hex = tokens[key];
+    const card = document.createElement('div');
+    card.className = 'token-grid__card';
+    card.style.background = tokens[bg];
+    card.style.color = tokens[fg];
+
+    const lbl = document.createElement('span');
+    lbl.className = 'token-grid__label';
+    lbl.textContent = label;
+
+    const val = document.createElement('span');
+    val.className = 'token-grid__hex';
+    val.textContent = hex;
+
+    card.appendChild(lbl);
+    card.appendChild(val);
+    grid.appendChild(card);
+  }
+
+  container.appendChild(grid);
 }
 
 async function handleApply(): Promise<void> {

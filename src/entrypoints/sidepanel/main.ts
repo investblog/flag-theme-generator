@@ -52,12 +52,35 @@ function msg(key: string): string {
   }
 }
 
+// Wave 1 top-20 by population — shown by default
+const WAVE1 = new Set([
+  'IN',
+  'CN',
+  'US',
+  'ID',
+  'PK',
+  'NG',
+  'BR',
+  'BD',
+  'RU',
+  'ET',
+  'MX',
+  'JP',
+  'EG',
+  'PH',
+  'CD',
+  'VN',
+  'IR',
+  'TR',
+  'DE',
+  'TH',
+]);
+
 // State
 let searchQuery = '';
 let activeRegion = '';
 let currentStrictness = 0.7;
 let canApplyTheme = false;
-let selectedPalette: FlagPalette | null = null;
 let selectedMode: ThemeMode = 'DOMINANT_ONLY';
 let listEl: HTMLElement | null = null;
 
@@ -81,11 +104,8 @@ async function init(): Promise<void> {
   }
 
   try {
-    const [savedCode, savedMode] = await Promise.all([currentPaletteCode.getValue(), currentMode.getValue()]);
+    const savedMode = await currentMode.getValue();
     if (savedMode) selectedMode = savedMode;
-    if (savedCode) {
-      selectedPalette = PALETTES.find((p) => p.countryCode === savedCode) ?? null;
-    }
   } catch {
     /* storage unavailable */
   }
@@ -163,7 +183,9 @@ function renderList(): void {
   if (!listEl) return;
   listEl.innerHTML = '';
 
+  const isFiltering = !!searchQuery || !!activeRegion;
   const filtered = PALETTES.filter((p) => {
+    if (!isFiltering) return WAVE1.has(p.countryCode);
     if (activeRegion && p.region !== activeRegion) return false;
     if (searchQuery) {
       const haystack = `${p.name_en} ${p.name_ru} ${p.countryCode}`.toLowerCase();
@@ -181,17 +203,13 @@ function renderList(): void {
   }
 
   for (const palette of filtered) {
-    const isSelected = selectedPalette?.countryCode === palette.countryCode;
-    listEl.appendChild(createPaletteCard(palette, isSelected));
-    if (isSelected) {
-      listEl.appendChild(createDetailSection(palette));
-    }
+    listEl.appendChild(createPaletteCard(palette));
   }
 }
 
-function createPaletteCard(palette: FlagPalette, isSelected: boolean): HTMLElement {
+function createPaletteCard(palette: FlagPalette): HTMLElement {
   const card = document.createElement('div');
-  card.className = `sp-card${isSelected ? ' sp-card--selected' : ''}`;
+  card.className = 'sp-card';
 
   // Flag
   const flag = document.createElement('div');
@@ -228,50 +246,75 @@ function createPaletteCard(palette: FlagPalette, isSelected: boolean): HTMLEleme
   card.appendChild(modes);
 
   card.addEventListener('click', () => {
-    if (selectedPalette?.countryCode === palette.countryCode) {
-      selectedPalette = null;
-    } else {
-      selectedPalette = palette;
-      // Auto-select best mode for this palette
-      const r = evaluateCompatibility(palette, currentStrictness);
-      if (selectedMode !== 'DOMINANT_ONLY' && !r.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
-        if (r.supports.DARK) selectedMode = 'DARK';
-        else if (r.supports.AMOLED) selectedMode = 'AMOLED';
-        else if (r.supports.LIGHT) selectedMode = 'LIGHT';
-        else selectedMode = 'DOMINANT_ONLY';
-      }
+    // Auto-select best mode for this palette
+    const r = evaluateCompatibility(palette, currentStrictness);
+    if (selectedMode !== 'DOMINANT_ONLY' && !r.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
+      if (r.supports.DARK) selectedMode = 'DARK';
+      else if (r.supports.AMOLED) selectedMode = 'AMOLED';
+      else if (r.supports.LIGHT) selectedMode = 'LIGHT';
+      else selectedMode = 'DOMINANT_ONLY';
     }
-    renderList();
+    openPaletteDrawer(palette);
   });
 
   return card;
 }
 
-function createDetailSection(palette: FlagPalette): HTMLElement {
-  const detail = document.createElement('div');
-  detail.className = 'sp-detail';
+function openPaletteDrawer(palette: FlagPalette): void {
+  // Close existing drawer
+  document.querySelector('.drawer')?.remove();
 
-  // Flag banner with copy/download
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'drawer__overlay';
+  overlay.addEventListener('click', () => drawer.remove());
+  drawer.appendChild(overlay);
+
+  const panel = document.createElement('div');
+  panel.className = 'drawer__panel';
+
+  // ── Header: flag + name + code + copy/download SVG ──
+  const header = document.createElement('header');
+  header.className = 'drawer__header';
+
+  const headerLeft = document.createElement('div');
+  headerLeft.className = 'drawer__header-content';
+
+  const titleRow = document.createElement('div');
+  titleRow.className = 'drawer__title';
+
   const flagSvg = getFlagSvg(palette.countryCode);
   if (flagSvg) {
-    const banner = document.createElement('div');
-    banner.className = 'sp-flag-banner';
-
-    const flagEl = document.createElement('div');
-    flagEl.className = 'sp-flag-banner__flag';
+    const flagEl = document.createElement('span');
+    flagEl.className = 'sp-card__flag';
     flagEl.innerHTML = flagSvg;
-    banner.appendChild(flagEl);
+    titleRow.appendChild(flagEl);
+  }
 
+  const nameEl = document.createElement('span');
+  nameEl.className = 'drawer__header-title';
+  nameEl.textContent = palette.name_en;
+  titleRow.appendChild(nameEl);
+
+  const codeEl = document.createElement('span');
+  codeEl.className = 'sp-card__code';
+  codeEl.textContent = palette.countryCode;
+  titleRow.appendChild(codeEl);
+
+  headerLeft.appendChild(titleRow);
+
+  // Flag SVG actions row
+  if (flagSvg) {
     const flagActions = document.createElement('div');
-    flagActions.className = 'sp-flag-banner__actions';
+    flagActions.className = 'drawer__flag-actions';
 
-    // Copy SVG
     const copyBtn = document.createElement('button');
-    copyBtn.className = 'btn btn--ghost btn--icon';
-    copyBtn.title = 'Copy SVG';
+    copyBtn.className = 'btn btn--ghost btn--sm';
     copyBtn.appendChild(svgIcon(ICON_COPY));
-    copyBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
+    copyBtn.appendChild(document.createTextNode(' Copy SVG'));
+    copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(flagSvg);
         copyBtn.classList.add('text-ok');
@@ -281,13 +324,11 @@ function createDetailSection(palette: FlagPalette): HTMLElement {
       }
     });
 
-    // Download SVG
     const dlBtn = document.createElement('button');
-    dlBtn.className = 'btn btn--ghost btn--icon';
-    dlBtn.title = 'Download SVG';
+    dlBtn.className = 'btn btn--ghost btn--sm';
     dlBtn.appendChild(svgIcon(ICON_DOWNLOAD));
-    dlBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    dlBtn.appendChild(document.createTextNode(' Download'));
+    dlBtn.addEventListener('click', () => {
       const blob = new Blob([flagSvg], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -299,52 +340,83 @@ function createDetailSection(palette: FlagPalette): HTMLElement {
 
     flagActions.appendChild(copyBtn);
     flagActions.appendChild(dlBtn);
-    banner.appendChild(flagActions);
-    detail.appendChild(banner);
+    headerLeft.appendChild(flagActions);
   }
 
-  const report = evaluateCompatibility(palette, currentStrictness);
+  header.appendChild(headerLeft);
 
-  // Mode picker
-  const modeTitle = document.createElement('div');
-  modeTitle.className = 'sp-section-title';
-  modeTitle.textContent = msg('welcomeChooseMode');
-  detail.appendChild(modeTitle);
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'drawer__close';
+  closeBtn.textContent = '\u00d7';
+  closeBtn.addEventListener('click', () => drawer.remove());
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
 
-  const modes = document.createElement('div');
-  modes.className = 'sp-modes';
-  for (const { mode, msgKey } of MODE_KEYS) {
-    const btn = document.createElement('button');
-    btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
-    btn.textContent = msg(msgKey);
+  // ── Body: modes, tokens, export, WCAG ──
+  const body = document.createElement('div');
+  body.className = 'drawer__body';
 
-    const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-    if (!isSupported) {
-      btn.disabled = true;
+  function renderDrawerBody(): void {
+    body.innerHTML = '';
+
+    const report = evaluateCompatibility(palette, currentStrictness);
+
+    // Mode picker
+    const modeTitle = document.createElement('div');
+    modeTitle.className = 'sp-section-title';
+    modeTitle.textContent = msg('welcomeChooseMode');
+    body.appendChild(modeTitle);
+
+    const modes = document.createElement('div');
+    modes.className = 'sp-modes';
+    for (const { mode, msgKey } of MODE_KEYS) {
+      const btn = document.createElement('button');
+      btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
+      btn.textContent = msg(msgKey);
+
+      const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
+      if (!isSupported) {
+        btn.disabled = true;
+      }
+
+      btn.addEventListener('click', () => {
+        if (!isSupported) return;
+        selectedMode = mode;
+        renderDrawerBody();
+      });
+      modes.appendChild(btn);
     }
+    body.appendChild(modes);
 
-    btn.addEventListener('click', () => {
-      if (!isSupported) return;
-      selectedMode = mode;
-      renderList();
-    });
-    modes.appendChild(btn);
+    // Token grid
+    const tokens = generateTokens(palette, selectedMode, currentStrictness);
+
+    const tokensTitle = document.createElement('div');
+    tokensTitle.className = 'sp-section-title';
+    tokensTitle.textContent = msg('welcomePreview');
+    body.appendChild(tokensTitle);
+    body.appendChild(createTokenGrid(tokens));
+
+    // Export
+    body.appendChild(createExportSection(palette, tokens));
+
+    // WCAG
+    const wcagTitle = document.createElement('div');
+    wcagTitle.className = 'sp-section-title';
+    wcagTitle.textContent = 'WCAG Contrast';
+    body.appendChild(wcagTitle);
+    body.appendChild(createWcagSummary(tokens));
   }
-  detail.appendChild(modes);
 
-  // Token grid
-  const tokens = generateTokens(palette, selectedMode, currentStrictness);
+  renderDrawerBody();
+  panel.appendChild(body);
 
-  const tokensTitle = document.createElement('div');
-  tokensTitle.className = 'sp-section-title';
-  tokensTitle.textContent = msg('welcomePreview');
-  detail.appendChild(tokensTitle);
+  // ── Footer: Apply + Reset ──
+  const footer = document.createElement('footer');
+  footer.className = 'drawer__footer';
 
-  detail.appendChild(createTokenGrid(tokens));
-
-  // Actions: Apply + Reset
-  const actions = document.createElement('div');
-  actions.className = 'sp-actions';
+  const footerActions = document.createElement('div');
+  footerActions.className = 'sp-actions';
 
   const applyBtn = document.createElement('button');
   if (canApplyTheme) {
@@ -361,23 +433,18 @@ function createDetailSection(palette: FlagPalette): HTMLElement {
   resetBtn.className = 'btn btn--ghost';
   resetBtn.textContent = msg('btnReset');
   resetBtn.disabled = !canApplyTheme;
-  resetBtn.addEventListener('click', handleReset);
+  resetBtn.addEventListener('click', () => {
+    handleReset();
+    drawer.remove();
+  });
 
-  actions.appendChild(applyBtn);
-  actions.appendChild(resetBtn);
-  detail.appendChild(actions);
+  footerActions.appendChild(applyBtn);
+  footerActions.appendChild(resetBtn);
+  footer.appendChild(footerActions);
+  panel.appendChild(footer);
 
-  // Export section
-  detail.appendChild(createExportSection(palette, tokens));
-
-  // WCAG summary
-  const wcagTitle = document.createElement('div');
-  wcagTitle.className = 'sp-section-title';
-  wcagTitle.textContent = 'WCAG Contrast';
-  detail.appendChild(wcagTitle);
-  detail.appendChild(createWcagSummary(tokens));
-
-  return detail;
+  drawer.appendChild(panel);
+  document.body.appendChild(drawer);
 }
 
 /* ============================================
@@ -604,7 +671,6 @@ async function handleApply(palette: FlagPalette, btn: HTMLButtonElement): Promis
 }
 
 async function handleReset(): Promise<void> {
-  selectedPalette = null;
   selectedMode = 'DOMINANT_ONLY';
 
   await currentPaletteCode.setValue(null);

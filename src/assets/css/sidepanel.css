@@ -210,63 +210,35 @@
 }
 
 /* ============================================
-   Detail Section (expanded below selected card)
+   Palette Drawer Overrides
    ============================================ */
 
-.sp-detail {
-  padding: var(--space-3);
-  background: var(--bg-soft);
-  border: 1px solid var(--border-subtle);
-  border-radius: 0 0 var(--radius, 0.5rem) var(--radius, 0.5rem);
-  margin-top: -1px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+.drawer__panel {
+  max-width: 100%;
 }
 
-/* ============================================
-   Flag Banner
-   ============================================ */
-
-.sp-flag-banner {
+.drawer__flag-actions {
   display: flex;
-  align-items: flex-start;
   gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
-.sp-flag-banner__flag {
-  flex: 1;
-  border-radius: var(--radius, 0.5rem);
-  overflow: hidden;
-  line-height: 0;
+.drawer__flag-actions .btn svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
 }
 
-.sp-flag-banner__flag svg {
+.drawer__body .sp-section-title {
+  margin-top: var(--space-3);
+}
+
+.drawer__body .sp-section-title:first-child {
+  margin-top: 0;
+}
+
+.drawer__footer .sp-actions {
   width: 100%;
-  height: auto;
-  display: block;
-}
-
-.sp-flag-banner__actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  flex-shrink: 0;
-}
-
-.btn.btn--icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(1em + 1rem);
-  height: calc(1em + 1rem);
-  padding: 0;
-  border-radius: var(--r-pill);
-}
-
-.btn.btn--icon svg {
-  width: 1.25em;
-  height: 1.25em;
 }
 
 /* ============================================

@@ -9,6 +9,27 @@ import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
+// Lucide-style SVG icon helper (from CookiePeek pattern)
+function svgIcon(pathD: string, size = 14): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', pathD);
+  svg.appendChild(path);
+  return svg;
+}
+
+const ICON_COPY =
+  'M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1';
+const ICON_DOWNLOAD = 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3';
+
 const MODE_NAMES: Record<string, string> = {
   AMOLED: 'A',
   DARK: 'D',
@@ -107,6 +128,7 @@ async function init(): Promise<void> {
   allChip.classList.add('filter-chip--active');
   filters.appendChild(allChip);
   for (const region of getRegions()) {
+    if (region === 'Antarctica') continue;
     filters.appendChild(createFilterChip(region, region, filters));
   }
   app.appendChild(filters);
@@ -228,6 +250,58 @@ function createPaletteCard(palette: FlagPalette, isSelected: boolean): HTMLEleme
 function createDetailSection(palette: FlagPalette): HTMLElement {
   const detail = document.createElement('div');
   detail.className = 'sp-detail';
+
+  // Flag banner with copy/download
+  const flagSvg = getFlagSvg(palette.countryCode);
+  if (flagSvg) {
+    const banner = document.createElement('div');
+    banner.className = 'sp-flag-banner';
+
+    const flagEl = document.createElement('div');
+    flagEl.className = 'sp-flag-banner__flag';
+    flagEl.innerHTML = flagSvg;
+    banner.appendChild(flagEl);
+
+    const flagActions = document.createElement('div');
+    flagActions.className = 'sp-flag-banner__actions';
+
+    // Copy SVG
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn--ghost btn--icon';
+    copyBtn.title = 'Copy SVG';
+    copyBtn.appendChild(svgIcon(ICON_COPY));
+    copyBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(flagSvg);
+        copyBtn.classList.add('text-ok');
+        setTimeout(() => copyBtn.classList.remove('text-ok'), 2000);
+      } catch {
+        /* clipboard unavailable */
+      }
+    });
+
+    // Download SVG
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'btn btn--ghost btn--icon';
+    dlBtn.title = 'Download SVG';
+    dlBtn.appendChild(svgIcon(ICON_DOWNLOAD));
+    dlBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const blob = new Blob([flagSvg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `flag-${palette.countryCode.toLowerCase()}.svg`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    flagActions.appendChild(copyBtn);
+    flagActions.appendChild(dlBtn);
+    banner.appendChild(flagActions);
+    detail.appendChild(banner);
+  }
 
   const report = evaluateCompatibility(palette, currentStrictness);
 

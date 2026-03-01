@@ -28,9 +28,11 @@ const WAVE1_CODES = [
   'TH',
 ];
 
+const VALID_REGIONS = new Set(['Africa', 'Americas', 'Antarctica', 'Asia', 'Europe', 'Oceania']);
+
 describe('PALETTES data integrity', () => {
-  it('contains exactly 20 countries', () => {
-    expect(PALETTES).toHaveLength(20);
+  it('contains at least 190 countries', () => {
+    expect(PALETTES.length).toBeGreaterThanOrEqual(190);
   });
 
   it('includes all Wave 1 country codes', () => {
@@ -55,11 +57,26 @@ describe('PALETTES data integrity', () => {
     }
   });
 
-  it('each palette has non-empty names and at least one locale', () => {
+  it('each palette has non-empty names', () => {
     for (const p of PALETTES) {
       expect(p.name_en.length).toBeGreaterThan(0);
       expect(p.name_ru.length).toBeGreaterThan(0);
-      expect(p.recommendedLocales.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('each palette has at least one locale (except AQ)', () => {
+    for (const p of PALETTES) {
+      if (p.countryCode === 'AQ') {
+        expect(p.recommendedLocales).toHaveLength(0);
+      } else {
+        expect(p.recommendedLocales.length, `${p.countryCode} should have locales`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it('each palette has a valid region', () => {
+    for (const p of PALETTES) {
+      expect(VALID_REGIONS.has(p.region!), `${p.countryCode} region "${p.region}" is invalid`).toBe(true);
     }
   });
 });
@@ -85,7 +102,7 @@ describe('palette lookups', () => {
   });
 });
 
-describe('pipeline smoke test — all palettes', () => {
+describe('pipeline smoke test — all palettes', { timeout: 60_000 }, () => {
   it('every palette generates valid DOMINANT_ONLY tokens passing all pairs', () => {
     for (const palette of PALETTES) {
       const tokens = generateTokens(palette, 'DOMINANT_ONLY', 0.7);

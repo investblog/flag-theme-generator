@@ -108,5 +108,13 @@
   "themeUnavailable": {
     "message": "Export only — theme API unavailable",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "searchPlaceholder": {
+    "message": "Search countries…",
+    "description": "Placeholder for country search input"
+  },
+  "noResults": {
+    "message": "No countries match your search.",
+    "description": "Empty state when search/filter yields no results"
   }
 }

@@ -225,6 +225,51 @@
 }
 
 /* ============================================
+   Flag Banner
+   ============================================ */
+
+.sp-flag-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.sp-flag-banner__flag {
+  flex: 1;
+  border-radius: var(--radius, 0.5rem);
+  overflow: hidden;
+  line-height: 0;
+}
+
+.sp-flag-banner__flag svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sp-flag-banner__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.btn.btn--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(1em + 1rem);
+  height: calc(1em + 1rem);
+  padding: 0;
+  border-radius: var(--r-pill);
+}
+
+.btn.btn--icon svg {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+/* ============================================
    Mode Picker
    ============================================ */
 

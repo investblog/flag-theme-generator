@@ -71,8 +71,68 @@ function init(): void {
 
   // Country picker section
   const countrySection = createSection('welcomeChooseCountry');
+
+  // Search input
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.className = 'welcome__search';
+  searchInput.placeholder = msg('searchPlaceholder');
+  countrySection.appendChild(searchInput);
+
+  // Region filter chips (Antarctica only via search)
+  const regions = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'];
+  const filtersRow = document.createElement('div');
+  filtersRow.className = 'welcome__filters';
+  let activeRegion: string | null = null;
+
+  for (const region of regions) {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip';
+    chip.textContent = region;
+    chip.dataset.region = region;
+    chip.addEventListener('click', () => {
+      activeRegion = activeRegion === region ? null : region;
+      for (const c of filtersRow.querySelectorAll('.filter-chip')) {
+        c.classList.toggle('filter-chip--active', (c as HTMLElement).dataset.region === activeRegion);
+      }
+      filterCountryGrid();
+    });
+    filtersRow.appendChild(chip);
+  }
+  countrySection.appendChild(filtersRow);
+
+  // Wave 1 top-20 by population — shown by default
+  const WAVE1 = new Set([
+    'IN',
+    'CN',
+    'US',
+    'ID',
+    'PK',
+    'NG',
+    'BR',
+    'BD',
+    'RU',
+    'ET',
+    'MX',
+    'JP',
+    'EG',
+    'PH',
+    'CD',
+    'VN',
+    'IR',
+    'TR',
+    'DE',
+    'TH',
+  ]);
+
   const grid = document.createElement('div');
   grid.className = 'country-grid';
+
+  // Empty state
+  const emptyState = document.createElement('div');
+  emptyState.className = 'welcome__empty';
+  emptyState.textContent = msg('noResults');
+  emptyState.hidden = true;
 
   // Show locale matches first, then rest
   const orderedPalettes = ambiguous
@@ -84,7 +144,45 @@ function init(): void {
     grid.appendChild(card);
   }
   countrySection.appendChild(grid);
+  countrySection.appendChild(emptyState);
+
+  // Filter logic: default shows only Wave 1, search/filter reveals all
+  function filterCountryGrid(): void {
+    const query = searchInput.value.trim().toLowerCase();
+    const isFiltering = !!query || !!activeRegion;
+    let visibleCount = 0;
+
+    for (const card of grid.querySelectorAll('.country-card') as NodeListOf<HTMLElement>) {
+      const code = card.dataset.code ?? '';
+      const palette = PALETTES.find((p) => p.countryCode === code);
+      if (!palette) continue;
+
+      let visible: boolean;
+      if (!isFiltering) {
+        // Default: only Wave 1
+        visible = WAVE1.has(code);
+      } else {
+        const matchesSearch =
+          !query ||
+          palette.name_en.toLowerCase().includes(query) ||
+          palette.name_ru.toLowerCase().includes(query) ||
+          palette.countryCode.toLowerCase().includes(query);
+        const matchesRegion = !activeRegion || palette.region === activeRegion;
+        visible = matchesSearch && matchesRegion;
+      }
+
+      card.hidden = !visible;
+      if (visible) visibleCount++;
+    }
+
+    emptyState.hidden = visibleCount > 0;
+  }
+
+  searchInput.addEventListener('input', filterCountryGrid);
   app.appendChild(countrySection);
+
+  // Apply initial filter (show Wave 1 only)
+  filterCountryGrid();
 
   // Auto-select recommended or first locale match
   if (recommended) {

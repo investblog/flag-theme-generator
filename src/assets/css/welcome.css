@@ -44,6 +44,65 @@
 }
 
 /* ============================================
+   Search & Filters
+   ============================================ */
+
+.welcome__search {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--text-main);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-field, 0.75rem);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  margin-bottom: var(--space-2);
+}
+
+.welcome__search:focus {
+  border-color: var(--primary);
+}
+
+.welcome__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.filter-chip {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-xs);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-chip:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+}
+
+.filter-chip.filter-chip--active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg-soft);
+}
+
+.welcome__empty {
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+/* ============================================
    Country Picker
    ============================================ */
 

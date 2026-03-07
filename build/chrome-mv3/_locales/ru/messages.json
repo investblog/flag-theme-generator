@@ -1,0 +1,108 @@
+{
+  "extName": {
+    "message": "Генератор тем по флагам",
+    "description": "Extension display name"
+  },
+  "extDescription": {
+    "message": "Генерация тем для браузера на основе цветовых палитр флагов с проверкой контрастности WCAG.",
+    "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Генератор тем по флагам",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "Это расширение меняет тему браузера, используя цветовые палитры флагов.",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "Выберите страну",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "Рекомендовано для вас",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "Выберите режим темы",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "Предпросмотр",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "Тёмный",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "Светлый",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "Только акцент",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "Эта палитра не проходит контрастность в режиме «$MODE$».",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Светлый"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "Применить тему",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "Сбросить",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "Открыть галерею",
+    "description": "Link to gallery page"
+  },
+  "autoByLocale": {
+    "message": "Авто по локали",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "Тема может измениться при смене языка браузера.",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "Фон",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "Поверхность",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "Текст",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "Акцент",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "Ссылка",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Тема применена!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Только экспорт — API тем недоступен",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  }
+}

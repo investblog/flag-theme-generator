@@ -73,6 +73,23 @@ function getQualityTone(score: number): 'Excellent' | 'Strong' | 'Balanced' | 'F
   return 'Fragile';
 }
 
+function getWarningTag(warning: string): string {
+  switch (warning) {
+    case 'USES_SYNTHETIC_SOURCE':
+      return 'Synthetic assist';
+    case 'LOW_ROLE_DIVERSITY':
+      return 'Low separation';
+    case 'THIN_CONTRAST_MARGIN':
+      return 'Thin headroom';
+    case 'HEAVY_COLOR_ADJUSTMENT':
+      return 'Heavy adjustment';
+    case 'NEUTRAL_SOURCE_PALETTE':
+      return 'Neutral source';
+    default:
+      return 'Tradeoff';
+  }
+}
+
 function getWarningCopy(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
@@ -91,11 +108,11 @@ function getWarningCopy(warning: string): string {
 }
 
 function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return 'Most faithful fallback mode.';
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Unavailable for this palette.';
+  if (mode === 'DOMINANT_ONLY') return 'Safest fallback for this palette.';
+  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Cannot meet contrast targets in this mode.';
   const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} match.`;
-  return `${getQualityTone(quality.score)} match with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
+  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} fit.`;
+  return `${getQualityTone(quality.score)} fit with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
 }
 
 function ensureModeSelection(report: CompatibilityReport): void {
@@ -263,7 +280,7 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   const bestQuality = bestMode === 'DOMINANT_ONLY' ? null : report.quality[bestMode as 'AMOLED' | 'DARK' | 'LIGHT'];
   const summary = document.createElement('div');
   summary.className = 'sp-card__summary';
-  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} · ${bestQuality.score}/100` : 'Fallback mode';
+  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} ï¿½ ${bestQuality.score}/100` : 'Fallback mode';
   info.appendChild(summary);
   card.appendChild(info);
 
@@ -302,9 +319,9 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
   const header = document.createElement('div');
   header.className = 'sp-quality__header';
   header.innerHTML = `
-    <span class="sp-quality__eyebrow">${bestMode === activeMode ? 'Recommended mode' : 'Current mode'}</span>
+    <span class="sp-quality__eyebrow">${bestMode === activeMode ? 'Recommended' : 'Current'}</span>
     <strong class="sp-quality__title">${getModeLabel(activeMode)}</strong>
-    <span class="sp-quality__meta">${quality ? `${quality.score}/100 · ${getQualityTone(quality.score)}` : 'Fallback mode'}</span>
+    <span class="sp-quality__meta">${quality ? `${quality.score}/100 ï¿½ ${getQualityTone(quality.score)}` : 'Fallback mode'}</span>
   `;
   block.appendChild(header);
 
@@ -342,7 +359,7 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
       for (const warning of quality.warnings) {
         const item = document.createElement('span');
         item.className = 'sp-quality__warning';
-        item.textContent = compact ? warning.replaceAll('_', ' ').toLowerCase() : getWarningCopy(warning);
+        item.textContent = compact ? getWarningTag(warning) : `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
         warnings.appendChild(item);
       }
     }
@@ -480,7 +497,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
       btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
       const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
       btn.textContent =
-        mode === 'DOMINANT_ONLY' || !report ? msg(msgKey) : `${msg(msgKey)} · ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
+        mode === 'DOMINANT_ONLY' || !report ? msg(msgKey) : `${msg(msgKey)} ï¿½ ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
 
       if (!isSupported) btn.disabled = true;
       btn.title = summarizeMode(report, mode);

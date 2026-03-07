@@ -55,6 +55,23 @@ function getQualityTone(score: number): 'Excellent' | 'Strong' | 'Balanced' | 'F
   return 'Fragile';
 }
 
+function getWarningTag(warning: string): string {
+  switch (warning) {
+    case 'USES_SYNTHETIC_SOURCE':
+      return 'Synthetic assist';
+    case 'LOW_ROLE_DIVERSITY':
+      return 'Low separation';
+    case 'THIN_CONTRAST_MARGIN':
+      return 'Thin headroom';
+    case 'HEAVY_COLOR_ADJUSTMENT':
+      return 'Heavy adjustment';
+    case 'NEUTRAL_SOURCE_PALETTE':
+      return 'Neutral source';
+    default:
+      return 'Tradeoff';
+  }
+}
+
 function getWarningCopy(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
@@ -73,11 +90,11 @@ function getWarningCopy(warning: string): string {
 }
 
 function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return 'Most faithful fallback mode.';
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Unavailable for this palette.';
+  if (mode === 'DOMINANT_ONLY') return 'Safest fallback for this palette.';
+  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Cannot meet contrast targets in this mode.';
   const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} match with clear contrast.`;
-  return `${getQualityTone(quality.score)} match with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
+  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} fit with clear contrast.`;
+  return `${getQualityTone(quality.score)} fit with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
 }
 
 function ensureModeSelection(report: CompatibilityReport): void {
@@ -226,7 +243,7 @@ function init(): void {
   modeSection.appendChild(modeGrid);
   app.appendChild(modeSection);
 
-  const qualitySection = createSection('Quality');
+  const qualitySection = createSection('Mode fit');
   const qualityContainer = document.createElement('div');
   qualityContainer.className = 'quality-panel';
   qualityContainer.id = 'quality-summary';
@@ -425,7 +442,7 @@ function updateModeGrid(): void {
     if (mode === bestMode && mode !== 'DOMINANT_ONLY') {
       const badge = document.createElement('span');
       badge.className = 'mode-card__badge';
-      badge.textContent = 'Best';
+      badge.textContent = 'Top';
       labelRow.appendChild(badge);
     }
 
@@ -460,7 +477,7 @@ function updateQualitySummary(): void {
   container.innerHTML = '';
 
   if (!selectedPalette) {
-    container.innerHTML = '<p class="quality-panel__empty">Choose a country to see the recommended mode and tradeoffs.</p>';
+    container.innerHTML = '<p class="quality-panel__empty">Choose a country to see the best mode and its tradeoffs.</p>';
     return;
   }
 
@@ -475,7 +492,7 @@ function updateQualitySummary(): void {
 
   const heroLabel = document.createElement('span');
   heroLabel.className = 'quality-panel__eyebrow';
-  heroLabel.textContent = bestMode === activeMode ? 'Recommended mode' : 'Current mode';
+  heroLabel.textContent = bestMode === activeMode ? 'Recommended' : 'Current';
 
   const heroTitle = document.createElement('div');
   heroTitle.className = 'quality-panel__title';
@@ -484,15 +501,15 @@ function updateQualitySummary(): void {
   const heroMeta = document.createElement('div');
   heroMeta.className = 'quality-panel__meta';
   heroMeta.textContent = quality
-    ? `${quality.score}/100 · ${getQualityTone(quality.score)} match`
-    : 'Fallback mode with the most flag-faithful defaults';
+    ? `${quality.score}/100 ï¿½ ${getQualityTone(quality.score)} match`
+    : 'Safe fallback with the most stable defaults';
 
   const heroBody = document.createElement('p');
   heroBody.className = 'quality-panel__body';
   heroBody.textContent =
     activeMode === 'DOMINANT_ONLY'
-      ? 'Use this when you want the safest palette, even if it is less specialized than AMOLED, Dark or Light.'
-      : `Best automatic recommendation is ${getModeLabel(bestMode)}. ${summarizeMode(report, activeMode)}`;
+      ? 'Use this when you want the safest palette, even if it is less specialized than the dedicated modes.'
+      : `Best automatic pick is ${getModeLabel(bestMode)}. ${summarizeMode(report, activeMode)}`;
 
   hero.appendChild(heroLabel);
   hero.appendChild(heroTitle);
@@ -526,7 +543,7 @@ function updateQualitySummary(): void {
       for (const warning of quality.warnings) {
         const item = document.createElement('div');
         item.className = 'quality-warning';
-        item.textContent = getWarningCopy(warning);
+        item.textContent = `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
         warningWrap.appendChild(item);
       }
     }

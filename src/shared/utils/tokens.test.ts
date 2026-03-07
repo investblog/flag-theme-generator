@@ -67,6 +67,7 @@ describe('evaluateCompatibility', () => {
     expect(report.supports.AMOLED).toBe(true);
     expect(report.supports.DARK).toBe(true);
     expect(report.supports.LIGHT).toBe(true);
+    expect(report.quality.AMOLED.warnings).toContain('NEUTRAL_SOURCE_PALETTE');
   });
 
   it('drift warnings do not automatically disable a mode', () => {
@@ -75,6 +76,21 @@ describe('evaluateCompatibility', () => {
     const hasDriftReason = report.reasons.some((r) => r.code === 'EXCESSIVE_COLOR_SHIFT_REQUIRED');
     expect(hasDriftReason).toBe(true);
     expect(report.supports.AMOLED || report.supports.DARK || report.supports.LIGHT).toBe(true);
+  });
+
+  it('exposes quality metrics in expected ranges', () => {
+    const palette = makePalette(['#002868', '#bf0a30', '#ffffff']);
+    const report = evaluateCompatibility(palette, 0.7);
+    for (const mode of ['AMOLED', 'DARK', 'LIGHT'] as const) {
+      expect(report.quality[mode].score).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].score).toBeLessThanOrEqual(100);
+      expect(report.quality[mode].fidelity).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].fidelity).toBeLessThanOrEqual(1);
+      expect(report.quality[mode].contrastHeadroom).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].contrastHeadroom).toBeLessThanOrEqual(1);
+      expect(report.quality[mode].distinctness).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].distinctness).toBeLessThanOrEqual(1);
+    }
   });
 
   it('problematic real palettes now support all three modes', () => {
@@ -86,6 +102,9 @@ describe('evaluateCompatibility', () => {
       expect(report.supports.AMOLED, `${code} AMOLED`).toBe(true);
       expect(report.supports.DARK, `${code} DARK`).toBe(true);
       expect(report.supports.LIGHT, `${code} LIGHT`).toBe(true);
+      expect(report.quality.AMOLED.score, `${code} AMOLED quality`).toBeGreaterThan(35);
+      expect(report.quality.DARK.score, `${code} DARK quality`).toBeGreaterThan(35);
+      expect(report.quality.LIGHT.score, `${code} LIGHT quality`).toBeGreaterThan(35);
     }
   });
 

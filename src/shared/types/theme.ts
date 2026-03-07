@@ -6,7 +6,7 @@ export interface FlagPalette {
   countryCode: CountryCode;
   name_en: string;
   name_ru: string;
-  /** 2–6 hex colors from the flag */
+  /** 2-6 hex colors from the flag */
   flagColors: [string, string, ...string[]];
   /** BCP 47 locale tags this palette maps to */
   recommendedLocales: string[];
@@ -18,9 +18,9 @@ export interface FlagPalette {
 export type ThemeMode = 'AMOLED' | 'DARK' | 'LIGHT' | 'DOMINANT_ONLY';
 
 /**
- * Controls max allowed color drift (ΔE).
- * - ~0.9 strict → 10–12 ΔE cap
- * - ~0.3 relaxed → 18–24 ΔE cap
+ * Controls max allowed color drift (deltaE).
+ * - ~0.9 strict -> 10-12 deltaE cap
+ * - ~0.3 relaxed -> 18-24 deltaE cap
  */
 export type Strictness = number;
 
@@ -42,13 +42,13 @@ export interface ThemeTokens {
 export interface AdjustmentResult {
   /** Final adjusted hex color */
   color: string;
-  /** CIE ΔE distance from original */
+  /** CIE deltaE distance from original */
   deltaE: number;
   /** Whether the adjusted color meets the required contrast */
   passes: boolean;
 }
 
-/** Reason a mode was disabled */
+/** Reason a mode was disabled or degraded */
 export interface CompatibilityReason {
   mode: ThemeMode;
   code: ReasonCode;
@@ -61,11 +61,27 @@ export type ReasonCode =
   | 'EXCESSIVE_COLOR_SHIFT_REQUIRED'
   | 'NEUTRAL_ONLY_FLAG';
 
+export type QualityWarningCode =
+  | 'USES_SYNTHETIC_SOURCE'
+  | 'LOW_ROLE_DIVERSITY'
+  | 'THIN_CONTRAST_MARGIN'
+  | 'HEAVY_COLOR_ADJUSTMENT'
+  | 'NEUTRAL_SOURCE_PALETTE';
+
 /** Per-mode metrics: maps each contrast pair label to its ratio */
 export type ModeMetrics = Record<string, Record<string, number>>;
 
 /** Per-mode adjustments: maps each token to its shift info */
 export type ModeAdjustments = Record<string, Record<string, { from: string; to: string; deltaE: number }>>;
+
+/** Per-mode quality summary for ranking and UI */
+export interface ModeQuality {
+  score: number;
+  fidelity: number;
+  contrastHeadroom: number;
+  distinctness: number;
+  warnings: QualityWarningCode[];
+}
 
 /** Full compatibility report for a palette at a given strictness */
 export interface CompatibilityReport {
@@ -74,6 +90,7 @@ export interface CompatibilityReport {
   reasons: CompatibilityReason[];
   metrics: ModeMetrics;
   adjustments: ModeAdjustments;
+  quality: Record<'AMOLED' | 'DARK' | 'LIGHT', ModeQuality>;
 }
 
 /** WCAG contrast thresholds */
@@ -96,7 +113,7 @@ export interface ContrastPair {
   label: string;
 }
 
-/** All required contrast pairs per spec §6.2 */
+/** All required contrast pairs per spec section 6.2 */
 export const REQUIRED_PAIRS: ContrastPair[] = [
   { a: 'text', b: 'bg', threshold: 4.5, label: 'text / bg' },
   { a: 'text', b: 'surface', threshold: 4.5, label: 'text / surface' },

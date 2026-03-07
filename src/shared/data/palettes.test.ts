@@ -47,7 +47,7 @@ describe('PALETTES data integrity', () => {
     expect(new Set(codes).size).toBe(codes.length);
   });
 
-  it('each palette has 2–6 valid hex colors', () => {
+  it('each palette has 2-6 valid hex colors', () => {
     for (const p of PALETTES) {
       expect(p.flagColors.length).toBeGreaterThanOrEqual(2);
       expect(p.flagColors.length).toBeLessThanOrEqual(6);
@@ -102,7 +102,7 @@ describe('palette lookups', () => {
   });
 });
 
-describe('pipeline smoke test — all palettes', { timeout: 60_000 }, () => {
+describe('pipeline smoke test all palettes', { timeout: 60_000 }, () => {
   it('every palette generates valid DOMINANT_ONLY tokens passing all pairs', () => {
     for (const palette of PALETTES) {
       const tokens = generateTokens(palette, 'DOMINANT_ONLY', 0.7);
@@ -121,6 +121,12 @@ describe('pipeline smoke test — all palettes', { timeout: 60_000 }, () => {
       expect(report.supports).toHaveProperty('LIGHT');
       expect(report.metrics).toBeDefined();
       expect(report.adjustments).toBeDefined();
+      expect(report.quality).toBeDefined();
+      for (const mode of ['AMOLED', 'DARK', 'LIGHT'] as const) {
+        expect(report.quality[mode].score).toBeGreaterThanOrEqual(0);
+        expect(report.quality[mode].score).toBeLessThanOrEqual(100);
+        expect(report.quality[mode].warnings).toBeInstanceOf(Array);
+      }
     }
   });
 });

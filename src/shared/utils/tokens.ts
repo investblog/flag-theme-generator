@@ -4,6 +4,8 @@ import type {
   FlagPalette,
   ModeAdjustments,
   ModeMetrics,
+  ModeQuality,
+  QualityWarningCode,
   Strictness,
   ThemeMode,
   ThemeTokens,
@@ -87,6 +89,22 @@ interface RoleAssignment {
   link: string;
   focusRing: string;
   borderHueSource: string | null;
+}
+
+interface TokensWithSources {
+  tokens: ThemeTokens;
+  sources: Record<string, string>;
+  assignment: RoleAssignment;
+  profiles: CandidateProfile[];
+  syntheticUsed: boolean;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 function buildCandidatePool(flagColors: string[], bg: string): CandidatePool {
@@ -396,9 +414,61 @@ function tintBorder(presetBorder: string, flagColors: string[], bg: string, surf
   return presetBorder;
 }
 
-interface TokensWithSources {
-  tokens: ThemeTokens;
-  sources: Record<string, string>;
+function buildModeQuality(
+  mode: ThemeMode,
+  tokens: ThemeTokens,
+  reasonsForMode: CompatibilityReason[],
+  modeMetrics: Record<string, number>,
+  modeAdjustments: Record<string, { from: string; to: string; deltaE: number }>,
+  assignment: RoleAssignment,
+  profiles: CandidateProfile[],
+  syntheticUsed: boolean,
+  isNeutral: boolean,
+): ModeQuality {
+  const margins = REQUIRED_PAIRS.map((pair) => modeMetrics[pair.label] - pair.threshold);
+  const minMargin = Math.min(...margins);
+  const avgMargin = margins.reduce((sum, margin) => sum + margin, 0) / margins.length;
+  const contrastHeadroom = clamp01((avgMargin + Math.max(0, minMargin)) / 3.5);
+
+  const distinctnessValues = [
+    colorDeltaE(tokens.link, tokens.accent) / MIN_DIVERSITY_DE,
+    colorDeltaE(tokens.focusRing, tokens.accent2) / MIN_DIVERSITY_DE,
+    colorDeltaE(tokens.accent, tokens.accent2) / SOFT_DIVERSITY_DE,
+  ];
+  const distinctness = clamp01(distinctnessValues.reduce((sum, value) => sum + Math.min(value, 1.4), 0) / distinctnessValues.length);
+
+  const adjustmentValues = Object.values(modeAdjustments).map((entry) => entry.deltaE);
+  const avgDelta = adjustmentValues.reduce((sum, value) => sum + value, 0) / adjustmentValues.length;
+  const maxDelta = Math.max(...adjustmentValues, 0);
+  const fidelity = clamp01(1 - avgDelta / 28 - Math.max(0, maxDelta - 18) / 60);
+
+  const warnings = new Set<QualityWarningCode>();
+  if (syntheticUsed) warnings.add('USES_SYNTHETIC_SOURCE');
+  if (distinctness < 0.82) warnings.add('LOW_ROLE_DIVERSITY');
+  if (contrastHeadroom < 0.45 || minMargin < 0.35) warnings.add('THIN_CONTRAST_MARGIN');
+  if (fidelity < 0.55 || reasonsForMode.some((reason) => reason.code === 'EXCESSIVE_COLOR_SHIFT_REQUIRED')) {
+    warnings.add('HEAVY_COLOR_ADJUSTMENT');
+  }
+  if (isNeutral) warnings.add('NEUTRAL_SOURCE_PALETTE');
+
+  const assignedProfiles = [assignment.accent, assignment.accent2, assignment.link, assignment.focusRing]
+    .map((source) => getProfile(profiles, source))
+    .filter((profile): profile is CandidateProfile => Boolean(profile));
+  const nativeInteractiveShare =
+    assignedProfiles.length === 0
+      ? 0
+      : assignedProfiles.filter((profile) => profile.class === 'interactive' && !profile.synthetic).length /
+        assignedProfiles.length;
+
+  const score = clamp01(fidelity * 0.38 + contrastHeadroom * 0.32 + distinctness * 0.2 + nativeInteractiveShare * 0.1);
+
+  return {
+    score: round2(score * 100),
+    fidelity: round2(fidelity),
+    contrastHeadroom: round2(contrastHeadroom),
+    distinctness: round2(distinctness),
+    warnings: [...warnings],
+  };
 }
 
 function generateTokensInternal(palette: FlagPalette, mode: ThemeMode, strictness: Strictness): TokensWithSources {
@@ -464,6 +534,11 @@ function generateTokensInternal(palette: FlagPalette, mode: ThemeMode, strictnes
       focusRing: assignment.focusRing,
       accentText: accentTextBase,
     },
+    assignment,
+    profiles,
+    syntheticUsed: [...pool.synthetic].some((source) =>
+      [assignment.accent, assignment.accent2, assignment.link, assignment.focusRing].includes(source),
+    ),
   };
 }
 
@@ -477,13 +552,19 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
   const reasons: CompatibilityReason[] = [];
   const metrics: ModeMetrics = {};
   const adjustments: ModeAdjustments = {};
+  const quality: CompatibilityReport['quality'] = {
+    AMOLED: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+    DARK: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+    LIGHT: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+  };
 
   const isNeutral = palette.flagColors.every((c) => colorChroma(c) < 10);
 
   for (const mode of modes) {
-    const { tokens, sources } = generateTokensInternal(palette, mode, strictness);
+    const { tokens, sources, assignment, profiles, syntheticUsed } = generateTokensInternal(palette, mode, strictness);
     const modeMetrics: Record<string, number> = {};
     const modeAdjustments: Record<string, { from: string; to: string; deltaE: number }> = {};
+    const reasonStart = reasons.length;
     let modePass = true;
 
     for (const pair of REQUIRED_PAIRS) {
@@ -525,11 +606,26 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
       reasons.push({ mode, code: 'NEUTRAL_ONLY_FLAG' });
     }
 
+    const reasonsForMode = reasons.slice(reasonStart).filter((reason) => reason.mode === mode);
+    quality[mode] = buildModeQuality(
+      mode,
+      tokens,
+      reasonsForMode,
+      modeMetrics,
+      modeAdjustments,
+      assignment,
+      profiles,
+      syntheticUsed,
+      isNeutral,
+    );
+
     supports[mode] = modePass;
     metrics[mode] = modeMetrics;
     adjustments[mode] = modeAdjustments;
   }
 
   const dominantOnlyRequired = !supports.AMOLED && !supports.DARK && !supports.LIGHT;
-  return { supports, dominantOnlyRequired, reasons, metrics, adjustments };
+  return { supports, dominantOnlyRequired, reasons, metrics, adjustments, quality };
 }
+
+

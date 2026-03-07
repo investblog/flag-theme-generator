@@ -120,5 +120,173 @@
   "noResults": {
     "message": "No countries match your search.",
     "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "Mode fit",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "Choose a country to see the best mode and its tradeoffs.",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "Recommended",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "Current",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "Top",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "Safe",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "Safe fallback with the most stable defaults",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "Use this when you want the safest palette, even if it is less specialized than the dedicated modes.",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "No notable tradeoffs in this mode.",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "Best automatic pick is $MODE$. $SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Dark"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "Strong fit with clear contrast."
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "Excellent",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "Strong",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "Balanced",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "Fragile",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "Safest fallback for this palette.",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "Cannot meet contrast targets in this mode.",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "$TONE$ fit with clear contrast.",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Strong"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "$TONE$ fit with $COUNT$ tradeoff(s).",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Balanced"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - $TONE$ fit",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "Strong"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "Fidelity",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "Headroom",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "Distinctness",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "Distinct",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "Synthetic assist",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "Low separation",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "Thin headroom",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "Heavy adjustment",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "Neutral source",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "One interactive color is synthesized to complete the palette.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "Interactive roles are visually close, so links and accents feel less separated.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "Contrast passes, but with limited headroom.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "Flag colors needed stronger correction to stay readable.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "The source flag is mostly neutral, so the result is less color-faithful.",
+    "description": "Warning explanation"
   }
 }

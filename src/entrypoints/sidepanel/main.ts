@@ -47,10 +47,10 @@ const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
 
 const SUPPORTED_MODES: ThemeMode[] = ['AMOLED', 'DARK', 'LIGHT'];
 
-function msg(key: string): string {
+function msg(key: string, ...subs: string[]): string {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return browser.i18n.getMessage(key as any) || key;
+    return browser.i18n.getMessage(key as any, subs) || key;
   } catch {
     return key;
   }
@@ -66,53 +66,65 @@ function getBestMode(report: CompatibilityReport): ThemeMode {
   return [...supported].sort((a, b) => report.quality[b as 'AMOLED' | 'DARK' | 'LIGHT'].score - report.quality[a as 'AMOLED' | 'DARK' | 'LIGHT'].score)[0];
 }
 
-function getQualityTone(score: number): 'Excellent' | 'Strong' | 'Balanced' | 'Fragile' {
-  if (score >= 90) return 'Excellent';
-  if (score >= 78) return 'Strong';
-  if (score >= 62) return 'Balanced';
-  return 'Fragile';
+function getQualityTone(score: number): string {
+  if (score >= 90) return msg('qualityToneExcellent');
+  if (score >= 78) return msg('qualityToneStrong');
+  if (score >= 62) return msg('qualityToneBalanced');
+  return msg('qualityToneFragile');
+}
+
+function getWarningSeverity(warning: string): 'info' | 'warning' | 'caution' {
+  switch (warning) {
+    case 'HEAVY_COLOR_ADJUSTMENT':
+      return 'caution';
+    case 'LOW_ROLE_DIVERSITY':
+    case 'THIN_CONTRAST_MARGIN':
+      return 'warning';
+    default:
+      return 'info';
+  }
 }
 
 function getWarningTag(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
-      return 'Synthetic assist';
+      return msg('qualityWarningTagSynthetic');
     case 'LOW_ROLE_DIVERSITY':
-      return 'Low separation';
+      return msg('qualityWarningTagDiversity');
     case 'THIN_CONTRAST_MARGIN':
-      return 'Thin headroom';
+      return msg('qualityWarningTagHeadroom');
     case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'Heavy adjustment';
+      return msg('qualityWarningTagAdjustment');
     case 'NEUTRAL_SOURCE_PALETTE':
-      return 'Neutral source';
+      return msg('qualityWarningTagNeutral');
     default:
-      return 'Tradeoff';
+      return msg('qualityWarningTagAdjustment');
   }
 }
 
 function getWarningCopy(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
-      return 'One interactive color is synthesized to complete the palette.';
+      return msg('qualityWarningCopySynthetic');
     case 'LOW_ROLE_DIVERSITY':
-      return 'Links, accents or focus states are visually close.';
+      return msg('qualityWarningCopyDiversity');
     case 'THIN_CONTRAST_MARGIN':
-      return 'Contrast passes, but with limited headroom.';
+      return msg('qualityWarningCopyHeadroom');
     case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'Flag colors needed stronger correction to stay readable.';
+      return msg('qualityWarningCopyAdjustment');
     case 'NEUTRAL_SOURCE_PALETTE':
-      return 'This flag is mostly neutral, so the palette is less color-faithful.';
+      return msg('qualityWarningCopyNeutral');
     default:
-      return warning;
+      return msg('qualityWarningCopyAdjustment');
   }
 }
 
 function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return 'Safest fallback for this palette.';
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Cannot meet contrast targets in this mode.';
+  if (mode === 'DOMINANT_ONLY') return msg('qualitySummaryFallback');
+  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return msg('qualitySummaryUnavailable');
   const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} fit.`;
-  return `${getQualityTone(quality.score)} fit with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
+  if (quality.warnings.length === 0) return msg('qualitySummaryClear', getQualityTone(quality.score));
+  return msg('qualitySummaryTradeoffs', getQualityTone(quality.score), String(quality.warnings.length));
 }
 
 function ensureModeSelection(report: CompatibilityReport): void {
@@ -319,7 +331,7 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
   const header = document.createElement('div');
   header.className = 'sp-quality__header';
   header.innerHTML = `
-    <span class="sp-quality__eyebrow">${bestMode === activeMode ? 'Recommended' : 'Current'}</span>
+    <span class="sp-quality__eyebrow">${bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent')}</span>
     <strong class="sp-quality__title">${getModeLabel(activeMode)}</strong>
     <span class="sp-quality__meta">${quality ? `${quality.score}/100 � ${getQualityTone(quality.score)}` : 'Fallback mode'}</span>
   `;
@@ -329,17 +341,17 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
   body.className = 'sp-quality__body';
   body.textContent =
     activeMode === 'DOMINANT_ONLY'
-      ? 'Use this when you want the safest theme with the least interpretation.'
-      : `Best automatic pick is ${getModeLabel(bestMode)}. ${summarizeMode(report, activeMode)}`;
+      ? msg('qualitySafeBody')
+      : msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, activeMode));
   block.appendChild(body);
 
   if (quality) {
     const stats = document.createElement('div');
     stats.className = 'sp-quality__stats';
     for (const [label, value] of [
-      ['Fidelity', quality.fidelity],
-      ['Headroom', quality.contrastHeadroom],
-      ['Distinct', quality.distinctness],
+      [msg('qualityStatFidelity'), quality.fidelity],
+      [msg('qualityStatHeadroom'), quality.contrastHeadroom],
+      [msg('qualityStatDistinct'), quality.distinctness],
     ] as const) {
       const chip = document.createElement('span');
       chip.className = 'sp-quality__stat';
@@ -353,13 +365,14 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
     if (quality.warnings.length === 0) {
       const item = document.createElement('span');
       item.className = 'sp-quality__warning sp-quality__warning--ok';
-      item.textContent = 'No notable tradeoffs';
+      item.textContent = msg('qualityNoTradeoffs');
       warnings.appendChild(item);
     } else {
       for (const warning of quality.warnings) {
         const item = document.createElement('span');
         item.className = 'sp-quality__warning';
-        item.textContent = compact ? getWarningTag(warning) : `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
+        item.className = `sp-quality__warning sp-quality__warning--${getWarningSeverity(warning)}`;
+      item.textContent = compact ? getWarningTag(warning) : `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
         warnings.appendChild(item);
       }
     }

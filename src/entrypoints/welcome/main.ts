@@ -48,53 +48,65 @@ function getBestMode(report: CompatibilityReport): ThemeMode {
   return [...supported].sort((a, b) => report.quality[b as 'AMOLED' | 'DARK' | 'LIGHT'].score - report.quality[a as 'AMOLED' | 'DARK' | 'LIGHT'].score)[0];
 }
 
-function getQualityTone(score: number): 'Excellent' | 'Strong' | 'Balanced' | 'Fragile' {
-  if (score >= 90) return 'Excellent';
-  if (score >= 78) return 'Strong';
-  if (score >= 62) return 'Balanced';
-  return 'Fragile';
+function getQualityTone(score: number): string {
+  if (score >= 90) return msg('qualityToneExcellent');
+  if (score >= 78) return msg('qualityToneStrong');
+  if (score >= 62) return msg('qualityToneBalanced');
+  return msg('qualityToneFragile');
+}
+
+function getWarningSeverity(warning: string): 'info' | 'warning' | 'caution' {
+  switch (warning) {
+    case 'HEAVY_COLOR_ADJUSTMENT':
+      return 'caution';
+    case 'LOW_ROLE_DIVERSITY':
+    case 'THIN_CONTRAST_MARGIN':
+      return 'warning';
+    default:
+      return 'info';
+  }
 }
 
 function getWarningTag(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
-      return 'Synthetic assist';
+      return msg('qualityWarningTagSynthetic');
     case 'LOW_ROLE_DIVERSITY':
-      return 'Low separation';
+      return msg('qualityWarningTagDiversity');
     case 'THIN_CONTRAST_MARGIN':
-      return 'Thin headroom';
+      return msg('qualityWarningTagHeadroom');
     case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'Heavy adjustment';
+      return msg('qualityWarningTagAdjustment');
     case 'NEUTRAL_SOURCE_PALETTE':
-      return 'Neutral source';
+      return msg('qualityWarningTagNeutral');
     default:
-      return 'Tradeoff';
+      return msg('qualityWarningTagAdjustment');
   }
 }
 
 function getWarningCopy(warning: string): string {
   switch (warning) {
     case 'USES_SYNTHETIC_SOURCE':
-      return 'One interactive color is synthesized to complete the palette.';
+      return msg('qualityWarningCopySynthetic');
     case 'LOW_ROLE_DIVERSITY':
-      return 'Interactive roles are visually close, so links and accents feel less separated.';
+      return msg('qualityWarningCopyDiversity');
     case 'THIN_CONTRAST_MARGIN':
-      return 'Contrast passes, but with limited headroom.';
+      return msg('qualityWarningCopyHeadroom');
     case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'Flag colors needed stronger correction to stay readable.';
+      return msg('qualityWarningCopyAdjustment');
     case 'NEUTRAL_SOURCE_PALETTE':
-      return 'The source flag is mostly neutral, so the result is less color-faithful.';
+      return msg('qualityWarningCopyNeutral');
     default:
-      return warning;
+      return msg('qualityWarningCopyAdjustment');
   }
 }
 
 function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return 'Safest fallback for this palette.';
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Cannot meet contrast targets in this mode.';
+  if (mode === 'DOMINANT_ONLY') return msg('qualitySummaryFallback');
+  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return msg('qualitySummaryUnavailable');
   const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} fit with clear contrast.`;
-  return `${getQualityTone(quality.score)} fit with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
+  if (quality.warnings.length === 0) return msg('qualitySummaryClear', getQualityTone(quality.score));
+  return msg('qualitySummaryTradeoffs', getQualityTone(quality.score), String(quality.warnings.length));
 }
 
 function ensureModeSelection(report: CompatibilityReport): void {
@@ -243,7 +255,7 @@ function init(): void {
   modeSection.appendChild(modeGrid);
   app.appendChild(modeSection);
 
-  const qualitySection = createSection('Mode fit');
+  const qualitySection = createSection('qualitySection');
   const qualityContainer = document.createElement('div');
   qualityContainer.className = 'quality-panel';
   qualityContainer.id = 'quality-summary';
@@ -442,7 +454,7 @@ function updateModeGrid(): void {
     if (mode === bestMode && mode !== 'DOMINANT_ONLY') {
       const badge = document.createElement('span');
       badge.className = 'mode-card__badge';
-      badge.textContent = 'Top';
+      badge.textContent = msg('qualityTop');
       labelRow.appendChild(badge);
     }
 
@@ -477,7 +489,7 @@ function updateQualitySummary(): void {
   container.innerHTML = '';
 
   if (!selectedPalette) {
-    container.innerHTML = '<p class="quality-panel__empty">Choose a country to see the best mode and its tradeoffs.</p>';
+    container.innerHTML = `<p class="quality-panel__empty">${msg('qualityEmpty')}</p>`;
     return;
   }
 
@@ -492,7 +504,7 @@ function updateQualitySummary(): void {
 
   const heroLabel = document.createElement('span');
   heroLabel.className = 'quality-panel__eyebrow';
-  heroLabel.textContent = bestMode === activeMode ? 'Recommended' : 'Current';
+  heroLabel.textContent = bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent');
 
   const heroTitle = document.createElement('div');
   heroTitle.className = 'quality-panel__title';
@@ -502,14 +514,14 @@ function updateQualitySummary(): void {
   heroMeta.className = 'quality-panel__meta';
   heroMeta.textContent = quality
     ? `${quality.score}/100 � ${getQualityTone(quality.score)} match`
-    : 'Safe fallback with the most stable defaults';
+    : msg('qualitySafeMeta');
 
   const heroBody = document.createElement('p');
   heroBody.className = 'quality-panel__body';
   heroBody.textContent =
     activeMode === 'DOMINANT_ONLY'
-      ? 'Use this when you want the safest palette, even if it is less specialized than the dedicated modes.'
-      : `Best automatic pick is ${getModeLabel(bestMode)}. ${summarizeMode(report, activeMode)}`;
+      ? msg('qualitySafeBody')
+      : msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, activeMode));
 
   hero.appendChild(heroLabel);
   hero.appendChild(heroTitle);
@@ -521,9 +533,9 @@ function updateQualitySummary(): void {
     const stats = document.createElement('div');
     stats.className = 'quality-panel__stats';
     for (const [label, value] of [
-      ['Fidelity', quality.fidelity],
-      ['Headroom', quality.contrastHeadroom],
-      ['Distinctness', quality.distinctness],
+      [msg('qualityStatFidelity'), quality.fidelity],
+      [msg('qualityStatHeadroom'), quality.contrastHeadroom],
+      [msg('qualityStatDistinctness'), quality.distinctness],
     ] as const) {
       const stat = document.createElement('div');
       stat.className = 'quality-stat';
@@ -537,12 +549,12 @@ function updateQualitySummary(): void {
     if (quality.warnings.length === 0) {
       const item = document.createElement('div');
       item.className = 'quality-warning quality-warning--ok';
-      item.textContent = 'No notable tradeoffs in this mode.';
+      item.textContent = msg('qualityNoTradeoffs');
       warningWrap.appendChild(item);
     } else {
       for (const warning of quality.warnings) {
         const item = document.createElement('div');
-        item.className = 'quality-warning';
+        item.className = `quality-warning quality-warning--${getWarningSeverity(warning)}`;
         item.textContent = `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
         warningWrap.appendChild(item);
       }

@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 dist/
+build/
 .output/
 
 # WXT
@@ -36,3 +37,6 @@ temp/
 # Claude Code local settings & instructions
 .claude/
 CLAUDE.md
+
+# AI agent configs
+AGENTS.md

@@ -5,9 +5,20 @@ import type { MessageResponse } from '@shared/types/messages';
 import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { exportCSS } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
+import {
+  getBestMode,
+  getModeLabel,
+  getQualityTone,
+  getWarningCopy,
+  getWarningSeverity,
+  getWarningTag,
+  MODE_KEYS,
+  msg,
+  pickMode,
+  summarizeMode,
+} from '@shared/utils/quality';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
-/** Token cards — each shows its hex on the competing background color. */
 const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeTokens; fg: keyof ThemeTokens }[] = [
   { key: 'bg', label: 'BG', bg: 'bg', fg: 'text' },
   { key: 'surface', label: 'Surface', bg: 'surface', fg: 'text' },
@@ -21,25 +32,6 @@ const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeToken
   { key: 'focusRing', label: 'Focus', bg: 'surface', fg: 'focusRing' },
 ];
 
-const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
-  { mode: 'AMOLED', msgKey: 'modeAmoled' },
-  { mode: 'DARK', msgKey: 'modeDark' },
-  { mode: 'LIGHT', msgKey: 'modeLight' },
-  { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
-];
-
-/** Safe i18n helper — returns key if browser.i18n unavailable. */
-function msg(key: string, ...subs: string[]): string {
-  try {
-    // Dynamic key from data arrays — cast needed for WXT strict i18n types
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return browser.i18n.getMessage(key as any, subs) || key;
-  } catch {
-    return key;
-  }
-}
-
-// State
 let selectedPalette: FlagPalette | null = null;
 let selectedMode: ThemeMode = 'DOMINANT_ONLY';
 let currentStrictness = 0.7;
@@ -61,7 +53,6 @@ function init(): void {
   app.innerHTML = '';
   app.className = 'welcome';
 
-  // Header
   const header = document.createElement('header');
   header.className = 'welcome__header';
   header.innerHTML = `
@@ -70,7 +61,6 @@ function init(): void {
   `;
   app.appendChild(header);
 
-  // Detect locale and auto-recommend
   let locale = 'en';
   try {
     locale = browser.i18n.getUILanguage();
@@ -82,17 +72,13 @@ function init(): void {
   const ambiguous = isAmbiguousLocale(locale);
   const localeMatches = matchPalettesForLocale(locale);
 
-  // Country picker section
   const countrySection = createSection('welcomeChooseCountry');
-
-  // Search input
   const searchInput = document.createElement('input');
   searchInput.type = 'text';
   searchInput.className = 'welcome__search';
   searchInput.placeholder = msg('searchPlaceholder');
   countrySection.appendChild(searchInput);
 
-  // Region filter chips (Antarctica only via search)
   const regions = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'];
   const filtersRow = document.createElement('div');
   filtersRow.className = 'welcome__filters';
@@ -114,7 +100,6 @@ function init(): void {
   }
   countrySection.appendChild(filtersRow);
 
-  // Wave 1 top-20 by population — shown by default
   const WAVE1 = new Set([
     'IN',
     'CN',
@@ -141,13 +126,11 @@ function init(): void {
   const grid = document.createElement('div');
   grid.className = 'country-grid';
 
-  // Empty state
   const emptyState = document.createElement('div');
   emptyState.className = 'welcome__empty';
   emptyState.textContent = msg('noResults');
   emptyState.hidden = true;
 
-  // Show locale matches first, then rest
   const orderedPalettes = ambiguous
     ? [...localeMatches, ...PALETTES.filter((p) => !localeMatches.includes(p))]
     : PALETTES;
@@ -159,7 +142,6 @@ function init(): void {
   countrySection.appendChild(grid);
   countrySection.appendChild(emptyState);
 
-  // Filter logic: default shows only Wave 1, search/filter reveals all
   function filterCountryGrid(): void {
     const query = searchInput.value.trim().toLowerCase();
     const isFiltering = !!query || !!activeRegion;
@@ -172,7 +154,6 @@ function init(): void {
 
       let visible: boolean;
       if (!isFiltering) {
-        // Default: only Wave 1
         visible = WAVE1.has(code);
       } else {
         const matchesSearch =
@@ -193,16 +174,12 @@ function init(): void {
 
   searchInput.addEventListener('input', filterCountryGrid);
   app.appendChild(countrySection);
-
-  // Apply initial filter (show Wave 1 only)
   filterCountryGrid();
 
-  // Auto-select recommended or first locale match
   if (recommended) {
     selectPalette(recommended, grid);
   }
 
-  // Mode picker section
   const modeSection = createSection('welcomeChooseMode');
   const modeGrid = document.createElement('div');
   modeGrid.className = 'mode-grid';
@@ -210,7 +187,13 @@ function init(): void {
   modeSection.appendChild(modeGrid);
   app.appendChild(modeSection);
 
-  // Preview section
+  const qualitySection = createSection('qualitySection');
+  const qualityContainer = document.createElement('div');
+  qualityContainer.className = 'quality-panel';
+  qualityContainer.id = 'quality-summary';
+  qualitySection.appendChild(qualityContainer);
+  app.appendChild(qualitySection);
+
   const previewSection = createSection('welcomePreview');
   const previewContainer = document.createElement('div');
   previewContainer.className = 'token-preview';
@@ -218,29 +201,27 @@ function init(): void {
   previewSection.appendChild(previewContainer);
   app.appendChild(previewSection);
 
-  // Export button (for webmasters — works without applying)
   const exportRow = document.createElement('div');
   exportRow.className = 'welcome__section';
   const exportBtn = document.createElement('button');
   exportBtn.className = 'btn btn--ghost';
   exportBtn.id = 'btn-export';
-  exportBtn.textContent = 'Export CSS';
+  exportBtn.textContent = msg('btnExportCss');
   exportBtn.disabled = true;
   exportBtn.addEventListener('click', () => {
     if (!selectedPalette) return;
     const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
     const css = exportCSS(tokens);
     navigator.clipboard.writeText(css).then(() => {
-      exportBtn.textContent = 'Copied!';
+      exportBtn.textContent = msg('btnCopied');
       setTimeout(() => {
-        exportBtn.textContent = 'Export CSS';
+        exportBtn.textContent = msg('btnExportCss');
       }, 1500);
     });
   });
   exportRow.appendChild(exportBtn);
   app.appendChild(exportRow);
 
-  // Actions
   const actions = document.createElement('div');
   actions.className = 'welcome__section';
 
@@ -277,7 +258,6 @@ function init(): void {
   btnRow.appendChild(galleryLink);
   actions.appendChild(btnRow);
 
-  // Auto-by-locale toggle
   const toggleRow = document.createElement('div');
   toggleRow.className = 'toggle-row';
   const checkbox = document.createElement('input');
@@ -301,12 +281,11 @@ function init(): void {
 
   app.appendChild(actions);
 
-  // Load saved state
   loadSavedState(grid);
   updateModeGrid();
+  updateQualitySummary();
   updatePreview();
 
-  // Check if theme API is available (Firefox only)
   checkThemeApi().then((available) => {
     themeApiAvailable = available;
     if (!available) {
@@ -353,13 +332,15 @@ function createCountryCard(palette: FlagPalette, grid: HTMLElement): HTMLElement
 
 function selectPalette(palette: FlagPalette, grid: HTMLElement): void {
   selectedPalette = palette;
+  const report = evaluateCompatibility(selectedPalette, currentStrictness);
+  selectedMode = pickMode(selectedMode, report);
 
-  // Update selection UI
   for (const card of grid.querySelectorAll('.country-card')) {
     card.classList.toggle('country-card--selected', (card as HTMLElement).dataset.code === palette.countryCode);
   }
 
   updateModeGrid();
+  updateQualitySummary();
   updatePreview();
 
   const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
@@ -375,6 +356,8 @@ function updateModeGrid(): void {
   grid.innerHTML = '';
 
   const report = selectedPalette ? evaluateCompatibility(selectedPalette, currentStrictness) : null;
+  if (report) selectedMode = pickMode(selectedMode, report);
+  const bestMode = report ? getBestMode(report) : 'DOMINANT_ONLY';
 
   for (const { mode, msgKey } of MODE_KEYS) {
     const card = document.createElement('div');
@@ -392,19 +375,125 @@ function updateModeGrid(): void {
       card.classList.add('mode-card--selected');
     }
 
+    const labelRow = document.createElement('div');
+    labelRow.className = 'mode-card__row';
+
     const label = document.createElement('span');
     label.className = 'mode-card__label';
     label.textContent = msg(msgKey);
-    card.appendChild(label);
+    labelRow.appendChild(label);
+
+    if (mode === bestMode && mode !== 'DOMINANT_ONLY') {
+      const badge = document.createElement('span');
+      badge.className = 'mode-card__badge';
+      badge.textContent = msg('qualityTop');
+      labelRow.appendChild(badge);
+    }
+
+    const score = document.createElement('span');
+    score.className = 'mode-card__score';
+    score.textContent =
+      mode === 'DOMINANT_ONLY' || !report
+        ? msg('qualitySafeShort')
+        : `${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}/100`;
+
+    const hint = document.createElement('span');
+    hint.className = 'mode-card__hint';
+    hint.textContent = report ? summarizeMode(report, mode) : msg('pickCountryPreview');
+
+    card.appendChild(labelRow);
+    card.appendChild(score);
+    card.appendChild(hint);
 
     card.addEventListener('click', () => {
       if (!isSupported) return;
       selectedMode = mode;
       updateModeGrid();
+      updateQualitySummary();
       updatePreview();
     });
 
     grid.appendChild(card);
+  }
+}
+
+function updateQualitySummary(): void {
+  const container = document.getElementById('quality-summary');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!selectedPalette) {
+    container.innerHTML = `<p class="quality-panel__empty">${msg('qualityEmpty')}</p>`;
+    return;
+  }
+
+  const report = evaluateCompatibility(selectedPalette, currentStrictness);
+  selectedMode = pickMode(selectedMode, report);
+  const activeMode = selectedMode === 'DOMINANT_ONLY' ? getBestMode(report) : selectedMode;
+  const bestMode = getBestMode(report);
+  const quality = activeMode === 'DOMINANT_ONLY' ? null : report.quality[activeMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+
+  const hero = document.createElement('div');
+  hero.className = 'quality-panel__hero';
+
+  const heroLabel = document.createElement('span');
+  heroLabel.className = 'quality-panel__eyebrow';
+  heroLabel.textContent = bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent');
+
+  const heroTitle = document.createElement('div');
+  heroTitle.className = 'quality-panel__title';
+  heroTitle.textContent = getModeLabel(activeMode);
+
+  const heroMeta = document.createElement('div');
+  heroMeta.className = 'quality-panel__meta';
+  heroMeta.textContent = quality
+    ? msg('qualityMeta', String(quality.score), getQualityTone(quality.score))
+    : msg('qualitySafeMeta');
+
+  const heroBody = document.createElement('p');
+  heroBody.className = 'quality-panel__body';
+  heroBody.textContent =
+    activeMode === 'DOMINANT_ONLY'
+      ? msg('qualitySafeBody')
+      : msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, activeMode));
+
+  hero.appendChild(heroLabel);
+  hero.appendChild(heroTitle);
+  hero.appendChild(heroMeta);
+  hero.appendChild(heroBody);
+  container.appendChild(hero);
+
+  if (quality) {
+    const stats = document.createElement('div');
+    stats.className = 'quality-panel__stats';
+    for (const [label, value] of [
+      [msg('qualityStatFidelity'), quality.fidelity],
+      [msg('qualityStatHeadroom'), quality.contrastHeadroom],
+      [msg('qualityStatDistinctness'), quality.distinctness],
+    ] as const) {
+      const stat = document.createElement('div');
+      stat.className = 'quality-stat';
+      stat.innerHTML = `<span class="quality-stat__label">${label}</span><strong class="quality-stat__value">${Math.round(value * 100)}%</strong>`;
+      stats.appendChild(stat);
+    }
+    container.appendChild(stats);
+
+    const warningWrap = document.createElement('div');
+    warningWrap.className = 'quality-panel__warnings';
+    if (quality.warnings.length === 0) {
+      const item = document.createElement('div');
+      item.className = 'quality-warning quality-warning--ok';
+      item.textContent = msg('qualityNoTradeoffs');
+      warningWrap.appendChild(item);
+    } else {
+      for (const warning of quality.warnings) {
+        const item = document.createElement('div');
+        item.className = `quality-warning quality-warning--${getWarningSeverity(warning)}`;
+        item.textContent = `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
+        warningWrap.appendChild(item);
+      }
+    }
+    container.appendChild(warningWrap);
   }
 }
 
@@ -414,7 +503,6 @@ function updatePreview(): void {
   container.innerHTML = '';
 
   const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
-
   const grid = document.createElement('div');
   grid.className = 'token-grid';
 
@@ -477,12 +565,16 @@ async function handleApply(): Promise<void> {
 async function handleReset(): Promise<void> {
   await currentPaletteCode.setValue(null);
   await currentMode.setValue('DOMINANT_ONLY');
+  selectedMode = 'DOMINANT_ONLY';
 
   try {
     await browser.runtime.sendMessage({ type: 'RESET_THEME' });
   } catch {
     /* background not ready */
   }
+
+  updateModeGrid();
+  updateQualitySummary();
 }
 
 async function loadSavedState(grid: HTMLElement): Promise<void> {
@@ -501,7 +593,7 @@ async function loadSavedState(grid: HTMLElement): Promise<void> {
       if (palette) selectPalette(palette, grid);
     }
   } catch {
-    // Storage unavailable in dev — use defaults
+    // Storage unavailable in dev -> use defaults
   }
 }
 

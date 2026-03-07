@@ -4,6 +4,8 @@ import type {
   FlagPalette,
   ModeAdjustments,
   ModeMetrics,
+  ModeQuality,
+  QualityWarningCode,
   Strictness,
   ThemeMode,
   ThemeTokens,
@@ -12,19 +14,17 @@ import { REQUIRED_PAIRS } from '../types/theme';
 import { chroma as colorChroma, deltaE as colorDeltaE, hexToLch, lchToHex } from './color';
 import { adjustToContrast, contrast } from './contrast';
 
-/* ============================================
-   Diversification constants
-   ============================================ */
-const MIN_CHROMATIC = 12; // LCH chroma below this → achromatic
-const MIN_DIVERSITY_DE = 8; // minimum ΔE between link↔accent, focusRing↔accent2
-const DIVERSITY_L_SHIFT = 12; // LCH lightness shift step for diversification
+const MIN_CHROMATIC = 12;
+const MIN_DIVERSITY_DE = 8;
+const SOFT_DIVERSITY_DE = 6;
+const DIVERSITY_L_SHIFT = 12;
 
-/** Per-mode tuning — each mode has unique contrast and border needs. */
 interface ModeConfig {
-  contrastBuffer: number; // headroom above WCAG minimums for accent/link/focus
-  borderChroma: number; // LCH chroma for tinted border
-  borderContrast: number; // minimum border vs bg/surface contrast target
+  contrastBuffer: number;
+  borderChroma: number;
+  borderContrast: number;
 }
+
 const MODE_TUNING: Record<ThemeMode, ModeConfig> = {
   AMOLED: { contrastBuffer: 0.5, borderChroma: 12, borderContrast: 2.5 },
   DARK: { contrastBuffer: 1.5, borderChroma: 20, borderContrast: 3.0 },
@@ -32,7 +32,6 @@ const MODE_TUNING: Record<ThemeMode, ModeConfig> = {
   DOMINANT_ONLY: { contrastBuffer: 1.5, borderChroma: 20, borderContrast: 3.0 },
 };
 
-/** Static neutral tokens per mode — verified to pass all preset-only contrast pairs. */
 const MODE_PRESETS: Record<ThemeMode, Pick<ThemeTokens, 'bg' | 'surface' | 'text' | 'mutedText' | 'border'>> = {
   AMOLED: {
     bg: '#000000',
@@ -64,61 +63,278 @@ const MODE_PRESETS: Record<ThemeMode, Pick<ThemeTokens, 'bg' | 'surface' | 'text
   },
 };
 
-/** Rank flag colors by visual prominence: chroma * 0.6 + contrast vs bg * 0.4. */
-function rankFlagColors(flagColors: string[], bg: string): string[] {
-  return [...flagColors]
-    .map((c) => ({
-      color: c,
-      score: colorChroma(c) * 0.6 + contrast(c, bg) * 0.4,
-    }))
-    .sort((a, b) => b.score - a.score)
-    .map((e) => e.color);
-}
-
-/* ============================================
-   Candidate pool builder
-   ============================================ */
-
 interface CandidatePool {
   chromatic: string[];
   achromatic: string[];
+  synthetic: Set<string>;
 }
 
-/**
- * Separate flag colors into chromatic/achromatic buckets.
- * When only 1 chromatic color exists, synthesize a secondary via +40° hue shift.
- * Guarantees ≥2 chromatic candidates (or 0 if fully achromatic).
- */
+type InteractiveRole = 'accent' | 'accent2' | 'link' | 'focusRing';
+type CandidateClass = 'interactive' | 'decorative' | 'reject';
+
+interface CandidateProfile {
+  source: string;
+  class: CandidateClass;
+  synthetic: boolean;
+  contrastBg: number;
+  contrastSurface: number;
+  chroma: number;
+  lightness: number;
+  roleScores: Record<InteractiveRole | 'borderHueSource', number>;
+}
+
+interface RoleAssignment {
+  accent: string;
+  accent2: string;
+  link: string;
+  focusRing: string;
+  borderHueSource: string | null;
+}
+
+interface TokensWithSources {
+  tokens: ThemeTokens;
+  sources: Record<string, string>;
+  assignment: RoleAssignment;
+  profiles: CandidateProfile[];
+  syntheticUsed: boolean;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 function buildCandidatePool(flagColors: string[], bg: string): CandidatePool {
   const chromatic: string[] = [];
   const achromatic: string[] = [];
+  const synthetic = new Set<string>();
+
   for (const c of flagColors) {
-    if (colorChroma(c) >= MIN_CHROMATIC) {
-      chromatic.push(c);
-    } else {
-      achromatic.push(c);
-    }
+    if (colorChroma(c) >= MIN_CHROMATIC) chromatic.push(c);
+    else achromatic.push(c);
   }
-  // Synthesize a secondary when only 1 chromatic source
+
   if (chromatic.length === 1) {
     const [l, c, h] = hexToLch(chromatic[0]);
-    chromatic.push(lchToHex(l, c, (h + 40) % 360));
+    const candidate = lchToHex(l, c, (h + 40) % 360);
+    chromatic.push(candidate);
+    synthetic.add(candidate);
   }
-  // Fully achromatic — synthesize from bg hue
+
   if (chromatic.length === 0) {
     const [bgL, , bgH] = hexToLch(bg);
     const synthL = bgL < 50 ? 65 : 45;
-    chromatic.push(lchToHex(synthL, 30, bgH));
-    chromatic.push(lchToHex(synthL, 30, (bgH + 40) % 360));
+    const first = lchToHex(synthL, 30, bgH);
+    const second = lchToHex(synthL, 30, (bgH + 40) % 360);
+    chromatic.push(first);
+    chromatic.push(second);
+    synthetic.add(first);
+    synthetic.add(second);
   }
-  return { chromatic, achromatic };
+
+  return { chromatic, achromatic, synthetic };
 }
 
-/* ============================================
-   Token diversification
-   ============================================ */
+function roleStrictness(role: InteractiveRole, strictness: Strictness, mode: ThemeMode): Strictness {
+  if (mode === 'DOMINANT_ONLY') return strictness;
+  if (role === 'link') return Math.min(strictness, mode === 'LIGHT' ? 0.4 : 0.5);
+  if (role === 'focusRing') return Math.min(strictness, mode === 'LIGHT' ? 0.35 : 0.45);
+  if (role === 'accent') return Math.min(strictness, mode === 'LIGHT' ? 0.45 : 0.55);
+  return Math.min(strictness, mode === 'LIGHT' ? 0.5 : 0.6);
+}
 
-/** Check if candidate is diverse enough and passes contrast against bg and surface. */
+function scoreInteractiveRole(
+  role: InteractiveRole,
+  color: string,
+  bg: string,
+  surface: string,
+  mode: ThemeMode,
+  synthetic: boolean,
+): number {
+  const bgContrast = contrast(color, bg);
+  const surfaceContrast = contrast(color, surface);
+  const weakestContrast = Math.min(bgContrast, surfaceContrast);
+  const minContrast = role === 'link' ? 4.5 : 3.0;
+  const chroma = colorChroma(color);
+  const [lightness] = hexToLch(color);
+  const targetLightness = mode === 'LIGHT' ? 34 : 72;
+  const contrastScore =
+    weakestContrast >= minContrast
+      ? weakestContrast * 2.8
+      : weakestContrast * 0.9 - (minContrast - weakestContrast) * 9;
+  const chromaBonus =
+    role === 'focusRing'
+      ? Math.min(chroma, 42) * 0.024
+      : role === 'link'
+        ? Math.min(chroma, 36) * 0.016
+        : Math.min(chroma, 48) * 0.02;
+  const lightnessPenalty = Math.abs(lightness - targetLightness) * (role === 'link' ? 0.02 : 0.03);
+  const syntheticPenalty = synthetic ? 0.35 : 0;
+  return contrastScore + chromaBonus - lightnessPenalty - syntheticPenalty;
+}
+
+function profileCandidates(pool: CandidatePool, mode: ThemeMode, bg: string, surface: string): CandidateProfile[] {
+  return pool.chromatic.map((source) => {
+    const contrastBg = contrast(source, bg);
+    const contrastSurface = contrast(source, surface);
+    const weakestContrast = Math.min(contrastBg, contrastSurface);
+    const chroma = colorChroma(source);
+    const [lightness] = hexToLch(source);
+    const synthetic = pool.synthetic.has(source);
+
+    let candidateClass: CandidateClass = 'interactive';
+    if (weakestContrast < 1.3) candidateClass = 'reject';
+    else if (weakestContrast < 2.5 || chroma < MIN_CHROMATIC) candidateClass = 'decorative';
+
+    return {
+      source,
+      class: candidateClass,
+      synthetic,
+      contrastBg,
+      contrastSurface,
+      chroma,
+      lightness,
+      roleScores: {
+        accent: scoreInteractiveRole('accent', source, bg, surface, mode, synthetic),
+        accent2: scoreInteractiveRole('accent2', source, bg, surface, mode, synthetic) - 0.1,
+        link: scoreInteractiveRole('link', source, bg, surface, mode, synthetic),
+        focusRing: scoreInteractiveRole('focusRing', source, bg, surface, mode, synthetic) + 0.12,
+        borderHueSource: chroma - Math.max(0, 4.5 - weakestContrast) * 8 - (synthetic ? 6 : 0),
+      },
+    };
+  });
+}
+
+function getProfile(profiles: CandidateProfile[], source: string): CandidateProfile | undefined {
+  return profiles.find((profile) => profile.source === source);
+}
+
+function pairPenalty(a: string, b: string, minDelta: number, weight: number): number {
+  const de = colorDeltaE(a, b);
+  return de >= minDelta ? 0 : (minDelta - de) * weight;
+}
+
+function assignmentScore(profiles: CandidateProfile[], assignment: Omit<RoleAssignment, 'borderHueSource'>): number {
+  const accent = getProfile(profiles, assignment.accent);
+  const accent2 = getProfile(profiles, assignment.accent2);
+  const link = getProfile(profiles, assignment.link);
+  const focusRing = getProfile(profiles, assignment.focusRing);
+  if (!accent || !accent2 || !link || !focusRing) return Number.NEGATIVE_INFINITY;
+
+  let score =
+    accent.roleScores.accent * 1.15 +
+    accent2.roleScores.accent2 * 0.9 +
+    link.roleScores.link * 1.45 +
+    focusRing.roleScores.focusRing * 1.15;
+
+  const interactiveSet = new Set([assignment.accent, assignment.accent2, assignment.link, assignment.focusRing]);
+  score += interactiveSet.size * 1.4;
+
+  if (accent.synthetic) score -= 0.6;
+  if (link.synthetic) score -= 1.2;
+  if (focusRing.synthetic) score -= 0.8;
+  if (accent2.synthetic) score -= 0.4;
+
+  if (
+    accent.class === 'reject' ||
+    accent2.class === 'reject' ||
+    link.class === 'reject' ||
+    focusRing.class === 'reject'
+  ) {
+    return Number.NEGATIVE_INFINITY;
+  }
+
+  if (link.class !== 'interactive') score -= 1.4;
+  if (focusRing.class !== 'interactive') score -= 1.1;
+  if (accent.class !== 'interactive') score -= 0.8;
+
+  score -= pairPenalty(assignment.link, assignment.accent, MIN_DIVERSITY_DE, 1.8);
+  score -= pairPenalty(assignment.focusRing, assignment.accent2, MIN_DIVERSITY_DE, 1.6);
+  score -= pairPenalty(assignment.accent, assignment.accent2, SOFT_DIVERSITY_DE, 0.9);
+  score -= pairPenalty(assignment.link, assignment.focusRing, SOFT_DIVERSITY_DE, 0.7);
+
+  return score;
+}
+
+function sortCandidatesForRole(profiles: CandidateProfile[], role: InteractiveRole): CandidateProfile[] {
+  return [...profiles]
+    .filter((profile) => profile.class !== 'reject')
+    .sort((a, b) => b.roleScores[role] - a.roleScores[role]);
+}
+
+function assignRoles(profiles: CandidateProfile[]): RoleAssignment {
+  const fallback = profiles[0]?.source ?? '#4f46e5';
+  const accentCandidates = sortCandidatesForRole(profiles, 'accent').slice(0, 5);
+  const accent2Candidates = sortCandidatesForRole(profiles, 'accent2').slice(0, 5);
+  const linkCandidates = sortCandidatesForRole(profiles, 'link').slice(0, 5);
+  const focusCandidates = sortCandidatesForRole(profiles, 'focusRing').slice(0, 5);
+
+  let best: Omit<RoleAssignment, 'borderHueSource'> | null = null;
+  let bestScore = Number.NEGATIVE_INFINITY;
+
+  for (const link of linkCandidates) {
+    for (const accent of accentCandidates) {
+      for (const focusRing of focusCandidates) {
+        for (const accent2 of accent2Candidates) {
+          const candidate = {
+            accent: accent.source,
+            accent2: accent2.source,
+            link: link.source,
+            focusRing: focusRing.source,
+          };
+          const score = assignmentScore(profiles, candidate);
+          if (score > bestScore) {
+            bestScore = score;
+            best = candidate;
+          }
+        }
+      }
+    }
+  }
+
+  const resolved = best ?? {
+    accent: accentCandidates[0]?.source ?? fallback,
+    accent2: accent2Candidates[0]?.source ?? accentCandidates[0]?.source ?? fallback,
+    link: linkCandidates[0]?.source ?? accentCandidates[0]?.source ?? fallback,
+    focusRing: focusCandidates[0]?.source ?? accent2Candidates[0]?.source ?? fallback,
+  };
+
+  const borderHueSource =
+    [...profiles]
+      .filter((profile) => profile.class !== 'reject')
+      .sort((a, b) => b.roleScores.borderHueSource - a.roleScores.borderHueSource)[0]?.source ?? null;
+
+  return {
+    ...resolved,
+    borderHueSource,
+  };
+}
+
+function adjustAgainstSurfaces(
+  color: string,
+  surfaces: string[],
+  minContrast: number,
+  strictness: Strictness,
+  mode: ThemeMode,
+): string {
+  let adjusted = color;
+  for (let pass = 0; pass < 3; pass++) {
+    const orderedSurfaces = [...surfaces].sort((a, b) => contrast(adjusted, a) - contrast(adjusted, b));
+    let changed = false;
+    for (const surface of orderedSurfaces) {
+      if (contrast(adjusted, surface) >= minContrast) continue;
+      const result = adjustToContrast(adjusted, surface, minContrast, strictness, mode);
+      if (result.color !== adjusted) changed = true;
+      adjusted = result.color;
+    }
+    if (!changed) break;
+  }
+  return adjusted;
+}
+
 function isViableDiverse(candidate: string, peer: string, bg: string, surface: string, minContrast: number): boolean {
   return (
     colorDeltaE(candidate, peer) >= MIN_DIVERSITY_DE &&
@@ -127,15 +343,6 @@ function isViableDiverse(candidate: string, peer: string, bg: string, surface: s
   );
 }
 
-/**
- * Shift `token` away from `peer` until ΔE ≥ MIN_DIVERSITY_DE.
- *
- * Dark modes: lightness up first (lighter = more vibrant on dark bg), then hue shift.
- * Light mode: hue shift first (lightness darkening kills chromatic identity on white bg),
- *   then try lightening (may work if token is already very dark), then darken as last resort.
- *
- * Returns original if nothing achieves diversity without breaking contrast.
- */
 function diversifyFromPeer(
   token: string,
   peer: string,
@@ -149,7 +356,6 @@ function diversifyFromPeer(
   const [origL, origC, origH] = hexToLch(token);
 
   if (isDark) {
-    // Dark modes: lighten first, then hue shift
     for (let step = 1; step <= 4; step++) {
       const candidate = lchToHex(Math.min(100, origL + DIVERSITY_L_SHIFT * step), origC, origH);
       if (isViableDiverse(candidate, peer, bg, surface, minContrast)) return candidate;
@@ -161,38 +367,26 @@ function diversifyFromPeer(
       }
     }
   } else {
-    // Light mode: hue shift first (preserves lightness and vibrancy)
     for (const dir of [-1, 1]) {
       for (let deg = 15; deg <= 40; deg += 5) {
         const candidate = lchToHex(origL, origC, (origH + dir * deg + 360) % 360);
         if (isViableDiverse(candidate, peer, bg, surface, minContrast)) return candidate;
       }
     }
-    // Try lightening (works when token is already very dark)
     for (let step = 1; step <= 3; step++) {
       const candidate = lchToHex(Math.min(100, origL + DIVERSITY_L_SHIFT * step), origC, origH);
       if (isViableDiverse(candidate, peer, bg, surface, minContrast)) return candidate;
     }
-    // Last resort: darken
     for (let step = 1; step <= 3; step++) {
       const candidate = lchToHex(Math.max(0, origL - DIVERSITY_L_SHIFT * step), origC, origH);
       if (isViableDiverse(candidate, peer, bg, surface, minContrast)) return candidate;
     }
   }
 
-  return token; // better identical than broken contrast
+  return token;
 }
 
-/* ============================================
-   Border tinting
-   ============================================ */
-
-/**
- * Apply the lowest-chroma flag color's hue to the preset border.
- * Uses mode-specific chroma and contrast buffer. Nudges lightness if needed.
- */
 function tintBorder(presetBorder: string, flagColors: string[], bg: string, surface: string, cfg: ModeConfig): string {
-  // Find the lowest-chroma chromatic color (skip fully achromatic)
   let bestHue = -1;
   let bestChroma = Number.POSITIVE_INFINITY;
   for (const c of flagColors) {
@@ -202,7 +396,6 @@ function tintBorder(presetBorder: string, flagColors: string[], bg: string, surf
       bestHue = hexToLch(c)[2];
     }
   }
-  // No chromatic colors → fallback to highest-chroma color's hue for subtle tint
   if (bestHue < 0) {
     let maxChr = 0;
     for (const c of flagColors) {
@@ -216,8 +409,6 @@ function tintBorder(presetBorder: string, flagColors: string[], bg: string, surf
   if (bestHue < 0) return presetBorder;
 
   const [borderL] = hexToLch(presetBorder);
-
-  // Try at preset lightness first, then nudge up/down to meet mode-specific contrast
   for (const dL of [0, 3, 6, 9, 12, 16, 20, -3, -6]) {
     const candidateL = Math.max(0, Math.min(100, borderL + dL));
     const candidate = lchToHex(candidateL, cfg.borderChroma, bestHue);
@@ -228,12 +419,65 @@ function tintBorder(presetBorder: string, flagColors: string[], bg: string, surf
   return presetBorder;
 }
 
-interface TokensWithSources {
-  tokens: ThemeTokens;
-  sources: Record<string, string>;
+function buildModeQuality(
+  mode: ThemeMode,
+  tokens: ThemeTokens,
+  reasonsForMode: CompatibilityReason[],
+  modeMetrics: Record<string, number>,
+  modeAdjustments: Record<string, { from: string; to: string; deltaE: number }>,
+  assignment: RoleAssignment,
+  profiles: CandidateProfile[],
+  syntheticUsed: boolean,
+  isNeutral: boolean,
+): ModeQuality {
+  const margins = REQUIRED_PAIRS.map((pair) => modeMetrics[pair.label] - pair.threshold);
+  const minMargin = Math.min(...margins);
+  const avgMargin = margins.reduce((sum, margin) => sum + margin, 0) / margins.length;
+  const contrastHeadroom = clamp01((avgMargin + Math.max(0, minMargin)) / 3.5);
+
+  const distinctnessValues = [
+    colorDeltaE(tokens.link, tokens.accent) / MIN_DIVERSITY_DE,
+    colorDeltaE(tokens.focusRing, tokens.accent2) / MIN_DIVERSITY_DE,
+    colorDeltaE(tokens.accent, tokens.accent2) / SOFT_DIVERSITY_DE,
+  ];
+  const distinctness = clamp01(
+    distinctnessValues.reduce((sum, value) => sum + Math.min(value, 1.4), 0) / distinctnessValues.length,
+  );
+
+  const adjustmentValues = Object.values(modeAdjustments).map((entry) => entry.deltaE);
+  const avgDelta = adjustmentValues.reduce((sum, value) => sum + value, 0) / adjustmentValues.length;
+  const maxDelta = Math.max(...adjustmentValues, 0);
+  const fidelity = clamp01(1 - avgDelta / 28 - Math.max(0, maxDelta - 18) / 60);
+
+  const warnings = new Set<QualityWarningCode>();
+  if (syntheticUsed) warnings.add('USES_SYNTHETIC_SOURCE');
+  if (distinctness < 0.82) warnings.add('LOW_ROLE_DIVERSITY');
+  if (contrastHeadroom < 0.45 || minMargin < 0.35) warnings.add('THIN_CONTRAST_MARGIN');
+  if (fidelity < 0.55 || reasonsForMode.some((reason) => reason.code === 'EXCESSIVE_COLOR_SHIFT_REQUIRED')) {
+    warnings.add('HEAVY_COLOR_ADJUSTMENT');
+  }
+  if (isNeutral) warnings.add('NEUTRAL_SOURCE_PALETTE');
+
+  const assignedProfiles = [assignment.accent, assignment.accent2, assignment.link, assignment.focusRing]
+    .map((source) => getProfile(profiles, source))
+    .filter((profile): profile is CandidateProfile => Boolean(profile));
+  const nativeInteractiveShare =
+    assignedProfiles.length === 0
+      ? 0
+      : assignedProfiles.filter((profile) => profile.class === 'interactive' && !profile.synthetic).length /
+        assignedProfiles.length;
+
+  const score = clamp01(fidelity * 0.38 + contrastHeadroom * 0.32 + distinctness * 0.2 + nativeInteractiveShare * 0.1);
+
+  return {
+    score: round2(score * 100),
+    fidelity: round2(fidelity),
+    contrastHeadroom: round2(contrastHeadroom),
+    distinctness: round2(distinctness),
+    warnings: [...warnings],
+  };
 }
 
-/** Generate tokens with source tracking for compatibility evaluation. */
 function generateTokensInternal(palette: FlagPalette, mode: ThemeMode, strictness: Strictness): TokensWithSources {
   const preset = MODE_PRESETS[mode];
   const cfg = MODE_TUNING[mode];
@@ -241,28 +485,38 @@ function generateTokensInternal(palette: FlagPalette, mode: ThemeMode, strictnes
   const isDark = mode !== 'LIGHT';
   const buf = cfg.contrastBuffer;
 
-  // — Phase A: Build candidate pool —
   const pool = buildCandidatePool(palette.flagColors, bg);
-  const ranked = rankFlagColors(pool.chromatic, bg);
-  const primary = ranked[0];
-  // Pick a secondary from a different source than primary
-  const secondary = ranked.find((c) => colorDeltaE(c, primary) >= MIN_DIVERSITY_DE) ?? ranked[1] ?? primary;
+  const profiles = profileCandidates(pool, mode, bg, surface);
+  const assignment = assignRoles(profiles);
 
-  // — Phase B: Assign accent/accent2 from best candidates —
-  const accentAdj = adjustToContrast(primary, bg, 3.0 + buf, strictness, mode);
-  const accent = accentAdj.color;
-
-  const accent2Adj = adjustToContrast(secondary, bg, 3.0 + buf, strictness, mode);
-  const accent2 = accent2Adj.color;
-
-  // — Phase C: Adjust all tokens via existing adjustToContrast —
-  const linkTargetBg = contrast(primary, bg) <= contrast(primary, surface) ? bg : surface;
-  const linkResult = adjustToContrast(primary, linkTargetBg, 4.5 + buf, strictness, mode);
-  let link = linkResult.color;
-
-  const focusTargetBg = contrast(secondary, bg) <= contrast(secondary, surface) ? bg : surface;
-  const focusResult = adjustToContrast(secondary, focusTargetBg, 3.0 + buf, strictness, mode);
-  let focusRing = focusResult.color;
+  const accent = adjustAgainstSurfaces(
+    assignment.accent,
+    [bg],
+    3.0 + buf,
+    roleStrictness('accent', strictness, mode),
+    mode,
+  );
+  const accent2 = adjustAgainstSurfaces(
+    assignment.accent2,
+    [bg],
+    3.0 + buf,
+    roleStrictness('accent2', strictness, mode),
+    mode,
+  );
+  let link = adjustAgainstSurfaces(
+    assignment.link,
+    [bg, surface],
+    4.5 + buf,
+    roleStrictness('link', strictness, mode),
+    mode,
+  );
+  let focusRing = adjustAgainstSurfaces(
+    assignment.focusRing,
+    [bg, surface],
+    3.0 + buf,
+    roleStrictness('focusRing', strictness, mode),
+    mode,
+  );
 
   const whiteOnAccent = contrast('#ffffff', accent);
   const blackOnAccent = contrast('#000000', accent);
@@ -270,54 +524,56 @@ function generateTokensInternal(palette: FlagPalette, mode: ThemeMode, strictnes
   const accentTextAdj = adjustToContrast(accentTextBase, accent, 4.5 + buf, strictness, mode);
   const accentText = accentTextAdj.color;
 
-  // — Phase D: Diversify link↔accent, focusRing↔accent2 —
   link = diversifyFromPeer(link, accent, bg, surface, 4.5 + buf, isDark);
   focusRing = diversifyFromPeer(focusRing, accent2, bg, surface, 3.0 + buf, isDark);
 
-  // — Phase E: Tint border with flag hue —
-  const border = tintBorder(presetBorder, palette.flagColors, bg, surface, cfg);
+  const borderSources = assignment.borderHueSource
+    ? [assignment.borderHueSource, ...palette.flagColors]
+    : palette.flagColors;
+  const border = tintBorder(presetBorder, borderSources, bg, surface, cfg);
 
   return {
     tokens: { bg, surface, text, mutedText, border, accent, accent2, accentText, link, focusRing },
     sources: {
-      accent: primary,
-      accent2: secondary,
-      link: primary,
-      focusRing: secondary,
+      accent: assignment.accent,
+      accent2: assignment.accent2,
+      link: assignment.link,
+      focusRing: assignment.focusRing,
       accentText: accentTextBase,
     },
+    assignment,
+    profiles,
+    syntheticUsed: [...pool.synthetic].some((source) =>
+      [assignment.accent, assignment.accent2, assignment.link, assignment.focusRing].includes(source),
+    ),
   };
 }
 
-/**
- * Generate the 10 ThemeTokens from a palette, mode, and strictness.
- * All required contrast pairs are validated.
- */
 export function generateTokens(palette: FlagPalette, mode: ThemeMode, strictness: Strictness): ThemeTokens {
   return generateTokensInternal(palette, mode, strictness).tokens;
 }
 
-/**
- * Evaluate which theme modes a palette can support at a given strictness.
- * Returns a full compatibility report with metrics, reasons, and adjustments.
- */
 export function evaluateCompatibility(palette: FlagPalette, strictness: Strictness): CompatibilityReport {
   const modes: (ThemeMode & ('AMOLED' | 'DARK' | 'LIGHT'))[] = ['AMOLED', 'DARK', 'LIGHT'];
   const supports: Record<'AMOLED' | 'DARK' | 'LIGHT', boolean> = { AMOLED: true, DARK: true, LIGHT: true };
   const reasons: CompatibilityReason[] = [];
   const metrics: ModeMetrics = {};
   const adjustments: ModeAdjustments = {};
+  const quality: CompatibilityReport['quality'] = {
+    AMOLED: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+    DARK: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+    LIGHT: { score: 0, fidelity: 0, contrastHeadroom: 0, distinctness: 0, warnings: [] },
+  };
 
-  // Detect neutral-only flag (all flag colors have low chroma)
   const isNeutral = palette.flagColors.every((c) => colorChroma(c) < 10);
 
   for (const mode of modes) {
-    const { tokens, sources } = generateTokensInternal(palette, mode, strictness);
+    const { tokens, sources, assignment, profiles, syntheticUsed } = generateTokensInternal(palette, mode, strictness);
     const modeMetrics: Record<string, number> = {};
     const modeAdjustments: Record<string, { from: string; to: string; deltaE: number }> = {};
+    const reasonStart = reasons.length;
     let modePass = true;
 
-    // Check all required contrast pairs
     for (const pair of REQUIRED_PAIRS) {
       const ratio = contrast(tokens[pair.a], tokens[pair.b]);
       modeMetrics[pair.label] = ratio;
@@ -335,7 +591,6 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
       }
     }
 
-    // Compute adjustments for flag-derived tokens
     for (const key of Object.keys(sources) as (keyof typeof sources)[]) {
       const from = sources[key];
       const to = tokens[key as keyof ThemeTokens];
@@ -346,19 +601,30 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
       const relaxedCap = mode === 'LIGHT' ? 24 : 18;
       const cap = strictCap + (relaxedCap - strictCap) * (1 - strictness);
       if (de > cap) {
-        modePass = false;
         reasons.push({
           mode,
           code: 'EXCESSIVE_COLOR_SHIFT_REQUIRED',
-          details: `${key}: ΔE ${de.toFixed(1)} > cap ${cap.toFixed(1)}`,
+          details: `${key}: deltaE ${de.toFixed(1)} > cap ${cap.toFixed(1)}`,
         });
       }
     }
 
     if (isNeutral) {
-      modePass = false;
       reasons.push({ mode, code: 'NEUTRAL_ONLY_FLAG' });
     }
+
+    const reasonsForMode = reasons.slice(reasonStart).filter((reason) => reason.mode === mode);
+    quality[mode] = buildModeQuality(
+      mode,
+      tokens,
+      reasonsForMode,
+      modeMetrics,
+      modeAdjustments,
+      assignment,
+      profiles,
+      syntheticUsed,
+      isNeutral,
+    );
 
     supports[mode] = modePass;
     metrics[mode] = modeMetrics;
@@ -366,6 +632,5 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
   }
 
   const dominantOnlyRequired = !supports.AMOLED && !supports.DARK && !supports.LIGHT;
-
-  return { supports, dominantOnlyRequired, reasons, metrics, adjustments };
+  return { supports, dominantOnlyRequired, reasons, metrics, adjustments, quality };
 }

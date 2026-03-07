@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getPaletteByCode } from '../data/palettes';
 import type { FlagPalette, ThemeMode } from '../types/theme';
 import { REQUIRED_PAIRS } from '../types/theme';
 import { deltaE } from './color';
@@ -9,18 +10,17 @@ function makePalette(colors: [string, string, ...string[]], overrides?: Partial<
   return {
     countryCode: 'XX',
     name_en: 'Test',
-    name_ru: 'Тест',
+    name_ru: 'Test',
     flagColors: colors,
     recommendedLocales: ['en'],
     ...overrides,
   };
 }
 
-describe('generateTokens — preset validation', () => {
+describe('generateTokens preset validation', () => {
   it('DARK preset-only pairs pass thresholds', () => {
     const palette = makePalette(['#ff0000', '#ffffff']);
     const tokens = generateTokens(palette, 'DARK', 0.7);
-    // Check preset pairs: text/bg, text/surface, mutedText/bg, mutedText/surface, border/bg, border/surface
     expect(contrast(tokens.text, tokens.bg)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(tokens.text, tokens.surface)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(tokens.mutedText, tokens.bg)).toBeGreaterThanOrEqual(4.5);
@@ -43,8 +43,8 @@ describe('generateTokens — preset validation', () => {
   });
 });
 
-describe('generateTokens — accentText', () => {
-  it('accentText always contrasts ≥ 4.5 vs accent', () => {
+describe('generateTokens accentText', () => {
+  it('accentText always contrasts >= 4.5 vs accent', () => {
     for (const colors of [
       ['#ff0000', '#ffffff'],
       ['#002868', '#bf0a30', '#ffffff'],
@@ -60,10 +60,52 @@ describe('generateTokens — accentText', () => {
 });
 
 describe('evaluateCompatibility', () => {
-  it('neutral-only flag is detected', () => {
+  it('neutral-only flag is detected but does not disable all three theme modes', () => {
     const neutral = makePalette(['#808080', '#909090']);
     const report = evaluateCompatibility(neutral, 0.7);
     expect(report.reasons.some((r) => r.code === 'NEUTRAL_ONLY_FLAG')).toBe(true);
+    expect(report.supports.AMOLED).toBe(true);
+    expect(report.supports.DARK).toBe(true);
+    expect(report.supports.LIGHT).toBe(true);
+    expect(report.quality.AMOLED.warnings).toContain('NEUTRAL_SOURCE_PALETTE');
+  });
+
+  it('drift warnings do not automatically disable a mode', () => {
+    const palette = makePalette(['#bc002d', '#ffffff']);
+    const report = evaluateCompatibility(palette, 0.9);
+    const hasDriftReason = report.reasons.some((r) => r.code === 'EXCESSIVE_COLOR_SHIFT_REQUIRED');
+    expect(hasDriftReason).toBe(true);
+    expect(report.supports.AMOLED || report.supports.DARK || report.supports.LIGHT).toBe(true);
+  });
+
+  it('exposes quality metrics in expected ranges', () => {
+    const palette = makePalette(['#002868', '#bf0a30', '#ffffff']);
+    const report = evaluateCompatibility(palette, 0.7);
+    for (const mode of ['AMOLED', 'DARK', 'LIGHT'] as const) {
+      expect(report.quality[mode].score).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].score).toBeLessThanOrEqual(100);
+      expect(report.quality[mode].fidelity).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].fidelity).toBeLessThanOrEqual(1);
+      expect(report.quality[mode].contrastHeadroom).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].contrastHeadroom).toBeLessThanOrEqual(1);
+      expect(report.quality[mode].distinctness).toBeGreaterThanOrEqual(0);
+      expect(report.quality[mode].distinctness).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('problematic real palettes now support all three modes', () => {
+    for (const code of ['PK', 'FI', 'GR', 'SR', 'VA']) {
+      const palette = getPaletteByCode(code);
+      expect(palette).toBeTruthy();
+      if (!palette) continue;
+      const report = evaluateCompatibility(palette, 0.7);
+      expect(report.supports.AMOLED, `${code} AMOLED`).toBe(true);
+      expect(report.supports.DARK, `${code} DARK`).toBe(true);
+      expect(report.supports.LIGHT, `${code} LIGHT`).toBe(true);
+      expect(report.quality.AMOLED.score, `${code} AMOLED quality`).toBeGreaterThan(35);
+      expect(report.quality.DARK.score, `${code} DARK quality`).toBeGreaterThan(35);
+      expect(report.quality.LIGHT.score, `${code} LIGHT quality`).toBeGreaterThan(35);
+    }
   });
 
   it('DOMINANT_ONLY works with any palette', () => {
@@ -76,8 +118,7 @@ describe('evaluateCompatibility', () => {
   });
 });
 
-describe('token diversification', () => {
-  // 2-color flags where link and accent used to be identical
+describe('role-based token diversification', () => {
   const twocolorFlags: [string, [string, string, ...string[]]][] = [
     ['Japan', ['#bc002d', '#ffffff']],
     ['Indonesia', ['#ce1126', '#ffffff']],
@@ -86,27 +127,33 @@ describe('token diversification', () => {
   ];
   const allModes: ThemeMode[] = ['DARK', 'LIGHT', 'AMOLED', 'DOMINANT_ONLY'];
 
-  it('link ≠ accent — ΔE ≥ 8 for 2-color flags across all modes', () => {
+  it('link differs from accent for representative two-color flags across all modes', () => {
     for (const [name, colors] of twocolorFlags) {
       for (const mode of allModes) {
         const tokens = generateTokens(makePalette(colors), mode, 0.5);
         const de = deltaE(tokens.link, tokens.accent);
-        expect(de, `${name} ${mode}: link↔accent ΔE=${de.toFixed(1)}`).toBeGreaterThanOrEqual(8);
+        expect(de, `${name} ${mode}: link/accent deltaE=${de.toFixed(1)}`).toBeGreaterThanOrEqual(8);
       }
     }
   });
 
-  it('focusRing ≠ accent2 — ΔE ≥ 8 for 2-color flags across all modes', () => {
+  it('focusRing differs from accent2 for representative two-color flags across all modes', () => {
     for (const [name, colors] of twocolorFlags) {
       for (const mode of allModes) {
         const tokens = generateTokens(makePalette(colors), mode, 0.5);
         const de = deltaE(tokens.focusRing, tokens.accent2);
-        expect(de, `${name} ${mode}: focusRing↔accent2 ΔE=${de.toFixed(1)}`).toBeGreaterThanOrEqual(8);
+        expect(de, `${name} ${mode}: focus/accent2 deltaE=${de.toFixed(1)}`).toBeGreaterThanOrEqual(8);
       }
     }
   });
 
-  it('all REQUIRED_PAIRS still pass for 2-color flags after diversification', () => {
+  it('interactive roles remain distinct on a three-color flag before post-shift collapse', () => {
+    const tokens = generateTokens(makePalette(['#002868', '#bf0a30', '#ffffff']), 'DARK', 0.7);
+    expect(deltaE(tokens.link, tokens.accent)).toBeGreaterThanOrEqual(8);
+    expect(deltaE(tokens.focusRing, tokens.accent2)).toBeGreaterThanOrEqual(8);
+  });
+
+  it('all REQUIRED_PAIRS still pass for representative flags after role assignment', () => {
     for (const [name, colors] of twocolorFlags) {
       for (const mode of allModes) {
         const tokens = generateTokens(makePalette(colors), mode, 0.5);
@@ -123,8 +170,7 @@ describe('token diversification', () => {
 });
 
 describe('border tinting', () => {
-  it('border is tinted (≠ preset neutral) for chromatic flags', () => {
-    // DARK preset border is #404060
+  it('border is tinted for chromatic flags', () => {
     const palette = makePalette(['#002868', '#bf0a30', '#ffffff']);
     const tokens = generateTokens(palette, 'DARK', 0.7);
     expect(tokens.border).not.toBe('#404060');

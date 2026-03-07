@@ -1,34 +1,34 @@
 {
   "extName": {
-    "message": "Генератор тем по флагам",
+    "message": "\u0413\u0435\u043d\u0435\u0440\u0430\u0442\u043e\u0440 \u0442\u0435\u043c \u043f\u043e \u0444\u043b\u0430\u0433\u0430\u043c",
     "description": "Extension display name"
   },
   "extDescription": {
-    "message": "Генерация тем для браузера на основе цветовых палитр флагов с проверкой контрастности WCAG.",
+    "message": "\u0413\u0435\u043d\u0435\u0440\u0430\u0446\u0438\u044f \u0442\u0435\u043c \u0434\u043b\u044f \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u0446\u0432\u0435\u0442\u043e\u0432\u044b\u0445 \u043f\u0430\u043b\u0438\u0442\u0440 \u0444\u043b\u0430\u0433\u043e\u0432 \u0441 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u043e\u0439 \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u043d\u043e\u0441\u0442\u0438 WCAG.",
     "description": "Extension description for the browser store listing"
   },
   "welcomeHeading": {
-    "message": "Генератор тем по флагам",
+    "message": "\u0413\u0435\u043d\u0435\u0440\u0430\u0442\u043e\u0440 \u0442\u0435\u043c \u043f\u043e \u0444\u043b\u0430\u0433\u0430\u043c",
     "description": "Welcome page main heading"
   },
   "welcomeSubtitle": {
-    "message": "Это расширение меняет тему браузера, используя цветовые палитры флагов.",
+    "message": "\u042d\u0442\u043e \u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u0435 \u043c\u0435\u043d\u044f\u0435\u0442 \u0442\u0435\u043c\u0443 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430, \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u044f \u0446\u0432\u0435\u0442\u043e\u0432\u044b\u0435 \u043f\u0430\u043b\u0438\u0442\u0440\u044b \u0444\u043b\u0430\u0433\u043e\u0432.",
     "description": "Welcome page subtitle"
   },
   "welcomeChooseCountry": {
-    "message": "Выберите страну",
+    "message": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0442\u0440\u0430\u043d\u0443",
     "description": "Country picker section label"
   },
   "welcomeRecommended": {
-    "message": "Рекомендовано для вас",
+    "message": "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u043e\u0432\u0430\u043d\u043e \u0434\u043b\u044f \u0432\u0430\u0441",
     "description": "Label for auto-detected palette"
   },
   "welcomeChooseMode": {
-    "message": "Выберите режим темы",
+    "message": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0440\u0435\u0436\u0438\u043c \u0442\u0435\u043c\u044b",
     "description": "Mode picker section label"
   },
   "welcomePreview": {
-    "message": "Предпросмотр",
+    "message": "\u041f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440",
     "description": "Preview section label"
   },
   "modeAmoled": {
@@ -36,182 +36,234 @@
     "description": "AMOLED mode name"
   },
   "modeDark": {
-    "message": "Тёмный",
+    "message": "\u0422\u0435\u043c\u043d\u044b\u0439",
     "description": "Dark mode name"
   },
   "modeLight": {
-    "message": "Светлый",
+    "message": "\u0421\u0432\u0435\u0442\u043b\u044b\u0439",
     "description": "Light mode name"
   },
   "modeDominantOnly": {
-    "message": "Только акцент",
+    "message": "\u0422\u043e\u043b\u044c\u043a\u043e \u0430\u043a\u0446\u0435\u043d\u0442",
     "description": "Dominant-only mode name"
   },
   "modeDisabledTooltip": {
-    "message": "Эта палитра не проходит контрастность в режиме «$MODE$».",
+    "message": "\u042d\u0442\u0430 \u043f\u0430\u043b\u0438\u0442\u0440\u0430 \u043d\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442 \u0446\u0435\u043b\u0438 \u043f\u043e \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u0443 \u0432 \u0440\u0435\u0436\u0438\u043c\u0435 \u00ab$MODE$\u00bb.",
     "description": "Tooltip when a mode is disabled",
     "placeholders": {
       "mode": {
         "content": "$1",
-        "example": "Светлый"
+        "example": "\u0421\u0432\u0435\u0442\u043b\u044b\u0439"
       }
     }
   },
   "btnApply": {
-    "message": "Применить тему",
+    "message": "\u041f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c \u0442\u0435\u043c\u0443",
     "description": "Apply button text"
   },
   "btnReset": {
-    "message": "Сбросить",
+    "message": "\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c",
     "description": "Reset button text"
   },
   "btnOpenGallery": {
-    "message": "Открыть галерею",
+    "message": "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0433\u0430\u043b\u0435\u0440\u0435\u044e",
     "description": "Link to gallery page"
   },
   "btnBrowsePalettes": {
-    "message": "Палитры",
+    "message": "\u041f\u0430\u043b\u0438\u0442\u0440\u044b",
     "description": "Button to open side panel with palette browser"
   },
+  "btnExportCss": {
+    "message": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442 CSS",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e!",
+    "description": "Short clipboard success feedback"
+  },
   "sidepanelHint": {
-    "message": "Нажмите иконку расширения на панели инструментов",
+    "message": "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u0438\u043a\u043e\u043d\u043a\u0443 \u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u0438\u044f \u043d\u0430 \u043f\u0430\u043d\u0435\u043b\u0438 \u0438\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442\u043e\u0432, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c side panel",
     "description": "Hint shown when user clicks Browse Palettes"
   },
   "autoByLocale": {
-    "message": "Авто по локали",
+    "message": "\u0410\u0432\u0442\u043e \u043f\u043e \u043b\u043e\u043a\u0430\u043b\u0438",
     "description": "Toggle label for auto locale"
   },
   "autoByLocaleHint": {
-    "message": "Тема может измениться при смене языка браузера.",
+    "message": "\u0422\u0435\u043c\u0430 \u043c\u043e\u0436\u0435\u0442 \u0438\u0437\u043c\u0435\u043d\u0438\u0442\u044c\u0441\u044f \u043f\u0440\u0438 \u0441\u043c\u0435\u043d\u0435 \u044f\u0437\u044b\u043a\u0430 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430.",
     "description": "Hint text for auto-by-locale toggle"
   },
   "tokenBg": {
-    "message": "Фон",
+    "message": "\u0424\u043e\u043d",
     "description": "Token label"
   },
   "tokenSurface": {
-    "message": "Поверхность",
+    "message": "\u041f\u043e\u0432\u0435\u0440\u0445\u043d\u043e\u0441\u0442\u044c",
     "description": "Token label"
   },
   "tokenText": {
-    "message": "Текст",
+    "message": "\u0422\u0435\u043a\u0441\u0442",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "\u041f\u0440\u0438\u0433\u043b\u0443\u0448\u0435\u043d\u043d\u044b\u0439",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "\u0413\u0440\u0430\u043d\u0438\u0446\u0430",
     "description": "Token label"
   },
   "tokenAccent": {
-    "message": "Акцент",
+    "message": "\u0410\u043a\u0446\u0435\u043d\u0442",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "\u0410\u043a\u0446\u0435\u043d\u0442 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "\u0422\u0435\u043a\u0441\u0442 \u0430\u043a\u0446\u0435\u043d\u0442\u0430",
     "description": "Token label"
   },
   "tokenLink": {
-    "message": "Ссылка",
+    "message": "\u0421\u0441\u044b\u043b\u043a\u0430",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "\u0424\u043e\u043a\u0443\u0441",
     "description": "Token label"
   },
   "themeApplied": {
-    "message": "Тема применена!",
+    "message": "\u0422\u0435\u043c\u0430 \u043f\u0440\u0438\u043c\u0435\u043d\u0435\u043d\u0430!",
     "description": "Feedback when theme is applied successfully"
   },
   "themeUnavailable": {
-    "message": "Только экспорт — API тем недоступен",
+    "message": "\u0422\u043e\u043b\u044c\u043a\u043e \u044d\u043a\u0441\u043f\u043e\u0440\u0442 - API \u0442\u0435\u043c \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u0435\u043d",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
   "searchPlaceholder": {
-    "message": "Поиск стран…",
+    "message": "\u041f\u043e\u0438\u0441\u043a \u0441\u0442\u0440\u0430\u043d...",
     "description": "Placeholder for country search input"
   },
+  "searchAllRegions": {
+    "message": "\u0412\u0441\u0435",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "\u0410\u0444\u0440\u0438\u043a\u0430",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "\u0410\u043c\u0435\u0440\u0438\u043a\u0438",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "\u0410\u0437\u0438\u044f",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "\u0415\u0432\u0440\u043e\u043f\u0430",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "\u041e\u043a\u0435\u0430\u043d\u0438\u044f",
+    "description": "Region label"
+  },
   "noResults": {
-    "message": "Ничего не найдено.",
+    "message": "\u041d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e.",
     "description": "Empty state when search/filter yields no results"
   },
   "qualitySection": {
-    "message": "????????? ???????? ?????",
+    "message": "\u041f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439 \u0440\u0435\u0436\u0438\u043c",
     "description": "Section label for mode quality summary"
   },
   "qualityEmpty": {
-    "message": "???????? ??????, ????? ??????? ?????? ????? ? ??? ???????????.",
+    "message": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0442\u0440\u0430\u043d\u0443, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u043b\u0443\u0447\u0448\u0438\u0439 \u0440\u0435\u0436\u0438\u043c \u0438 \u0435\u0433\u043e \u043a\u043e\u043c\u043f\u0440\u043e\u043c\u0438\u0441\u0441\u044b.",
     "description": "Empty quality state"
   },
   "qualityRecommended": {
-    "message": "?????????????",
+    "message": "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u0442\u0441\u044f",
     "description": "Recommended mode label"
   },
   "qualityCurrent": {
-    "message": "???????",
+    "message": "\u0422\u0435\u043a\u0443\u0449\u0438\u0439",
     "description": "Current mode label"
   },
   "qualityTop": {
-    "message": "??????",
+    "message": "\u041b\u0443\u0447\u0448\u0438\u0439",
     "description": "Badge for top mode"
   },
   "qualitySafeShort": {
-    "message": "????????",
+    "message": "\u0411\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u044b\u0439",
     "description": "Short fallback label"
   },
   "qualitySafeMeta": {
-    "message": "???????? ???????? ????? ? ?????? ??????????? ?????????? ?? ?????????",
+    "message": "\u0411\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u044b\u0439 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u044b\u0439 \u0432\u0430\u0440\u0438\u0430\u043d\u0442 \u0441 \u0441\u0430\u043c\u044b\u043c\u0438 \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b\u043c\u0438 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u043c\u0438",
     "description": "Fallback meta text"
   },
   "qualitySafeBody": {
-    "message": "??????????? ???, ???? ????? ????? ?????????? ??????? ???????, ???? ???? ?? ????? ???????????????, ??? ????????? ??????.",
+    "message": "\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0435\u0433\u043e, \u0435\u0441\u043b\u0438 \u0432\u0430\u043c \u043d\u0443\u0436\u0435\u043d \u0441\u0430\u043c\u044b\u0439 \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b\u0439 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442, \u0434\u0430\u0436\u0435 \u0435\u0441\u043b\u0438 \u043e\u043d \u043c\u0435\u043d\u0435\u0435 \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u043d, \u0447\u0435\u043c \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0435 \u0440\u0435\u0436\u0438\u043c\u044b.",
     "description": "Fallback body text"
   },
   "qualityNoTradeoffs": {
-    "message": "? ???? ?????? ??? ???????? ????????????.",
+    "message": "\u0412 \u044d\u0442\u043e\u043c \u0440\u0435\u0436\u0438\u043c\u0435 \u043d\u0435\u0442 \u0437\u0430\u043c\u0435\u0442\u043d\u044b\u0445 \u043a\u043e\u043c\u043f\u0440\u043e\u043c\u0438\u0441\u0441\u043e\u0432.",
     "description": "No warnings message"
   },
   "qualityBestPick": {
-    "message": "?????? ?????????????? ????? ? $MODE$. $SUMMARY$",
+    "message": "\u041b\u0443\u0447\u0448\u0438\u0439 \u0430\u0432\u0442\u043e\u0432\u044b\u0431\u043e\u0440 - $MODE$. $SUMMARY$",
     "description": "Recommended mode body",
     "placeholders": {
       "mode": {
         "content": "$1",
-        "example": "??????"
+        "example": "\u0422\u0435\u043c\u043d\u044b\u0439"
       },
       "summary": {
         "content": "$2",
-        "example": "??????? ???????????? ? ??????? ??????????."
+        "example": "\u0425\u043e\u0440\u043e\u0448\u0435\u0435 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435 \u0441 \u044f\u0441\u043d\u044b\u043c \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u043e\u043c."
       }
     }
   },
   "qualityToneExcellent": {
-    "message": "????????",
+    "message": "\u041e\u0442\u043b\u0438\u0447\u043d\u044b\u0439",
     "description": "Quality tone label"
   },
   "qualityToneStrong": {
-    "message": "???????",
+    "message": "\u0421\u0438\u043b\u044c\u043d\u044b\u0439",
     "description": "Quality tone label"
   },
   "qualityToneBalanced": {
-    "message": "????????????????",
+    "message": "\u0421\u0431\u0430\u043b\u0430\u043d\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439",
     "description": "Quality tone label"
   },
   "qualityToneFragile": {
-    "message": "???????",
+    "message": "\u0425\u0440\u0443\u043f\u043a\u0438\u0439",
     "description": "Quality tone label"
   },
   "qualitySummaryFallback": {
-    "message": "????? ?????????? ???????? ????? ??? ???? ???????.",
+    "message": "\u0421\u0430\u043c\u044b\u0439 \u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u044b\u0439 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u044b\u0439 \u0432\u0430\u0440\u0438\u0430\u043d\u0442 \u0434\u043b\u044f \u044d\u0442\u043e\u0439 \u043f\u0430\u043b\u0438\u0442\u0440\u044b.",
     "description": "Fallback summary"
   },
   "qualitySummaryUnavailable": {
-    "message": "? ???? ?????? ??????? ?? ????? ????????? ?????????? ?? ?????????.",
+    "message": "\u0412 \u044d\u0442\u043e\u043c \u0440\u0435\u0436\u0438\u043c\u0435 \u043d\u0435\u043b\u044c\u0437\u044f \u0434\u043e\u0441\u0442\u0438\u0447\u044c \u0446\u0435\u043b\u0435\u0439 \u043f\u043e \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u0443.",
     "description": "Unavailable summary"
   },
   "qualitySummaryClear": {
-    "message": "$TONE$ ???????????? ? ??????? ??????????.",
+    "message": "$TONE$ \u0440\u0435\u0436\u0438\u043c \u0441 \u044f\u0432\u043d\u044b\u043c \u0437\u0430\u043f\u0430\u0441\u043e\u043c \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u0430.",
     "description": "Clear contrast summary",
     "placeholders": {
       "tone": {
         "content": "$1",
-        "example": "???????"
+        "example": "\u0421\u0438\u043b\u044c\u043d\u044b\u0439"
       }
     }
   },
   "qualitySummaryTradeoffs": {
-    "message": "$TONE$ ????????????, ????????????: $COUNT$.",
+    "message": "$TONE$ \u0440\u0435\u0436\u0438\u043c, \u043a\u043e\u043c\u043f\u0440\u043e\u043c\u0438\u0441\u0441\u043e\u0432: $COUNT$.",
     "description": "Tradeoff summary",
     "placeholders": {
       "tone": {
         "content": "$1",
-        "example": "????????????????"
+        "example": "\u0421\u0431\u0430\u043b\u0430\u043d\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439"
       },
       "count": {
         "content": "$2",
@@ -220,7 +272,7 @@
     }
   },
   "qualityMeta": {
-    "message": "$SCORE$/100 ? $TONE$ ????????????",
+    "message": "$SCORE$/100 - $TONE$ \u0440\u0435\u0436\u0438\u043c",
     "description": "Quality meta line",
     "placeholders": {
       "score": {
@@ -229,64 +281,148 @@
       },
       "tone": {
         "content": "$2",
-        "example": "???????"
+        "example": "\u0421\u0438\u043b\u044c\u043d\u044b\u0439"
       }
     }
   },
   "qualityStatFidelity": {
-    "message": "????????",
+    "message": "\u0422\u043e\u0447\u043d\u043e\u0441\u0442\u044c",
     "description": "Quality stat label"
   },
   "qualityStatHeadroom": {
-    "message": "?????",
+    "message": "\u0417\u0430\u043f\u0430\u0441",
     "description": "Quality stat label"
   },
   "qualityStatDistinctness": {
-    "message": "??????????",
+    "message": "\u0420\u0430\u0437\u043b\u0438\u0447\u0438\u043c\u043e\u0441\u0442\u044c",
     "description": "Quality stat label"
   },
   "qualityStatDistinct": {
-    "message": "??????.",
+    "message": "\u0420\u0430\u0437\u043b.",
     "description": "Compact quality stat label"
   },
   "qualityWarningTagSynthetic": {
-    "message": "????????????? ????",
+    "message": "\u0421\u0438\u043d\u0442\u0435\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0446\u0432\u0435\u0442",
     "description": "Warning tag"
   },
   "qualityWarningTagDiversity": {
-    "message": "???? ??????????",
+    "message": "\u041c\u0430\u043b\u043e \u0440\u0430\u0437\u0434\u0435\u043b\u0435\u043d\u0438\u044f",
     "description": "Warning tag"
   },
   "qualityWarningTagHeadroom": {
-    "message": "????????? ?????",
+    "message": "\u0422\u043e\u043d\u043a\u0438\u0439 \u0437\u0430\u043f\u0430\u0441",
     "description": "Warning tag"
   },
   "qualityWarningTagAdjustment": {
-    "message": "??????? ?????????",
+    "message": "\u0421\u0438\u043b\u044c\u043d\u0430\u044f \u043a\u043e\u0440\u0440\u0435\u043a\u0446\u0438\u044f",
     "description": "Warning tag"
   },
   "qualityWarningTagNeutral": {
-    "message": "??????????? ????????",
+    "message": "\u041d\u0435\u0439\u0442\u0440\u0430\u043b\u044c\u043d\u044b\u0439 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a",
     "description": "Warning tag"
   },
   "qualityWarningCopySynthetic": {
-    "message": "???? ????????????? ???? ??? ????????????, ????? ????????? ???????.",
+    "message": "\u041e\u0434\u0438\u043d \u0438\u0437 \u0438\u043d\u0442\u0435\u0440\u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0445 \u0446\u0432\u0435\u0442\u043e\u0432 \u0441\u0438\u043d\u0442\u0435\u0437\u0438\u0440\u043e\u0432\u0430\u043d, \u0447\u0442\u043e\u0431\u044b \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c \u043f\u0430\u043b\u0438\u0442\u0440\u0443.",
     "description": "Warning explanation"
   },
   "qualityWarningCopyDiversity": {
-    "message": "????????????? ???? ????????? ??????, ??????? ?????? ? ??????? ??????????? ??????.",
+    "message": "\u0418\u043d\u0442\u0435\u0440\u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0435 \u0440\u043e\u043b\u0438 \u0432\u0438\u0437\u0443\u0430\u043b\u044c\u043d\u043e \u0431\u043b\u0438\u0437\u043a\u0438, \u043f\u043e\u044d\u0442\u043e\u043c\u0443 \u0441\u0441\u044b\u043b\u043a\u0438 \u0438 \u0430\u043a\u0446\u0435\u043d\u0442\u044b \u0440\u0430\u0437\u0434\u0435\u043b\u044f\u044e\u0442\u0441\u044f \u0441\u043b\u0430\u0431\u0435\u0435.",
     "description": "Warning explanation"
   },
   "qualityWarningCopyHeadroom": {
-    "message": "???????? ????????, ?? ????? ?????????.",
+    "message": "\u041a\u043e\u043d\u0442\u0440\u0430\u0441\u0442 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442, \u043d\u043e \u0437\u0430\u043f\u0430\u0441 \u043c\u0438\u043d\u0438\u043c\u0430\u043b\u0435\u043d.",
     "description": "Warning explanation"
   },
   "qualityWarningCopyAdjustment": {
-    "message": "????? ????? ???????? ??????? ??????????????? ???? ??????????.",
+    "message": "\u0426\u0432\u0435\u0442\u0430 \u0444\u043b\u0430\u0433\u0430 \u043f\u0440\u0438\u0448\u043b\u043e\u0441\u044c \u0441\u0438\u043b\u044c\u043d\u0435\u0435 \u0441\u043a\u043e\u0440\u0440\u0435\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c, \u0447\u0442\u043e\u0431\u044b \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0447\u0438\u0442\u0430\u0435\u043c\u043e\u0441\u0442\u044c.",
     "description": "Warning explanation"
   },
   "qualityWarningCopyNeutral": {
-    "message": "???? ? ???????? ???????????, ??????? ????????? ?????? ????? ?? ???????? ?????.",
+    "message": "\u0418\u0441\u0445\u043e\u0434\u043d\u044b\u0439 \u0444\u043b\u0430\u0433 \u043f\u043e\u0447\u0442\u0438 \u043d\u0435\u0439\u0442\u0440\u0430\u043b\u0435\u043d, \u043f\u043e\u044d\u0442\u043e\u043c\u0443 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 \u043c\u0435\u043d\u0435\u0435 \u0442\u043e\u0447\u043d\u043e \u043f\u0435\u0440\u0435\u0434\u0430\u0435\u0442 \u0446\u0432\u0435\u0442\u0430 \u0444\u043b\u0430\u0433\u0430.",
     "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "\u0420\u0435\u0437\u0435\u0440\u0432",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0442\u0440\u0430\u043d\u0443 \u0434\u043b\u044f \u043f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "\u0421\u0442\u0440\u043e\u0433\u043e\u0441\u0442\u044c \u0446\u0432\u0435\u0442\u0430",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "\u0423\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u0442, \u043d\u0430\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u0441\u0438\u043b\u044c\u043d\u043e \u043c\u043e\u0436\u043d\u043e \u043a\u043e\u0440\u0440\u0435\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0446\u0432\u0435\u0442\u0430 \u0444\u043b\u0430\u0433\u0430 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0438\u0436\u0435\u043d\u0438\u044f \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u0430.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "\u041c\u044f\u0433\u043a\u0438\u0439",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "\u0421\u0442\u0440\u043e\u0433\u0438\u0439",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "\u0410\u0432\u0442\u043e \u043f\u043e \u043b\u043e\u043a\u0430\u043b\u0438",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c SVG",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c SVG",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "\u0410\u043d\u0430\u043b\u0438\u0437 \u043a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u0430",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "\u041a\u043e\u043d\u0442\u0440\u0430\u0441\u0442",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "\u0417\u0430\u043a\u0440\u044b\u0442\u044c",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "\u041f\u0430\u0440\u0430",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "\u041a\u043e\u043d\u0442\u0440\u0430\u0441\u0442",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "\u041c\u0438\u043d.",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "\u041e\u043a",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "\u041d\u0435\u0442",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "\u041e\u0442\u043a\u0440\u044b\u0442\u044c",
+    "description": "Promo link label"
   }
 }

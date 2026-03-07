@@ -159,9 +159,10 @@ describe('role-based token diversification', () => {
         const tokens = generateTokens(makePalette(colors), mode, 0.5);
         for (const pair of REQUIRED_PAIRS) {
           const ratio = contrast(tokens[pair.a], tokens[pair.b]);
-          expect(ratio, `${name} ${mode}: ${pair.label} = ${ratio.toFixed(2)} < ${pair.threshold}`).toBeGreaterThanOrEqual(
-            pair.threshold,
-          );
+          expect(
+            ratio,
+            `${name} ${mode}: ${pair.label} = ${ratio.toFixed(2)} < ${pair.threshold}`,
+          ).toBeGreaterThanOrEqual(pair.threshold);
         }
       }
     }

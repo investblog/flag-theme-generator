@@ -7,6 +7,18 @@ import { REQUIRED_PAIRS } from '@shared/types/theme';
 import { contrast } from '@shared/utils/contrast';
 import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
+import {
+  getBestMode,
+  getModeLabel,
+  getQualityTone,
+  getWarningCopy,
+  getWarningSeverity,
+  getWarningTag,
+  MODE_KEYS,
+  msg,
+  pickMode,
+  summarizeMode,
+} from '@shared/utils/quality';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 function svgIcon(pathD: string, size = 16): SVGSVGElement {
@@ -38,107 +50,27 @@ const MODE_NAMES: Record<string, string> = {
   LIGHT: 'L',
 };
 
-const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
-  { mode: 'AMOLED', msgKey: 'modeAmoled' },
-  { mode: 'DARK', msgKey: 'modeDark' },
-  { mode: 'LIGHT', msgKey: 'modeLight' },
-  { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
-];
-
-const SUPPORTED_MODES: ThemeMode[] = ['AMOLED', 'DARK', 'LIGHT'];
-
-function msg(key: string, ...subs: string[]): string {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return browser.i18n.getMessage(key as any, subs) || key;
-  } catch {
-    return key;
-  }
-}
-
-function getModeLabel(mode: ThemeMode): string {
-  return msg(MODE_KEYS.find((entry) => entry.mode === mode)?.msgKey ?? 'modeDominantOnly');
-}
-
-function getBestMode(report: CompatibilityReport): ThemeMode {
-  const supported = SUPPORTED_MODES.filter((mode) => report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']);
-  if (supported.length === 0) return 'DOMINANT_ONLY';
-  return [...supported].sort((a, b) => report.quality[b as 'AMOLED' | 'DARK' | 'LIGHT'].score - report.quality[a as 'AMOLED' | 'DARK' | 'LIGHT'].score)[0];
-}
-
-function getQualityTone(score: number): string {
-  if (score >= 90) return msg('qualityToneExcellent');
-  if (score >= 78) return msg('qualityToneStrong');
-  if (score >= 62) return msg('qualityToneBalanced');
-  return msg('qualityToneFragile');
-}
-
-function getWarningSeverity(warning: string): 'info' | 'warning' | 'caution' {
-  switch (warning) {
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'caution';
-    case 'LOW_ROLE_DIVERSITY':
-    case 'THIN_CONTRAST_MARGIN':
-      return 'warning';
-    default:
-      return 'info';
-  }
-}
-
-function getWarningTag(warning: string): string {
-  switch (warning) {
-    case 'USES_SYNTHETIC_SOURCE':
-      return msg('qualityWarningTagSynthetic');
-    case 'LOW_ROLE_DIVERSITY':
-      return msg('qualityWarningTagDiversity');
-    case 'THIN_CONTRAST_MARGIN':
-      return msg('qualityWarningTagHeadroom');
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return msg('qualityWarningTagAdjustment');
-    case 'NEUTRAL_SOURCE_PALETTE':
-      return msg('qualityWarningTagNeutral');
-    default:
-      return msg('qualityWarningTagAdjustment');
-  }
-}
-
-function getWarningCopy(warning: string): string {
-  switch (warning) {
-    case 'USES_SYNTHETIC_SOURCE':
-      return msg('qualityWarningCopySynthetic');
-    case 'LOW_ROLE_DIVERSITY':
-      return msg('qualityWarningCopyDiversity');
-    case 'THIN_CONTRAST_MARGIN':
-      return msg('qualityWarningCopyHeadroom');
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return msg('qualityWarningCopyAdjustment');
-    case 'NEUTRAL_SOURCE_PALETTE':
-      return msg('qualityWarningCopyNeutral');
-    default:
-      return msg('qualityWarningCopyAdjustment');
-  }
-}
-
-function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return msg('qualitySummaryFallback');
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return msg('qualitySummaryUnavailable');
-  const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return msg('qualitySummaryClear', getQualityTone(quality.score));
-  return msg('qualitySummaryTradeoffs', getQualityTone(quality.score), String(quality.warnings.length));
-}
-
-function ensureModeSelection(report: CompatibilityReport): void {
-  if (selectedMode === 'DOMINANT_ONLY') {
-    selectedMode = getBestMode(report);
-    return;
-  }
-  if (!report.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
-    selectedMode = getBestMode(report);
-  }
-}
-
 const WAVE1 = new Set([
-  'IN', 'CN', 'US', 'ID', 'PK', 'NG', 'BR', 'BD', 'RU', 'ET', 'MX', 'JP', 'EG', 'PH', 'CD', 'VN', 'IR', 'TR', 'DE', 'TH',
+  'IN',
+  'CN',
+  'US',
+  'ID',
+  'PK',
+  'NG',
+  'BR',
+  'BD',
+  'RU',
+  'ET',
+  'MX',
+  'JP',
+  'EG',
+  'PH',
+  'CD',
+  'VN',
+  'IR',
+  'TR',
+  'DE',
+  'TH',
 ]);
 
 let searchQuery = '';
@@ -187,7 +119,7 @@ async function init(): Promise<void> {
   const settingsBtn = document.createElement('button');
   settingsBtn.className = 'sp-header__settings';
   settingsBtn.textContent = '\u2699';
-  settingsBtn.title = 'Settings';
+  settingsBtn.title = msg('settingsTitle');
   settingsBtn.addEventListener('click', openSettingsDrawer);
   header.appendChild(title);
   header.appendChild(settingsBtn);
@@ -196,7 +128,7 @@ async function init(): Promise<void> {
   const search = document.createElement('input');
   search.className = 'sp-search';
   search.type = 'search';
-  search.placeholder = 'Search countries...';
+  search.placeholder = msg('searchPlaceholder');
   search.addEventListener('input', () => {
     searchQuery = search.value.trim().toLowerCase();
     renderList();
@@ -205,7 +137,7 @@ async function init(): Promise<void> {
 
   const filters = document.createElement('div');
   filters.className = 'sp-filters';
-  const allChip = createFilterChip('All', '', filters);
+  const allChip = createFilterChip(msg('searchAllRegions'), '', filters);
   allChip.classList.add('filter-chip--active');
   filters.appendChild(allChip);
   for (const region of getRegions()) {
@@ -257,7 +189,7 @@ function renderList(): void {
   if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'sp-empty';
-    empty.textContent = 'No palettes match your search.';
+    empty.textContent = msg('noResults');
     listEl.appendChild(empty);
     return;
   }
@@ -292,7 +224,7 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   const bestQuality = bestMode === 'DOMINANT_ONLY' ? null : report.quality[bestMode as 'AMOLED' | 'DARK' | 'LIGHT'];
   const summary = document.createElement('div');
   summary.className = 'sp-card__summary';
-  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} � ${bestQuality.score}/100` : 'Fallback mode';
+  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} - ${bestQuality.score}/100` : msg('modeDominantOnly');
   info.appendChild(summary);
   card.appendChild(info);
 
@@ -333,7 +265,7 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
   header.innerHTML = `
     <span class="sp-quality__eyebrow">${bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent')}</span>
     <strong class="sp-quality__title">${getModeLabel(activeMode)}</strong>
-    <span class="sp-quality__meta">${quality ? `${quality.score}/100 � ${getQualityTone(quality.score)}` : 'Fallback mode'}</span>
+    <span class="sp-quality__meta">${quality ? `${quality.score}/100 - ${getQualityTone(quality.score)}` : msg('qualitySafeMeta')}</span>
   `;
   block.appendChild(header);
 
@@ -370,9 +302,8 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
     } else {
       for (const warning of quality.warnings) {
         const item = document.createElement('span');
-        item.className = 'sp-quality__warning';
         item.className = `sp-quality__warning sp-quality__warning--${getWarningSeverity(warning)}`;
-      item.textContent = compact ? getWarningTag(warning) : `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
+        item.textContent = compact ? getWarningTag(warning) : `${getWarningTag(warning)}: ${getWarningCopy(warning)}`;
         warnings.appendChild(item);
       }
     }
@@ -434,7 +365,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
   if (flagSvg) {
     const copySvgBtn = document.createElement('button');
     copySvgBtn.className = 'drawer__icon-btn';
-    copySvgBtn.title = 'Copy SVG';
+    copySvgBtn.title = msg('copySvg');
     copySvgBtn.appendChild(svgIcon(ICON_COPY));
     copySvgBtn.addEventListener('click', async () => {
       try {
@@ -448,7 +379,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
 
     const dlBtn = document.createElement('button');
     dlBtn.className = 'drawer__icon-btn';
-    dlBtn.title = 'Download SVG';
+    dlBtn.title = msg('downloadSvg');
     dlBtn.appendChild(svgIcon(ICON_DOWNLOAD));
     dlBtn.addEventListener('click', () => {
       const blob = new Blob([flagSvg], { type: 'image/svg+xml' });
@@ -467,7 +398,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
   let showContrast = false;
   const contrastBtn = document.createElement('button');
   contrastBtn.className = 'drawer__icon-btn';
-  contrastBtn.title = 'Contrast analysis';
+  contrastBtn.title = msg('contrastAnalysis');
   contrastBtn.appendChild(svgIcon(ICON_PIPETTE));
   contrastBtn.addEventListener('click', () => {
     showContrast = !showContrast;
@@ -479,7 +410,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'drawer__icon-btn';
-  closeBtn.title = 'Close';
+  closeBtn.title = msg('close');
   closeBtn.appendChild(svgIcon(ICON_X));
   closeBtn.addEventListener('click', closeDrawer);
   headerActions.appendChild(closeBtn);
@@ -494,7 +425,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
     body.innerHTML = '';
 
     const report = evaluateCompatibility(palette, currentStrictness);
-    ensureModeSelection(report);
+    selectedMode = pickMode(selectedMode, report);
 
     body.appendChild(createQualityBlock(report, selectedMode));
 
@@ -510,7 +441,9 @@ function openPaletteDrawer(palette: FlagPalette): void {
       btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
       const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
       btn.textContent =
-        mode === 'DOMINANT_ONLY' || !report ? msg(msgKey) : `${msg(msgKey)} � ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
+        mode === 'DOMINANT_ONLY' || !report
+          ? msg(msgKey)
+          : `${msg(msgKey)} - ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
 
       if (!isSupported) btn.disabled = true;
       btn.title = summarizeMode(report, mode);
@@ -552,7 +485,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
     contrastSection.hidden = !showContrast;
     const contrastTitle = document.createElement('div');
     contrastTitle.className = 'sp-section-title';
-    contrastTitle.textContent = 'Contrast';
+    contrastTitle.textContent = msg('contrastTitle');
     contrastSection.appendChild(contrastTitle);
     contrastSection.appendChild(createWcagSummary(tokens));
     detailScroll.appendChild(contrastSection);
@@ -660,7 +593,7 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
 
   const title = document.createElement('div');
   title.className = 'sp-section-title';
-  title.textContent = 'Export';
+  title.textContent = msg('exportTitle');
   section.appendChild(title);
 
   const tabs = document.createElement('div');
@@ -671,7 +604,7 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
 
   const copyBtn = document.createElement('button');
   copyBtn.className = 'sp-export__copy';
-  copyBtn.title = 'Copy';
+  copyBtn.title = msg('exportCopy');
   copyBtn.appendChild(svgIcon(ICON_COPY));
 
   let activeTab: ExportTab = 'css';
@@ -734,7 +667,7 @@ function createWcagSummary(tokens: ThemeTokens): HTMLElement {
   table.className = 'wcag-summary';
 
   const thead = document.createElement('thead');
-  thead.innerHTML = '<tr><th>Pair</th><th>Ratio</th><th>Req</th><th></th></tr>';
+  thead.innerHTML = `<tr><th>${msg('wcagPair')}</th><th>${msg('wcagRatio')}</th><th>${msg('wcagReq')}</th><th></th></tr>`;
   table.appendChild(thead);
 
   const tbody = document.createElement('tbody');
@@ -751,7 +684,7 @@ function createWcagSummary(tokens: ThemeTokens): HTMLElement {
     tdRequired.textContent = `${pair.threshold}:1`;
     const tdStatus = document.createElement('td');
     tdStatus.className = passes ? 'wcag-summary__pass' : 'wcag-summary__fail';
-    tdStatus.textContent = passes ? 'Pass' : 'Fail';
+    tdStatus.textContent = passes ? msg('wcagPass') : msg('wcagFail');
 
     tr.appendChild(tdPair);
     tr.appendChild(tdRatio);
@@ -842,10 +775,10 @@ function openSettingsDrawer(): void {
   header.className = 'drawer__header';
   const title = document.createElement('h2');
   title.className = 'drawer__header-title';
-  title.textContent = 'Settings';
+  title.textContent = msg('settingsTitle');
   const closeBtn = document.createElement('button');
   closeBtn.className = 'drawer__icon-btn';
-  closeBtn.title = 'Close';
+  closeBtn.title = msg('close');
   closeBtn.appendChild(svgIcon(ICON_X));
   closeBtn.addEventListener('click', closeDrawer);
   header.appendChild(title);
@@ -859,12 +792,12 @@ function openSettingsDrawer(): void {
   strictSection.className = 'drawer__section';
   const strictTitle = document.createElement('h3');
   strictTitle.className = 'drawer__section-title';
-  strictTitle.textContent = 'Color Strictness';
+  strictTitle.textContent = msg('settingsColorStrictness');
   strictSection.appendChild(strictTitle);
 
   const strictDesc = document.createElement('p');
   strictDesc.className = 'settings__desc';
-  strictDesc.textContent = 'Controls how much flag colors can be adjusted to meet contrast requirements.';
+  strictDesc.textContent = msg('settingsColorStrictnessHint');
   strictSection.appendChild(strictDesc);
 
   const sliderRow = document.createElement('div');
@@ -898,9 +831,9 @@ function openSettingsDrawer(): void {
   const strictLabels = document.createElement('div');
   strictLabels.className = 'settings__slider-labels';
   const relaxedLabel = document.createElement('span');
-  relaxedLabel.textContent = 'Relaxed';
+  relaxedLabel.textContent = msg('settingsRelaxed');
   const strictLabel = document.createElement('span');
-  strictLabel.textContent = 'Strict';
+  strictLabel.textContent = msg('settingsStrict');
   strictLabels.appendChild(relaxedLabel);
   strictLabels.appendChild(strictLabel);
   strictSection.appendChild(strictLabels);
@@ -911,7 +844,7 @@ function openSettingsDrawer(): void {
   autoSection.className = 'drawer__section';
   const autoTitle = document.createElement('h3');
   autoTitle.className = 'drawer__section-title';
-  autoTitle.textContent = 'Auto by Locale';
+  autoTitle.textContent = msg('settingsAutoByLocaleTitle');
   autoSection.appendChild(autoTitle);
 
   const autoRow = document.createElement('div');
@@ -951,7 +884,7 @@ function openSettingsDrawer(): void {
   promoLink.href = 'https://301.st';
   promoLink.target = '_blank';
   promoLink.rel = 'noopener';
-  promoLink.textContent = 'Open';
+  promoLink.textContent = msg('promoOpen');
   promo.appendChild(promoText);
   promo.appendChild(promoLink);
   body.appendChild(promo);
@@ -962,4 +895,3 @@ function openSettingsDrawer(): void {
 }
 
 init();
-

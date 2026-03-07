@@ -238,7 +238,12 @@ function assignmentScore(profiles: CandidateProfile[], assignment: Omit<RoleAssi
   if (focusRing.synthetic) score -= 0.8;
   if (accent2.synthetic) score -= 0.4;
 
-  if (accent.class === 'reject' || accent2.class === 'reject' || link.class === 'reject' || focusRing.class === 'reject') {
+  if (
+    accent.class === 'reject' ||
+    accent2.class === 'reject' ||
+    link.class === 'reject' ||
+    focusRing.class === 'reject'
+  ) {
     return Number.NEGATIVE_INFINITY;
   }
 
@@ -435,7 +440,9 @@ function buildModeQuality(
     colorDeltaE(tokens.focusRing, tokens.accent2) / MIN_DIVERSITY_DE,
     colorDeltaE(tokens.accent, tokens.accent2) / SOFT_DIVERSITY_DE,
   ];
-  const distinctness = clamp01(distinctnessValues.reduce((sum, value) => sum + Math.min(value, 1.4), 0) / distinctnessValues.length);
+  const distinctness = clamp01(
+    distinctnessValues.reduce((sum, value) => sum + Math.min(value, 1.4), 0) / distinctnessValues.length,
+  );
 
   const adjustmentValues = Object.values(modeAdjustments).map((entry) => entry.deltaE);
   const avgDelta = adjustmentValues.reduce((sum, value) => sum + value, 0) / adjustmentValues.length;
@@ -627,5 +634,3 @@ export function evaluateCompatibility(palette: FlagPalette, strictness: Strictne
   const dominantOnlyRequired = !supports.AMOLED && !supports.DARK && !supports.LIGHT;
   return { supports, dominantOnlyRequired, reasons, metrics, adjustments, quality };
 }
-
-

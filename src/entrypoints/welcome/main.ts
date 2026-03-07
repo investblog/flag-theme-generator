@@ -2,9 +2,21 @@ import { PALETTES } from '@shared/data/palettes';
 import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { MessageResponse } from '@shared/types/messages';
-import type { CompatibilityReport, FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
+import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { exportCSS } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
+import {
+  getBestMode,
+  getModeLabel,
+  getQualityTone,
+  getWarningCopy,
+  getWarningSeverity,
+  getWarningTag,
+  MODE_KEYS,
+  msg,
+  pickMode,
+  summarizeMode,
+} from '@shared/utils/quality';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeTokens; fg: keyof ThemeTokens }[] = [
@@ -19,105 +31,6 @@ const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeToken
   { key: 'link', label: 'Link', bg: 'bg', fg: 'link' },
   { key: 'focusRing', label: 'Focus', bg: 'surface', fg: 'focusRing' },
 ];
-
-const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
-  { mode: 'AMOLED', msgKey: 'modeAmoled' },
-  { mode: 'DARK', msgKey: 'modeDark' },
-  { mode: 'LIGHT', msgKey: 'modeLight' },
-  { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
-];
-
-const SUPPORTED_MODES: ThemeMode[] = ['AMOLED', 'DARK', 'LIGHT'];
-
-function msg(key: string, ...subs: string[]): string {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return browser.i18n.getMessage(key as any, subs) || key;
-  } catch {
-    return key;
-  }
-}
-
-function getModeLabel(mode: ThemeMode): string {
-  return msg(MODE_KEYS.find((entry) => entry.mode === mode)?.msgKey ?? 'modeDominantOnly');
-}
-
-function getBestMode(report: CompatibilityReport): ThemeMode {
-  const supported = SUPPORTED_MODES.filter((mode) => report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']);
-  if (supported.length === 0) return 'DOMINANT_ONLY';
-  return [...supported].sort((a, b) => report.quality[b as 'AMOLED' | 'DARK' | 'LIGHT'].score - report.quality[a as 'AMOLED' | 'DARK' | 'LIGHT'].score)[0];
-}
-
-function getQualityTone(score: number): string {
-  if (score >= 90) return msg('qualityToneExcellent');
-  if (score >= 78) return msg('qualityToneStrong');
-  if (score >= 62) return msg('qualityToneBalanced');
-  return msg('qualityToneFragile');
-}
-
-function getWarningSeverity(warning: string): 'info' | 'warning' | 'caution' {
-  switch (warning) {
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return 'caution';
-    case 'LOW_ROLE_DIVERSITY':
-    case 'THIN_CONTRAST_MARGIN':
-      return 'warning';
-    default:
-      return 'info';
-  }
-}
-
-function getWarningTag(warning: string): string {
-  switch (warning) {
-    case 'USES_SYNTHETIC_SOURCE':
-      return msg('qualityWarningTagSynthetic');
-    case 'LOW_ROLE_DIVERSITY':
-      return msg('qualityWarningTagDiversity');
-    case 'THIN_CONTRAST_MARGIN':
-      return msg('qualityWarningTagHeadroom');
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return msg('qualityWarningTagAdjustment');
-    case 'NEUTRAL_SOURCE_PALETTE':
-      return msg('qualityWarningTagNeutral');
-    default:
-      return msg('qualityWarningTagAdjustment');
-  }
-}
-
-function getWarningCopy(warning: string): string {
-  switch (warning) {
-    case 'USES_SYNTHETIC_SOURCE':
-      return msg('qualityWarningCopySynthetic');
-    case 'LOW_ROLE_DIVERSITY':
-      return msg('qualityWarningCopyDiversity');
-    case 'THIN_CONTRAST_MARGIN':
-      return msg('qualityWarningCopyHeadroom');
-    case 'HEAVY_COLOR_ADJUSTMENT':
-      return msg('qualityWarningCopyAdjustment');
-    case 'NEUTRAL_SOURCE_PALETTE':
-      return msg('qualityWarningCopyNeutral');
-    default:
-      return msg('qualityWarningCopyAdjustment');
-  }
-}
-
-function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
-  if (mode === 'DOMINANT_ONLY') return msg('qualitySummaryFallback');
-  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return msg('qualitySummaryUnavailable');
-  const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-  if (quality.warnings.length === 0) return msg('qualitySummaryClear', getQualityTone(quality.score));
-  return msg('qualitySummaryTradeoffs', getQualityTone(quality.score), String(quality.warnings.length));
-}
-
-function ensureModeSelection(report: CompatibilityReport): void {
-  if (selectedMode === 'DOMINANT_ONLY') {
-    selectedMode = getBestMode(report);
-    return;
-  }
-  if (!report.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
-    selectedMode = getBestMode(report);
-  }
-}
 
 let selectedPalette: FlagPalette | null = null;
 let selectedMode: ThemeMode = 'DOMINANT_ONLY';
@@ -188,7 +101,26 @@ function init(): void {
   countrySection.appendChild(filtersRow);
 
   const WAVE1 = new Set([
-    'IN', 'CN', 'US', 'ID', 'PK', 'NG', 'BR', 'BD', 'RU', 'ET', 'MX', 'JP', 'EG', 'PH', 'CD', 'VN', 'IR', 'TR', 'DE', 'TH',
+    'IN',
+    'CN',
+    'US',
+    'ID',
+    'PK',
+    'NG',
+    'BR',
+    'BD',
+    'RU',
+    'ET',
+    'MX',
+    'JP',
+    'EG',
+    'PH',
+    'CD',
+    'VN',
+    'IR',
+    'TR',
+    'DE',
+    'TH',
   ]);
 
   const grid = document.createElement('div');
@@ -274,16 +206,16 @@ function init(): void {
   const exportBtn = document.createElement('button');
   exportBtn.className = 'btn btn--ghost';
   exportBtn.id = 'btn-export';
-  exportBtn.textContent = 'Export CSS';
+  exportBtn.textContent = msg('btnExportCss');
   exportBtn.disabled = true;
   exportBtn.addEventListener('click', () => {
     if (!selectedPalette) return;
     const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
     const css = exportCSS(tokens);
     navigator.clipboard.writeText(css).then(() => {
-      exportBtn.textContent = 'Copied!';
+      exportBtn.textContent = msg('btnCopied');
       setTimeout(() => {
-        exportBtn.textContent = 'Export CSS';
+        exportBtn.textContent = msg('btnExportCss');
       }, 1500);
     });
   });
@@ -401,7 +333,7 @@ function createCountryCard(palette: FlagPalette, grid: HTMLElement): HTMLElement
 function selectPalette(palette: FlagPalette, grid: HTMLElement): void {
   selectedPalette = palette;
   const report = evaluateCompatibility(selectedPalette, currentStrictness);
-  ensureModeSelection(report);
+  selectedMode = pickMode(selectedMode, report);
 
   for (const card of grid.querySelectorAll('.country-card')) {
     card.classList.toggle('country-card--selected', (card as HTMLElement).dataset.code === palette.countryCode);
@@ -424,7 +356,7 @@ function updateModeGrid(): void {
   grid.innerHTML = '';
 
   const report = selectedPalette ? evaluateCompatibility(selectedPalette, currentStrictness) : null;
-  if (report) ensureModeSelection(report);
+  if (report) selectedMode = pickMode(selectedMode, report);
   const bestMode = report ? getBestMode(report) : 'DOMINANT_ONLY';
 
   for (const { mode, msgKey } of MODE_KEYS) {
@@ -461,11 +393,13 @@ function updateModeGrid(): void {
     const score = document.createElement('span');
     score.className = 'mode-card__score';
     score.textContent =
-      mode === 'DOMINANT_ONLY' || !report ? 'Fallback' : `${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}/100`;
+      mode === 'DOMINANT_ONLY' || !report
+        ? msg('qualitySafeShort')
+        : `${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}/100`;
 
     const hint = document.createElement('span');
     hint.className = 'mode-card__hint';
-    hint.textContent = report ? summarizeMode(report, mode) : 'Pick a country to preview.';
+    hint.textContent = report ? summarizeMode(report, mode) : msg('pickCountryPreview');
 
     card.appendChild(labelRow);
     card.appendChild(score);
@@ -494,7 +428,7 @@ function updateQualitySummary(): void {
   }
 
   const report = evaluateCompatibility(selectedPalette, currentStrictness);
-  ensureModeSelection(report);
+  selectedMode = pickMode(selectedMode, report);
   const activeMode = selectedMode === 'DOMINANT_ONLY' ? getBestMode(report) : selectedMode;
   const bestMode = getBestMode(report);
   const quality = activeMode === 'DOMINANT_ONLY' ? null : report.quality[activeMode as 'AMOLED' | 'DARK' | 'LIGHT'];
@@ -513,7 +447,7 @@ function updateQualitySummary(): void {
   const heroMeta = document.createElement('div');
   heroMeta.className = 'quality-panel__meta';
   heroMeta.textContent = quality
-    ? `${quality.score}/100 � ${getQualityTone(quality.score)} match`
+    ? msg('qualityMeta', String(quality.score), getQualityTone(quality.score))
     : msg('qualitySafeMeta');
 
   const heroBody = document.createElement('p');
@@ -664,4 +598,3 @@ async function loadSavedState(grid: HTMLElement): Promise<void> {
 }
 
 init();
-

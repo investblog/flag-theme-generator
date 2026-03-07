@@ -73,6 +73,14 @@
     "message": "Browse Palettes",
     "description": "Button to open side panel with palette browser"
   },
+  "btnExportCss": {
+    "message": "Export CSS",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "Copied!",
+    "description": "Short clipboard success feedback"
+  },
   "sidepanelHint": {
     "message": "Click the extension icon in the toolbar to open the side panel",
     "description": "Hint shown when user clicks Browse Palettes"
@@ -97,12 +105,32 @@
     "message": "Text",
     "description": "Token label"
   },
+  "tokenMutedText": {
+    "message": "Muted",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "Border",
+    "description": "Token label"
+  },
   "tokenAccent": {
     "message": "Accent",
     "description": "Token label"
   },
+  "tokenAccent2": {
+    "message": "Accent 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "Accent Text",
+    "description": "Token label"
+  },
   "tokenLink": {
     "message": "Link",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "Focus",
     "description": "Token label"
   },
   "themeApplied": {
@@ -110,12 +138,36 @@
     "description": "Feedback when theme is applied successfully"
   },
   "themeUnavailable": {
-    "message": "Export only — theme API unavailable",
+    "message": "Export only - theme API unavailable",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
   "searchPlaceholder": {
-    "message": "Search countries…",
+    "message": "Search countries...",
     "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "All",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "Africa",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "Americas",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "Asia",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "Europe",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "Oceania",
+    "description": "Region label"
   },
   "noResults": {
     "message": "No countries match your search.",
@@ -288,5 +340,89 @@
   "qualityWarningCopyNeutral": {
     "message": "The source flag is mostly neutral, so the result is less color-faithful.",
     "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "Fallback",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "Pick a country to preview.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "Settings",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "Color Strictness",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "Controls how much flag colors can be adjusted to meet contrast requirements.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "Relaxed",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "Strict",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "Auto by Locale",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "Export",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "Copy",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "Copy SVG",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "Download SVG",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "Contrast analysis",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "Contrast",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "Close",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "Pair",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "Ratio",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "Req",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "Pass",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "Fail",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "Open",
+    "description": "Promo link label"
   }
 }

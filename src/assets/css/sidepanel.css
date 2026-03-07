@@ -1,7 +1,3 @@
-/* ============================================
-   Side Panel Layout
-   ============================================ */
-
 .sidepanel {
   display: flex;
   flex-direction: column;
@@ -9,10 +5,6 @@
   padding: var(--space-3);
   max-width: 420px;
 }
-
-/* ============================================
-   Header
-   ============================================ */
 
 .sp-header {
   position: sticky;
@@ -49,10 +41,6 @@
   border-color: var(--primary);
 }
 
-/* ============================================
-   Search
-   ============================================ */
-
 .sp-search {
   width: 100%;
   padding: var(--space-2) var(--space-3);
@@ -70,10 +58,6 @@
 .sp-search:focus {
   border-color: var(--primary);
 }
-
-/* ============================================
-   Region Filter Chips
-   ============================================ */
 
 .sp-filters {
   display: flex;
@@ -117,19 +101,11 @@
   background: var(--bg-soft);
 }
 
-/* ============================================
-   Palette List
-   ============================================ */
-
 .sp-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
-
-/* ============================================
-   Palette Card (compact horizontal)
-   ============================================ */
 
 .sp-card {
   display: flex;
@@ -140,16 +116,12 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius, 0.5rem);
   cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .sp-card:hover {
   border-color: var(--primary);
-}
-
-.sp-card.sp-card--selected {
-  border-color: var(--primary);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
 .sp-card__flag {
@@ -186,15 +158,17 @@
   font-family: monospace;
 }
 
+.sp-card__summary {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 .sp-card__modes {
   display: flex;
   gap: 3px;
   flex-shrink: 0;
 }
-
-/* ============================================
-   Mode Badges
-   ============================================ */
 
 .mode-badge {
   font-size: var(--fs-xs);
@@ -205,28 +179,33 @@
 }
 
 .mode-badge.mode-badge--supported {
-  background: var(--success);
-  color: #fff;
+  background: color-mix(in srgb, var(--success) 22%, transparent);
+  color: var(--success);
 }
 
-/* ============================================
-   Palette Drawer Overrides
-   ============================================ */
+.mode-badge.mode-badge--best {
+  outline: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  color: var(--primary);
+}
 
 .drawer__panel {
   max-width: 100%;
 }
 
-.drawer__flag-actions {
+.drawer__body.drawer__body--palette {
   display: flex;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.drawer__flag-actions .btn svg {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.125em;
+.drawer__body--palette > * {
+  flex-shrink: 0;
+}
+
+.drawer__body--palette > .drawer__detail-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .drawer__body .sp-section-title {
@@ -241,9 +220,85 @@
   width: 100%;
 }
 
-/* ============================================
-   Mode Picker
-   ============================================ */
+.sp-quality {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: calc(var(--radius, 0.5rem) + 2px);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border-subtle));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-elevated) 84%, var(--primary) 8%), var(--bg-elevated));
+}
+
+.sp-quality--compact {
+  padding: var(--space-2);
+}
+
+.sp-quality__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-quality__eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: var(--fw-semibold);
+}
+
+.sp-quality__title {
+  font-size: var(--fs-md);
+}
+
+.sp-quality__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.sp-quality__body {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.sp-quality__stats {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.sp-quality__stat {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--bg) 45%, transparent);
+  border: 1px solid var(--border-subtle);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.sp-quality__warnings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sp-quality__warning {
+  padding: var(--space-2);
+  border-radius: var(--radius, 0.5rem);
+  background: color-mix(in srgb, var(--warning, #d97706) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning, #d97706) 24%, var(--border-subtle));
+  color: var(--text-main);
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+}
+
+.sp-quality__warning--ok {
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border-color: color-mix(in srgb, var(--success) 24%, var(--border-subtle));
+}
 
 .sp-modes {
   display: flex;
@@ -278,46 +333,34 @@
   background: var(--bg-soft);
 }
 
-/* ============================================
-   Token Grid
-   ============================================ */
-
 .sp-tokens {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
 }
 
 .sp-token {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2);
-  background: var(--bg-elevated);
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-1);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius, 0.5rem);
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), outline var(--transition-fast);
 }
 
 .sp-token:hover {
   border-color: var(--primary);
 }
 
-.sp-token__swatch {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid var(--border-subtle);
-  flex-shrink: 0;
-  transition: border-color var(--transition-fast);
-}
-
 .sp-token__label {
   font-size: 10px;
   text-transform: uppercase;
-  color: var(--text-subtle);
+  color: inherit;
+  opacity: 0.7;
   letter-spacing: 0.03em;
   line-height: 1;
 }
@@ -325,17 +368,14 @@
 .sp-token__hex {
   font-family: monospace;
   font-size: var(--fs-xs);
-  color: var(--text-muted);
+  color: inherit;
   line-height: 1;
 }
 
-.sp-token.text-ok .sp-token__swatch {
-  border-color: var(--ok);
+.sp-token.text-ok {
+  outline: 2px solid var(--ok);
+  outline-offset: -1px;
 }
-
-/* ============================================
-   Actions (Apply / Reset)
-   ============================================ */
 
 .sp-actions {
   display: flex;
@@ -345,10 +385,6 @@
 .sp-actions .btn {
   flex: 1;
 }
-
-/* ============================================
-   Export Tabs
-   ============================================ */
 
 .sp-export {
   display: flex;
@@ -395,7 +431,7 @@
   overflow-x: auto;
   color: var(--text-main);
   line-height: 1.5;
-  max-height: 200px;
+  max-height: 140px;
   overflow-y: auto;
 }
 
@@ -426,10 +462,6 @@
   border-color: var(--ok);
 }
 
-/* ============================================
-   WCAG Summary (reused from gallery)
-   ============================================ */
-
 .wcag-summary {
   width: 100%;
   border-collapse: collapse;
@@ -456,20 +488,12 @@
   color: var(--danger);
 }
 
-/* ============================================
-   Section Titles (inside detail)
-   ============================================ */
-
 .sp-section-title {
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   color: var(--text-muted);
   margin: 0 0 var(--space-1);
 }
-
-/* ============================================
-   Empty State
-   ============================================ */
 
 .sp-empty {
   text-align: center;
@@ -478,17 +502,9 @@
   font-size: var(--fs-sm);
 }
 
-/* ============================================
-   Button overrides (extension context)
-   ============================================ */
-
 .btn.btn--primary {
   border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
-
-/* ============================================
-   Settings Drawer Controls (reused from gallery)
-   ============================================ */
 
 .drawer__section {
   margin-bottom: var(--space-4);
@@ -502,23 +518,62 @@
 }
 
 .drawer__header-title {
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
   margin: 0;
 }
 
-.drawer__close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: var(--fs-xl);
-  cursor: pointer;
-  padding: var(--space-1);
-  line-height: 1;
+.drawer__palette-name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.drawer__close:hover {
+.drawer__palette-code {
+  font-size: var(--fs-xs);
+  color: var(--text-subtle);
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.drawer__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.drawer__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-pill);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  line-height: 0;
+}
+
+.drawer__icon-btn:hover {
   color: var(--text-main);
+  border-color: var(--primary);
+}
+
+.drawer__icon-btn.text-ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.drawer__icon-btn.drawer__icon-btn--active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--bg-soft);
 }
 
 .settings__desc {
@@ -564,10 +619,6 @@
   font-size: var(--fs-sm);
   cursor: pointer;
 }
-
-/* ============================================
-   Promo Block
-   ============================================ */
 
 .drawer__promo {
   padding: var(--space-3);

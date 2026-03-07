@@ -2,15 +2,14 @@ import { PALETTES } from '@shared/data/palettes';
 import { getRegions } from '@shared/services/locale';
 import { addRecentPalette, autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { MessageResponse } from '@shared/types/messages';
-import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
+import type { CompatibilityReport, FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { REQUIRED_PAIRS } from '@shared/types/theme';
 import { contrast } from '@shared/utils/contrast';
 import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
-// Lucide-style SVG icon helper (from CookiePeek pattern)
-function svgIcon(pathD: string, size = 14): SVGSVGElement {
+function svgIcon(pathD: string, size = 16): SVGSVGElement {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('width', String(size));
   svg.setAttribute('height', String(size));
@@ -29,6 +28,9 @@ function svgIcon(pathD: string, size = 14): SVGSVGElement {
 const ICON_COPY =
   'M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1';
 const ICON_DOWNLOAD = 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3';
+const ICON_X = 'M18 6 6 18M6 6l12 12';
+const ICON_PIPETTE =
+  'm12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12M18 9l.4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3zM2 22l.414-.414';
 
 const MODE_NAMES: Record<string, string> = {
   AMOLED: 'A',
@@ -43,6 +45,8 @@ const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
   { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
 ];
 
+const SUPPORTED_MODES: ThemeMode[] = ['AMOLED', 'DARK', 'LIGHT'];
+
 function msg(key: string): string {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,31 +56,62 @@ function msg(key: string): string {
   }
 }
 
-// Wave 1 top-20 by population — shown by default
+function getModeLabel(mode: ThemeMode): string {
+  return msg(MODE_KEYS.find((entry) => entry.mode === mode)?.msgKey ?? 'modeDominantOnly');
+}
+
+function getBestMode(report: CompatibilityReport): ThemeMode {
+  const supported = SUPPORTED_MODES.filter((mode) => report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']);
+  if (supported.length === 0) return 'DOMINANT_ONLY';
+  return [...supported].sort((a, b) => report.quality[b as 'AMOLED' | 'DARK' | 'LIGHT'].score - report.quality[a as 'AMOLED' | 'DARK' | 'LIGHT'].score)[0];
+}
+
+function getQualityTone(score: number): 'Excellent' | 'Strong' | 'Balanced' | 'Fragile' {
+  if (score >= 90) return 'Excellent';
+  if (score >= 78) return 'Strong';
+  if (score >= 62) return 'Balanced';
+  return 'Fragile';
+}
+
+function getWarningCopy(warning: string): string {
+  switch (warning) {
+    case 'USES_SYNTHETIC_SOURCE':
+      return 'One interactive color is synthesized to complete the palette.';
+    case 'LOW_ROLE_DIVERSITY':
+      return 'Links, accents or focus states are visually close.';
+    case 'THIN_CONTRAST_MARGIN':
+      return 'Contrast passes, but with limited headroom.';
+    case 'HEAVY_COLOR_ADJUSTMENT':
+      return 'Flag colors needed stronger correction to stay readable.';
+    case 'NEUTRAL_SOURCE_PALETTE':
+      return 'This flag is mostly neutral, so the palette is less color-faithful.';
+    default:
+      return warning;
+  }
+}
+
+function summarizeMode(report: CompatibilityReport, mode: ThemeMode): string {
+  if (mode === 'DOMINANT_ONLY') return 'Most faithful fallback mode.';
+  if (!report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT']) return 'Unavailable for this palette.';
+  const quality = report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  if (quality.warnings.length === 0) return `${getQualityTone(quality.score)} match.`;
+  return `${getQualityTone(quality.score)} match with ${quality.warnings.length} tradeoff${quality.warnings.length > 1 ? 's' : ''}.`;
+}
+
+function ensureModeSelection(report: CompatibilityReport): void {
+  if (selectedMode === 'DOMINANT_ONLY') {
+    selectedMode = getBestMode(report);
+    return;
+  }
+  if (!report.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
+    selectedMode = getBestMode(report);
+  }
+}
+
 const WAVE1 = new Set([
-  'IN',
-  'CN',
-  'US',
-  'ID',
-  'PK',
-  'NG',
-  'BR',
-  'BD',
-  'RU',
-  'ET',
-  'MX',
-  'JP',
-  'EG',
-  'PH',
-  'CD',
-  'VN',
-  'IR',
-  'TR',
-  'DE',
-  'TH',
+  'IN', 'CN', 'US', 'ID', 'PK', 'NG', 'BR', 'BD', 'RU', 'ET', 'MX', 'JP', 'EG', 'PH', 'CD', 'VN', 'IR', 'TR', 'DE', 'TH',
 ]);
 
-// State
 let searchQuery = '';
 let activeRegion = '';
 let currentStrictness = 0.7;
@@ -115,7 +150,6 @@ async function init(): Promise<void> {
   app.innerHTML = '';
   app.className = 'sidepanel';
 
-  // Header
   const header = document.createElement('header');
   header.className = 'sp-header';
   const title = document.createElement('h1');
@@ -130,7 +164,6 @@ async function init(): Promise<void> {
   header.appendChild(settingsBtn);
   app.appendChild(header);
 
-  // Search
   const search = document.createElement('input');
   search.className = 'sp-search';
   search.type = 'search';
@@ -141,7 +174,6 @@ async function init(): Promise<void> {
   });
   app.appendChild(search);
 
-  // Region filters
   const filters = document.createElement('div');
   filters.className = 'sp-filters';
   const allChip = createFilterChip('All', '', filters);
@@ -153,7 +185,6 @@ async function init(): Promise<void> {
   }
   app.appendChild(filters);
 
-  // Palette list
   listEl = document.createElement('div');
   listEl.className = 'sp-list';
   listEl.id = 'sp-list';
@@ -211,13 +242,11 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   const card = document.createElement('div');
   card.className = 'sp-card';
 
-  // Flag
   const flag = document.createElement('div');
   flag.className = 'sp-card__flag';
   flag.innerHTML = getFlagSvg(palette.countryCode) ?? '';
   card.appendChild(flag);
 
-  // Info
   const info = document.createElement('div');
   info.className = 'sp-card__info';
   const name = document.createElement('div');
@@ -228,10 +257,16 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
   code.textContent = palette.countryCode;
   info.appendChild(name);
   info.appendChild(code);
+
+  const report = evaluateCompatibility(palette, currentStrictness);
+  const bestMode = getBestMode(report);
+  const bestQuality = bestMode === 'DOMINANT_ONLY' ? null : report.quality[bestMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  const summary = document.createElement('div');
+  summary.className = 'sp-card__summary';
+  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} � ${bestQuality.score}/100` : 'Fallback mode';
+  info.appendChild(summary);
   card.appendChild(info);
 
-  // Mode badges
-  const report = evaluateCompatibility(palette, currentStrictness);
   const modes = document.createElement('div');
   modes.className = 'sp-card__modes';
   for (const [key, label] of Object.entries(MODE_NAMES)) {
@@ -241,46 +276,104 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
     if (report.supports[key as 'AMOLED' | 'DARK' | 'LIGHT']) {
       badge.classList.add('mode-badge--supported');
     }
+    if (bestMode === key) {
+      badge.classList.add('mode-badge--best');
+    }
     modes.appendChild(badge);
   }
   card.appendChild(modes);
 
   card.addEventListener('click', () => {
-    // Auto-select best mode for this palette
     const r = evaluateCompatibility(palette, currentStrictness);
-    if (selectedMode !== 'DOMINANT_ONLY' && !r.supports[selectedMode as 'AMOLED' | 'DARK' | 'LIGHT']) {
-      if (r.supports.DARK) selectedMode = 'DARK';
-      else if (r.supports.AMOLED) selectedMode = 'AMOLED';
-      else if (r.supports.LIGHT) selectedMode = 'LIGHT';
-      else selectedMode = 'DOMINANT_ONLY';
-    }
+    selectedMode = getBestMode(r);
     openPaletteDrawer(palette);
   });
 
   return card;
 }
 
+function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compact = false): HTMLElement {
+  const block = document.createElement('section');
+  block.className = `sp-quality${compact ? ' sp-quality--compact' : ''}`;
+  const activeMode = mode === 'DOMINANT_ONLY' ? getBestMode(report) : mode;
+  const quality = activeMode === 'DOMINANT_ONLY' ? null : report.quality[activeMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  const bestMode = getBestMode(report);
+
+  const header = document.createElement('div');
+  header.className = 'sp-quality__header';
+  header.innerHTML = `
+    <span class="sp-quality__eyebrow">${bestMode === activeMode ? 'Recommended mode' : 'Current mode'}</span>
+    <strong class="sp-quality__title">${getModeLabel(activeMode)}</strong>
+    <span class="sp-quality__meta">${quality ? `${quality.score}/100 � ${getQualityTone(quality.score)}` : 'Fallback mode'}</span>
+  `;
+  block.appendChild(header);
+
+  const body = document.createElement('p');
+  body.className = 'sp-quality__body';
+  body.textContent =
+    activeMode === 'DOMINANT_ONLY'
+      ? 'Use this when you want the safest theme with the least interpretation.'
+      : `Best automatic pick is ${getModeLabel(bestMode)}. ${summarizeMode(report, activeMode)}`;
+  block.appendChild(body);
+
+  if (quality) {
+    const stats = document.createElement('div');
+    stats.className = 'sp-quality__stats';
+    for (const [label, value] of [
+      ['Fidelity', quality.fidelity],
+      ['Headroom', quality.contrastHeadroom],
+      ['Distinct', quality.distinctness],
+    ] as const) {
+      const chip = document.createElement('span');
+      chip.className = 'sp-quality__stat';
+      chip.textContent = `${label} ${Math.round(value * 100)}%`;
+      stats.appendChild(chip);
+    }
+    block.appendChild(stats);
+
+    const warnings = document.createElement('div');
+    warnings.className = 'sp-quality__warnings';
+    if (quality.warnings.length === 0) {
+      const item = document.createElement('span');
+      item.className = 'sp-quality__warning sp-quality__warning--ok';
+      item.textContent = 'No notable tradeoffs';
+      warnings.appendChild(item);
+    } else {
+      for (const warning of quality.warnings) {
+        const item = document.createElement('span');
+        item.className = 'sp-quality__warning';
+        item.textContent = compact ? warning.replaceAll('_', ' ').toLowerCase() : getWarningCopy(warning);
+        warnings.appendChild(item);
+      }
+    }
+    block.appendChild(warnings);
+  }
+
+  return block;
+}
+
 function openPaletteDrawer(palette: FlagPalette): void {
-  // Close existing drawer
   document.querySelector('.drawer')?.remove();
 
   const drawer = document.createElement('aside');
   drawer.className = 'drawer';
 
+  document.documentElement.style.overflow = 'hidden';
+  const closeDrawer = () => {
+    document.documentElement.style.overflow = '';
+    drawer.remove();
+  };
+
   const overlay = document.createElement('div');
   overlay.className = 'drawer__overlay';
-  overlay.addEventListener('click', () => drawer.remove());
+  overlay.addEventListener('click', closeDrawer);
   drawer.appendChild(overlay);
 
   const panel = document.createElement('div');
   panel.className = 'drawer__panel';
 
-  // ── Header: flag + name + code + copy/download SVG ──
   const header = document.createElement('header');
   header.className = 'drawer__header';
-
-  const headerLeft = document.createElement('div');
-  headerLeft.className = 'drawer__header-content';
 
   const titleRow = document.createElement('div');
   titleRow.className = 'drawer__title';
@@ -294,40 +387,39 @@ function openPaletteDrawer(palette: FlagPalette): void {
   }
 
   const nameEl = document.createElement('span');
-  nameEl.className = 'drawer__header-title';
+  nameEl.className = 'drawer__palette-name';
   nameEl.textContent = palette.name_en;
   titleRow.appendChild(nameEl);
 
   const codeEl = document.createElement('span');
-  codeEl.className = 'sp-card__code';
+  codeEl.className = 'drawer__palette-code';
   codeEl.textContent = palette.countryCode;
   titleRow.appendChild(codeEl);
 
-  headerLeft.appendChild(titleRow);
+  header.appendChild(titleRow);
 
-  // Flag SVG actions row
+  const headerActions = document.createElement('div');
+  headerActions.className = 'drawer__header-actions';
+
   if (flagSvg) {
-    const flagActions = document.createElement('div');
-    flagActions.className = 'drawer__flag-actions';
-
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'btn btn--ghost btn--sm';
-    copyBtn.appendChild(svgIcon(ICON_COPY));
-    copyBtn.appendChild(document.createTextNode(' Copy SVG'));
-    copyBtn.addEventListener('click', async () => {
+    const copySvgBtn = document.createElement('button');
+    copySvgBtn.className = 'drawer__icon-btn';
+    copySvgBtn.title = 'Copy SVG';
+    copySvgBtn.appendChild(svgIcon(ICON_COPY));
+    copySvgBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(flagSvg);
-        copyBtn.classList.add('text-ok');
-        setTimeout(() => copyBtn.classList.remove('text-ok'), 2000);
+        copySvgBtn.classList.add('text-ok');
+        setTimeout(() => copySvgBtn.classList.remove('text-ok'), 2000);
       } catch {
         /* clipboard unavailable */
       }
     });
 
     const dlBtn = document.createElement('button');
-    dlBtn.className = 'btn btn--ghost btn--sm';
+    dlBtn.className = 'drawer__icon-btn';
+    dlBtn.title = 'Download SVG';
     dlBtn.appendChild(svgIcon(ICON_DOWNLOAD));
-    dlBtn.appendChild(document.createTextNode(' Download'));
     dlBtn.addEventListener('click', () => {
       const blob = new Blob([flagSvg], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
@@ -338,30 +430,44 @@ function openPaletteDrawer(palette: FlagPalette): void {
       URL.revokeObjectURL(url);
     });
 
-    flagActions.appendChild(copyBtn);
-    flagActions.appendChild(dlBtn);
-    headerLeft.appendChild(flagActions);
+    headerActions.appendChild(copySvgBtn);
+    headerActions.appendChild(dlBtn);
   }
 
-  header.appendChild(headerLeft);
+  let showContrast = false;
+  const contrastBtn = document.createElement('button');
+  contrastBtn.className = 'drawer__icon-btn';
+  contrastBtn.title = 'Contrast analysis';
+  contrastBtn.appendChild(svgIcon(ICON_PIPETTE));
+  contrastBtn.addEventListener('click', () => {
+    showContrast = !showContrast;
+    contrastBtn.classList.toggle('drawer__icon-btn--active', showContrast);
+    const section = body.querySelector('.drawer__contrast-section') as HTMLElement | null;
+    if (section) section.hidden = !showContrast;
+  });
+  headerActions.appendChild(contrastBtn);
 
   const closeBtn = document.createElement('button');
-  closeBtn.className = 'drawer__close';
-  closeBtn.textContent = '\u00d7';
-  closeBtn.addEventListener('click', () => drawer.remove());
-  header.appendChild(closeBtn);
+  closeBtn.className = 'drawer__icon-btn';
+  closeBtn.title = 'Close';
+  closeBtn.appendChild(svgIcon(ICON_X));
+  closeBtn.addEventListener('click', closeDrawer);
+  headerActions.appendChild(closeBtn);
+
+  header.appendChild(headerActions);
   panel.appendChild(header);
 
-  // ── Body: modes, tokens, export, WCAG ──
   const body = document.createElement('div');
-  body.className = 'drawer__body';
+  body.className = 'drawer__body drawer__body--palette';
 
   function renderDrawerBody(): void {
     body.innerHTML = '';
 
     const report = evaluateCompatibility(palette, currentStrictness);
+    ensureModeSelection(report);
 
-    // Mode picker
+    body.appendChild(createQualityBlock(report, selectedMode));
+
     const modeTitle = document.createElement('div');
     modeTitle.className = 'sp-section-title';
     modeTitle.textContent = msg('welcomeChooseMode');
@@ -372,12 +478,12 @@ function openPaletteDrawer(palette: FlagPalette): void {
     for (const { mode, msgKey } of MODE_KEYS) {
       const btn = document.createElement('button');
       btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
-      btn.textContent = msg(msgKey);
-
       const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-      if (!isSupported) {
-        btn.disabled = true;
-      }
+      btn.textContent =
+        mode === 'DOMINANT_ONLY' || !report ? msg(msgKey) : `${msg(msgKey)} � ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
+
+      if (!isSupported) btn.disabled = true;
+      btn.title = summarizeMode(report, mode);
 
       btn.addEventListener('click', () => {
         if (!isSupported) return;
@@ -388,8 +494,19 @@ function openPaletteDrawer(palette: FlagPalette): void {
     }
     body.appendChild(modes);
 
-    // Token grid
     const tokens = generateTokens(palette, selectedMode, currentStrictness);
+
+    body.style.setProperty('--bg', tokens.bg);
+    body.style.setProperty('--bg-elevated', tokens.surface);
+    body.style.setProperty('--bg-soft', tokens.surface);
+    body.style.setProperty('--text-main', tokens.text);
+    body.style.setProperty('--text-muted', tokens.mutedText);
+    body.style.setProperty('--text-subtle', tokens.mutedText);
+    body.style.setProperty('--border-subtle', tokens.border);
+    body.style.setProperty('--primary', tokens.accent);
+    body.style.setProperty('--ok', tokens.accent2);
+    body.style.background = tokens.bg;
+    body.style.color = tokens.text;
 
     const tokensTitle = document.createElement('div');
     tokensTitle.className = 'sp-section-title';
@@ -397,21 +514,26 @@ function openPaletteDrawer(palette: FlagPalette): void {
     body.appendChild(tokensTitle);
     body.appendChild(createTokenGrid(tokens));
 
-    // Export
-    body.appendChild(createExportSection(palette, tokens));
+    const detailScroll = document.createElement('div');
+    detailScroll.className = 'drawer__detail-scroll';
 
-    // WCAG
-    const wcagTitle = document.createElement('div');
-    wcagTitle.className = 'sp-section-title';
-    wcagTitle.textContent = 'WCAG Contrast';
-    body.appendChild(wcagTitle);
-    body.appendChild(createWcagSummary(tokens));
+    const contrastSection = document.createElement('div');
+    contrastSection.className = 'drawer__contrast-section';
+    contrastSection.hidden = !showContrast;
+    const contrastTitle = document.createElement('div');
+    contrastTitle.className = 'sp-section-title';
+    contrastTitle.textContent = 'Contrast';
+    contrastSection.appendChild(contrastTitle);
+    contrastSection.appendChild(createWcagSummary(tokens));
+    detailScroll.appendChild(contrastSection);
+
+    detailScroll.appendChild(createExportSection(palette, tokens));
+    body.appendChild(detailScroll);
   }
 
   renderDrawerBody();
   panel.appendChild(body);
 
-  // ── Footer: Apply + Reset ──
   const footer = document.createElement('footer');
   footer.className = 'drawer__footer';
 
@@ -435,7 +557,7 @@ function openPaletteDrawer(palette: FlagPalette): void {
   resetBtn.disabled = !canApplyTheme;
   resetBtn.addEventListener('click', () => {
     handleReset();
-    drawer.remove();
+    closeDrawer();
   });
 
   footerActions.appendChild(applyBtn);
@@ -447,36 +569,30 @@ function openPaletteDrawer(palette: FlagPalette): void {
   document.body.appendChild(drawer);
 }
 
-/* ============================================
-   Token Grid
-   ============================================ */
-
-const TOKEN_LABELS: { key: keyof ThemeTokens; label: string }[] = [
-  { key: 'bg', label: 'BG' },
-  { key: 'surface', label: 'Surface' },
-  { key: 'text', label: 'Text' },
-  { key: 'mutedText', label: 'Muted' },
-  { key: 'border', label: 'Border' },
-  { key: 'accent', label: 'Accent' },
-  { key: 'accent2', label: 'Accent 2' },
-  { key: 'accentText', label: 'Acc. Text' },
-  { key: 'link', label: 'Link' },
-  { key: 'focusRing', label: 'Focus' },
+const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeTokens; fg: keyof ThemeTokens }[] = [
+  { key: 'bg', label: 'BG', bg: 'bg', fg: 'text' },
+  { key: 'surface', label: 'Surface', bg: 'surface', fg: 'text' },
+  { key: 'text', label: 'Text', bg: 'bg', fg: 'text' },
+  { key: 'mutedText', label: 'Muted', bg: 'bg', fg: 'mutedText' },
+  { key: 'border', label: 'Border', bg: 'bg', fg: 'border' },
+  { key: 'accent', label: 'Accent', bg: 'bg', fg: 'accent' },
+  { key: 'accent2', label: 'Accent 2', bg: 'bg', fg: 'accent2' },
+  { key: 'accentText', label: 'Acc. Text', bg: 'accent', fg: 'accentText' },
+  { key: 'link', label: 'Link', bg: 'bg', fg: 'link' },
+  { key: 'focusRing', label: 'Focus', bg: 'surface', fg: 'focusRing' },
 ];
 
 function createTokenGrid(tokens: ThemeTokens): HTMLElement {
   const grid = document.createElement('div');
   grid.className = 'sp-tokens';
 
-  for (const { key, label } of TOKEN_LABELS) {
+  for (const { key, label, bg, fg } of TOKEN_CARDS) {
     const hex = tokens[key];
     const card = document.createElement('button');
     card.className = 'sp-token';
     card.title = `Copy ${hex}`;
-
-    const swatch = document.createElement('span');
-    swatch.className = 'sp-token__swatch';
-    swatch.style.background = hex;
+    card.style.background = tokens[bg];
+    card.style.color = tokens[fg];
 
     const lbl = document.createElement('span');
     lbl.className = 'sp-token__label';
@@ -486,7 +602,6 @@ function createTokenGrid(tokens: ThemeTokens): HTMLElement {
     val.className = 'sp-token__hex';
     val.textContent = hex;
 
-    card.appendChild(swatch);
     card.appendChild(lbl);
     card.appendChild(val);
 
@@ -506,10 +621,6 @@ function createTokenGrid(tokens: ThemeTokens): HTMLElement {
 
   return grid;
 }
-
-/* ============================================
-   Export Section (inline tabbed)
-   ============================================ */
 
 type ExportTab = 'css' | 'tailwind' | 'json';
 
@@ -531,8 +642,7 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
   const copyBtn = document.createElement('button');
   copyBtn.className = 'sp-export__copy';
   copyBtn.title = 'Copy';
-  copyBtn.innerHTML =
-    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  copyBtn.appendChild(svgIcon(ICON_COPY));
 
   let activeTab: ExportTab = 'css';
 
@@ -589,10 +699,6 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
   return section;
 }
 
-/* ============================================
-   WCAG Summary Table
-   ============================================ */
-
 function createWcagSummary(tokens: ThemeTokens): HTMLElement {
   const table = document.createElement('table');
   table.className = 'wcag-summary';
@@ -627,10 +733,6 @@ function createWcagSummary(tokens: ThemeTokens): HTMLElement {
 
   return table;
 }
-
-/* ============================================
-   Apply / Reset Handlers
-   ============================================ */
 
 async function handleApply(palette: FlagPalette, btn: HTMLButtonElement): Promise<void> {
   try {
@@ -685,43 +787,44 @@ async function handleReset(): Promise<void> {
   renderList();
 }
 
-/* ============================================
-   Settings Drawer
-   ============================================ */
-
 function openSettingsDrawer(): void {
   document.querySelector('.drawer')?.remove();
 
   const drawer = document.createElement('aside');
   drawer.className = 'drawer';
 
+  document.documentElement.style.overflow = 'hidden';
+  const closeDrawer = () => {
+    document.documentElement.style.overflow = '';
+    drawer.remove();
+  };
+
   const overlay = document.createElement('div');
   overlay.className = 'drawer__overlay';
-  overlay.addEventListener('click', () => drawer.remove());
+  overlay.addEventListener('click', closeDrawer);
   drawer.appendChild(overlay);
 
   const panel = document.createElement('div');
   panel.className = 'drawer__panel';
+  panel.style.alignSelf = 'flex-start';
 
-  // Header
   const header = document.createElement('header');
   header.className = 'drawer__header';
   const title = document.createElement('h2');
   title.className = 'drawer__header-title';
   title.textContent = 'Settings';
   const closeBtn = document.createElement('button');
-  closeBtn.className = 'drawer__close';
-  closeBtn.textContent = '\u00d7';
-  closeBtn.addEventListener('click', () => drawer.remove());
+  closeBtn.className = 'drawer__icon-btn';
+  closeBtn.title = 'Close';
+  closeBtn.appendChild(svgIcon(ICON_X));
+  closeBtn.addEventListener('click', closeDrawer);
   header.appendChild(title);
   header.appendChild(closeBtn);
   panel.appendChild(header);
 
-  // Body
   const body = document.createElement('div');
   body.className = 'drawer__body';
 
-  // Strictness slider
   const strictSection = document.createElement('div');
   strictSection.className = 'drawer__section';
   const strictTitle = document.createElement('h3');
@@ -774,7 +877,6 @@ function openSettingsDrawer(): void {
 
   body.appendChild(strictSection);
 
-  // Auto-by-locale toggle
   const autoSection = document.createElement('div');
   autoSection.className = 'drawer__section';
   const autoTitle = document.createElement('h3');
@@ -809,7 +911,6 @@ function openSettingsDrawer(): void {
 
   body.appendChild(autoSection);
 
-  // Promo per spec
   const promo = document.createElement('div');
   promo.className = 'drawer__promo';
   const promoText = document.createElement('p');
@@ -831,3 +932,4 @@ function openSettingsDrawer(): void {
 }
 
 init();
+

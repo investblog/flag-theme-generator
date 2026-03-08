@@ -19,6 +19,8 @@ export interface CountryPageData {
   tokens: Record<string, Record<string, string>>;   // { dark: ThemeTokens, light: ..., amoled: ... }
   defaultMode: string;
   similarCountries: { name: string; slug: string; flagColors: string[] }[];
+  /** Inline SVG string of the country flag (3:2 ratio). */
+  flagSvg?: string;
   /** Localized country name (e.g., "Japón" for ES). Defaults to name. */
   localizedName?: string;
   /** Locale code for this page. Defaults to 'en'. */
@@ -100,7 +102,7 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
     </nav>
 
     <section class="hero">
-      <h1>${t(s.countryH1, { country: esc(countryName) })}</h1>
+      <h1>${d.flagSvg ? `<span class="hero__flag">${d.flagSvg}</span> ` : ''}${t(s.countryH1, { country: esc(countryName) })}</h1>
       <p class="hero__sub">${t(s.countryHeroSub, { country: esc(countryName) })}</p>
 
       <div class="preview">
@@ -168,6 +170,25 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
       </div>
     </section>
 ` : ''}
+    <section class="ext-promo">
+      <div class="ext-promo__card">
+        <div class="ext-promo__text">
+          <h2>${icon('palette', 20)} ${s.extensionTitle}</h2>
+          <p>${s.extensionDesc}</p>
+          <ul>
+            <li>${icon('check', 16)} ${s.extensionFeature1}</li>
+            <li>${icon('check', 16)} ${s.extensionFeature2}</li>
+            <li>${icon('check', 16)} ${s.extensionFeature3}</li>
+            <li>${icon('check', 16)} ${s.extensionFeature4}</li>
+          </ul>
+        </div>
+        <div class="ext-promo__actions">
+          <span class="btn btn--secondary btn--soon">${brandIcon('chrome', 18)} Chrome &mdash; ${s.extensionComingSoon}</span>
+          <span class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} Firefox &mdash; ${s.extensionComingSoon}</span>
+        </div>
+      </div>
+    </section>
+
     <section class="faq">
       <h2>${s.faqTitle}</h2>
       ${FAQ.map(f => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join('\n      ')}

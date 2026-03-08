@@ -6,7 +6,8 @@
  *
  * Run: npm run build (from site/)
  */
-import { mkdirSync, writeFileSync, readFileSync, copyFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
+import * as allFlags from 'country-flag-icons/string/3x2';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { generateChromeThemeZip, type ThemeInput, type ThemeAssets } from './chrome-theme.js';
@@ -54,6 +55,12 @@ const SUPPORTED_LANGS = new Set(Object.keys(strings));
 const SKIP_ZIPS = process.argv.includes('--skip-zips');
 
 // --- helpers ---
+const FLAG_SVG = allFlags as Record<string, string>;
+
+function getFlagSvg(code: string): string | undefined {
+  return FLAG_SVG[code.toUpperCase()];
+}
+
 function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
@@ -188,6 +195,7 @@ for (const palette of palettes) {
     tokens: allTokens,
     defaultMode: DEFAULT_MODE,
     similarCountries: similar,
+    flagSvg: getFlagSvg(palette.countryCode),
     lang: 'en',
     hreflang,
   };
@@ -238,6 +246,7 @@ for (const { palette, lang, localizedName } of localizedEntries) {
     tokens: allTokens,
     defaultMode: DEFAULT_MODE,
     similarCountries: similar,
+    flagSvg: getFlagSvg(palette.countryCode),
     localizedName,
     lang,
     hreflang,

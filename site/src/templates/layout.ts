@@ -27,6 +27,7 @@ export interface LayoutOpts {
 /** Human-readable labels for language codes. */
 const LANG_LABELS: Record<string, string> = {
   en: 'EN', es: 'ES', fr: 'FR', ar: 'AR', pt: 'PT', de: 'DE',
+  it: 'IT', nl: 'NL', zh: '中文', ja: '日本語', ko: '한국어', tr: 'TR',
 };
 
 function langSwitcher(currentLang: string, entries: HreflangEntry[]): string {

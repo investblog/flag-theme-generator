@@ -32,6 +32,18 @@ export default defineConfig({
       128: 'icons/128.png',
     },
 
+    // Chrome/Edge: action button in toolbar (opens side panel via setPanelBehavior)
+    ...(browser !== 'firefox' && {
+      action: {
+        default_icon: {
+          16: 'icons/16.png',
+          32: 'icons/32.png',
+          48: 'icons/48.png',
+        },
+        default_title: '__MSG_extName__',
+      },
+    }),
+
     ...(browser === 'firefox' && {
       browser_specific_settings: {
         gecko: {
@@ -44,6 +56,20 @@ export default defineConfig({
       },
     }),
   }),
+
+  hooks: {
+    'build:manifestGenerated': (_wxt, manifest) => {
+      // WXT auto-generates sidebar_action from sidepanel entrypoint but without icons
+      if (manifest.sidebar_action) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (manifest.sidebar_action as any).default_icon = {
+          16: 'icons/16.png',
+          32: 'icons/32.png',
+          48: 'icons/48.png',
+        };
+      }
+    },
+  },
 
   browser: 'chrome',
 });

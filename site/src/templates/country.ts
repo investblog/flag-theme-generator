@@ -184,6 +184,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
         </div>
         <div class="ext-promo__actions">
           <span class="btn btn--secondary btn--soon">${brandIcon('chrome', 18)} Chrome &mdash; ${s.extensionComingSoon}</span>
+          <span class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} Edge &mdash; ${s.extensionComingSoon}</span>
           <span class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} Firefox &mdash; ${s.extensionComingSoon}</span>
         </div>
       </div>

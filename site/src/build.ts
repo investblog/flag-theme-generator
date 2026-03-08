@@ -307,6 +307,53 @@ writeFileSync(resolve(DIST, 'index.html'), homePage({
 }));
 console.log('  Homepage generated');
 
+// --- localized homepage, catalog, region pages ---
+const nonEnLangs = [...SUPPORTED_LANGS].filter(l => l !== 'en');
+for (const lang of nonEnLangs) {
+  const langPrefix = resolve(DIST, lang);
+
+  // Homepage
+  ensureDir(langPrefix);
+  writeFileSync(resolve(langPrefix, 'index.html'), homePage({
+    popularCountries: popular,
+    regions: regionList,
+    allCountries,
+    totalCount: palettes.length,
+    lang,
+  }));
+  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/` });
+
+  // Catalog
+  ensureDir(resolve(langPrefix, 'countries'));
+  writeFileSync(resolve(langPrefix, 'countries', 'index.html'), catalogPage({
+    ...catalogData,
+    lang,
+  }));
+  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/countries/` });
+
+  // Region pages
+  for (const [rName, members] of regionMap) {
+    if (rName === 'Antarctica') continue;
+    const rSlug = regionSlug(rName);
+    const rDir = resolve(langPrefix, 'regions', rSlug);
+    ensureDir(rDir);
+
+    writeFileSync(resolve(rDir, 'index.html'), regionPage({
+      name: rName,
+      slug: rSlug,
+      countries: members.map(p => ({
+        name: getCountryName(p.countryCode, lang, p.name_en),
+        slug: slugify(p.name_en),
+        flagColors: p.flagColors as string[],
+      })),
+      allRegions: regionList,
+      lang,
+    }));
+    sitemapEntries.push({ loc: `${SITE_URL}/${lang}/regions/${rSlug}/` });
+  }
+}
+console.log(`  ${nonEnLangs.length} localized homepage + catalog + region sets generated`);
+
 // --- sitemap.xml ---
 const lastmod = new Date().toISOString().split('T')[0];
 function sitemapUrl(entry: SitemapEntry): string {

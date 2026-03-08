@@ -3,57 +3,67 @@
  */
 import { SITE_URL, icon, esc, breadcrumbLd } from './helpers.js';
 import { layout } from './layout.js';
+import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 
 export interface RegionPageData {
   name: string;
   slug: string;
   countries: { name: string; slug: string; flagColors: string[] }[];
   allRegions: { name: string; slug: string; count: number }[];
+  lang?: string;
 }
 
 export function regionPage(d: RegionPageData): string {
+  const lang = d.lang || 'en';
+  const s = getStrings(lang);
+  const prefix = lang === 'en' ? '' : `/${lang}`;
+
   const crumbs = [
-    { name: 'Home', url: SITE_URL + '/' },
-    { name: d.name, url: `${SITE_URL}/regions/${d.slug}/` },
+    { name: s.home, url: `${SITE_URL}${prefix}/` },
+    { name: d.name, url: `${SITE_URL}${prefix}/regions/${d.slug}/` },
   ];
 
   const body = `
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a> <span>/</span> <span>${esc(d.name)}</span>
+      <a href="${prefix}/">${esc(s.home)}</a> <span>/</span> <span>${esc(d.name)}</span>
     </nav>
 
     <section class="region-hero">
-      <h1>${esc(d.name)} Browser Themes</h1>
-      <p>${d.countries.length} flag-inspired browser themes from ${esc(d.name)}.</p>
+      <h1>${t(s.regionH1, { region: esc(d.name) })}</h1>
+      <p>${t(s.regionDesc, { count: d.countries.length, region: esc(d.name) })}</p>
     </section>
 
     <section>
       <div class="catalog-grid">
         ${d.countries.map(c =>
-          `<a class="card" href="/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
+          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
         ).join('\n        ')}
       </div>
     </section>
 
     <section>
-      <h2>Other Regions</h2>
+      <h2>${s.otherRegions}</h2>
       <div class="region-chips">
         ${d.allRegions.filter(r => r.slug !== d.slug).map(r =>
-          `<a class="region-chip" href="/regions/${r.slug}/">${r.name} (${r.count})</a>`
+          `<a class="region-chip" href="${prefix}/regions/${r.slug}/">${r.name} (${r.count})</a>`
         ).join('\n        ')}
       </div>
     </section>
 
     <nav class="page-nav">
-      <a href="/">${icon('chevron-left', 16)} Home</a>
-      <a href="/countries/">All Countries ${icon('chevron-right', 16)}</a>
+      <a href="${prefix}/">${icon('chevron-left', 16)} ${esc(s.home)}</a>
+      <a href="${prefix}/countries/">${s.allCountries} ${icon('chevron-right', 16)}</a>
     </nav>`;
 
   return layout({
-    title: `${d.name} Browser Themes — Flag Theme`,
-    description: `${d.countries.length} free browser themes inspired by flags of ${d.name}n countries. Chrome, Edge, Firefox, and Brave.`,
-    canonical: `${SITE_URL}/regions/${d.slug}/`,
+    lang,
+    dir: s.dir,
+    title: t(s.regionH1, { region: d.name }),
+    description: t(s.regionDesc, { count: d.countries.length, region: d.name }),
+    canonical: `${SITE_URL}${prefix}/regions/${d.slug}/`,
     head: `\n  <script type="application/ld+json">${breadcrumbLd(crumbs)}</script>`,
     body,
+    navCountriesLabel: s.countries,
+    footerText: t(s.footerText, { year: String(new Date().getFullYear()) }),
   });
 }

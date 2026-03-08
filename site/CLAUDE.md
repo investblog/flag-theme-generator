@@ -12,7 +12,7 @@ Lives inside the dark-theme-generator monorepo, shares `src/shared/` with the ex
 - **Styles:** CSS variables from token pipeline + base from extension
 - **Images:** resvg-js for SVG→PNG (NTP maps, attribution)
 - **Themes:** archiver for Chrome .zip themes
-- **Flags:** country-flag-icons (SVG 3:2)
+- **Flags:** country-flag-icons (SVG 3:2) — inline in country page h1
 - **No framework** — plain TS build script, no React/Vue/SSR
 
 ## Shared Code (from extension)
@@ -21,7 +21,6 @@ Import via relative paths (`../src/shared/`):
 - `data/palettes` — palette dataset (198 countries)
 - `utils/tokens` — `generateTokens(palette, mode, strictness)` → ThemeTokens
 - `utils/color` — color math (OKLCH, contrast, deltaE)
-- `utils/flags` — `getFlagSvg(countryCode)` → SVG string
 - `types/theme` — FlagPalette, ThemeMode, ThemeTokens
 
 ## Commands
@@ -29,40 +28,59 @@ Import via relative paths (`../src/shared/`):
 ```bash
 cd site/
 npm install
-npm run build          # Generate all pages + themes → dist/
-npm run preview        # Local preview via wrangler
-npm run deploy         # Deploy to CF Pages
+npm run build              # Generate all pages + themes → dist/
+npm run build -- --skip-zips  # Skip zip generation (fast rebuild)
+npm run preview            # Local preview via wrangler
+npm run deploy             # Deploy to CF Pages
 ```
 
 ## Site Structure
 
 ```
-/                          — homepage (search, popular, regions)
-/countries/                — full catalog
-/countries/{slug}/         — country SEO page (main surface)
-/regions/{slug}/           — regional hub
-/downloads/{code}-{mode}.zip — Chrome theme files
+/                              — homepage (search, popular, regions)
+/countries/                    — full catalog
+/countries/{slug}/             — country SEO page (main surface)
+/regions/{slug}/               — regional hub (5: africa, americas, asia, europe, oceania)
+/{lang}/                       — localized homepage
+/{lang}/countries/             — localized catalog
+/{lang}/countries/{slug}/      — localized country page
+/{lang}/regions/{slug}/        — localized regional hub
+/downloads/{code}-{mode}.zip   — Chrome theme files (594 total)
+/assets/                       — site.css, ui-icons.svg, brand-icons.svg
 ```
 
 ## Build Pipeline
 
 ```
-palettes.ts
-  → for each country × mode:
+palettes.ts (198 countries)
+  → for each country × mode (dark/light/amoled):
       → generateTokens() → CSS variables
       → HTML template → /countries/{slug}/index.html
       → Chrome theme manifest + NTP PNG → /downloads/{code}-{mode}.zip
-  → index.html, /countries/index.html
-  → /regions/{slug}/index.html
-  → sitemap.xml, robots.txt
+  → localized country pages (/{lang}/countries/{slug}/)
+  → homepage, catalog, region pages (EN + 11 locales)
+  → sitemap.xml (374 URLs), robots.txt
 ```
 
-## Localization
+## Localization (12 languages)
 
-- Wave 1: EN (base) + ES (test multilingual)
-- Country-language pages for long-tail SEO (e.g., `/tr/countries/turkey/` in Turkish)
-- RU not on launch (CF blocked from Russia)
-- All UI strings in `src/i18n/`
+- **Languages:** EN (base), ES, FR, AR, PT, DE, IT, NL, ZH, JA, KO, TR
+- **Strings:** `src/i18n/strings.ts` — `SiteStrings` interface, `t()` template, `getStrings(lang)`
+- **Country names:** `src/i18n/countries.ts` — wraps `i18n-iso-countries`
+- **All templates i18n-aware:** homepage, catalog, region, country
+- Country pages localized per `recommendedLocales` from palette data
+- Homepage/catalog/region generated for all 11 non-EN languages
+- hreflang cross-linking + language switcher dropdown
+- RU skipped (CF blocked from Russia)
+
+## Country Page Features
+
+- Inline flag SVG before h1
+- Browser preview mockup with mode switcher (Dark/Light/AMOLED)
+- CTA: Download Chrome, Get Firefox, Copy CSS
+- Extension promo section with feature list + "Coming soon" store buttons (Chrome/Edge/Firefox)
+- Flag swatches + design token grid
+- Similar themes + FAQ accordion + JSON-LD
 
 ## Design Tokens
 

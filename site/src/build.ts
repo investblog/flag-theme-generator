@@ -1,18 +1,28 @@
 /**
  * flagtheme.com — static site generator.
- * Generates country pages, Chrome themes, homepage, sitemap.
+ * Generates country pages (3 modes), Chrome themes, homepage,
+ * catalog, region hubs, sprites, sitemap.
  *
  * Run: npm run build (from site/)
  */
-import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, copyFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { generateChromeThemeZip, type ThemeInput, type ThemeAssets } from './chrome-theme.js';
+import { buildUISprite, buildBrandSprite } from './sprites.js';
+import { slugify, regionSlug, SITE_URL } from './templates/helpers.js';
+import { countryPage, type CountryPageData } from './templates/country.js';
+import { homePage } from './templates/homepage.js';
+import { catalogPage } from './templates/catalog.js';
+import { regionPage } from './templates/region.js';
+
+import type { FlagPalette } from '../../src/shared/types/theme';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MONO_ROOT = resolve(ROOT, '..');
 const shared = (p: string) => resolve(MONO_ROOT, 'src/shared', p);
 const DIST = resolve(ROOT, 'dist');
+const CSS_SRC = resolve(ROOT, 'src/assets/css/site.css');
 
 const THEME_ASSETS: ThemeAssets = {
   mapSvgPath: resolve(MONO_ROOT, 'temp/world-map.min.svg'),
@@ -23,153 +33,163 @@ const THEME_ASSETS: ThemeAssets = {
 const { PALETTES } = await import(pathToFileURL(shared('data/palettes.ts')).href);
 const { generateTokens } = await import(pathToFileURL(shared('utils/tokens.ts')).href);
 
-import type { FlagPalette } from '../../src/shared/types/theme';
-
 // --- config ---
-const MODES = ['DARK'] as const; // MVP: DARK only, expand to LIGHT/AMOLED later
+const MODES = ['dark', 'light', 'amoled'] as const;
+const MODE_API: Record<string, string> = { dark: 'DARK', light: 'LIGHT', amoled: 'AMOLED' };
+const DEFAULT_MODE = 'dark';
 const STRICTNESS = 0.7;
-const SITE_URL = 'https://flagtheme.com';
+const POPULAR_CODES = [
+  'US', 'GB', 'JP', 'BR', 'IN', 'DE', 'FR', 'IT', 'ES', 'MX',
+  'CA', 'AU', 'KR', 'TR', 'PL', 'NL', 'SE', 'NO', 'CH', 'ZA',
+];
 
 // --- helpers ---
-function slugify(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
-
 function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
 
-// --- build steps ---
-console.log(`Building flagtheme.com — ${PALETTES.length} countries × ${MODES.length} modes\n`);
+// --- start ---
+const palettes = PALETTES as FlagPalette[];
+console.log(`Building flagtheme.com — ${palettes.length} countries × ${MODES.length} modes\n`);
 const startTime = Date.now();
 
+// --- directories ---
 ensureDir(DIST);
 ensureDir(resolve(DIST, 'countries'));
 ensureDir(resolve(DIST, 'downloads'));
+ensureDir(resolve(DIST, 'regions'));
+ensureDir(resolve(DIST, 'assets'));
 
-// Track all pages for sitemap
+// --- static assets ---
+writeFileSync(resolve(DIST, 'assets', 'ui-icons.svg'), buildUISprite());
+writeFileSync(resolve(DIST, 'assets', 'brand-icons.svg'), buildBrandSprite());
+copyFileSync(CSS_SRC, resolve(DIST, 'assets', 'site.css'));
+console.log('  Static assets copied (sprites + CSS)');
+
+// --- precompute region data ---
+const regionMap = new Map<string, FlagPalette[]>();
+for (const p of palettes) {
+  const r = p.region || 'Other';
+  if (!regionMap.has(r)) regionMap.set(r, []);
+  regionMap.get(r)!.push(p);
+}
+const regionList = [...regionMap.entries()]
+  .filter(([name]) => name !== 'Antarctica')
+  .map(([name, members]) => ({ name, slug: regionSlug(name), count: members.length }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+// --- track sitemap ---
 const sitemapUrls: string[] = [SITE_URL + '/'];
 
 // --- generate country pages + Chrome themes ---
 let count = 0;
-for (const palette of PALETTES as FlagPalette[]) {
+for (const palette of palettes) {
   const slug = slugify(palette.name_en);
   const countryDir = resolve(DIST, 'countries', slug);
   ensureDir(countryDir);
 
+  // Generate tokens for all modes
+  const allTokens: Record<string, Record<string, string>> = {};
   for (const mode of MODES) {
-    const tokens = generateTokens(palette, mode, STRICTNESS);
+    allTokens[mode] = generateTokens(palette, MODE_API[mode], STRICTNESS);
+  }
 
-    // Generate Chrome theme .zip
+  // Generate Chrome theme .zip for each mode
+  for (const mode of MODES) {
     const themeInput: ThemeInput = {
       countryCode: palette.countryCode,
       name: palette.name_en,
-      mode,
+      mode: MODE_API[mode],
       flagColors: palette.flagColors,
-      tokens,
+      tokens: allTokens[mode],
     };
     const zipBuffer = await generateChromeThemeZip(themeInput, THEME_ASSETS);
-    const zipName = `${palette.countryCode.toLowerCase()}-${mode.toLowerCase()}.zip`;
+    const zipName = `${palette.countryCode.toLowerCase()}-${mode}.zip`;
     writeFileSync(resolve(DIST, 'downloads', zipName), zipBuffer);
-
-    // Country page
-    const html = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${palette.name_en} Browser Theme — Flag Theme</title>
-  <meta name="description" content="Download a ${palette.name_en} flag-inspired browser theme for Chrome and Firefox. Free, beautiful, WCAG-accessible.">
-  <style>
-    :root {
-      --uc-bg: ${tokens.bg};
-      --uc-surface: ${tokens.surface};
-      --uc-text: ${tokens.text};
-      --uc-muted-text: ${tokens.mutedText};
-      --uc-border: ${tokens.border};
-      --uc-accent: ${tokens.accent};
-      --uc-accent2: ${tokens.accent2};
-      --uc-accent-text: ${tokens.accentText};
-      --uc-link: ${tokens.link};
-      --uc-focus-ring: ${tokens.focusRing};
-    }
-    body { background: var(--uc-bg); color: var(--uc-text); font-family: system-ui, sans-serif; margin: 0; padding: 2rem; }
-    h1 { color: var(--uc-accent); }
-    a { color: var(--uc-link); }
-    .chip { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem; background: var(--uc-surface); border: 1px solid var(--uc-border); color: var(--uc-muted-text); font-size: 0.875rem; }
-  </style>
-</head>
-<body>
-  <h1>${palette.name_en} Browser Theme</h1>
-  <p>A beautiful browser theme inspired by the flag of ${palette.name_en}.</p>
-  <p>
-    <span class="chip">${mode}</span>
-    <span class="chip">${palette.flagColors.length} colors</span>
-  </p>
-  <p><a href="/downloads/${palette.countryCode.toLowerCase()}-${mode.toLowerCase()}.zip">Download for Chrome</a></p>
-  <p><a href="/countries/">← All countries</a></p>
-</body>
-</html>`;
-
-    writeFileSync(resolve(countryDir, 'index.html'), html);
   }
 
+  // Similar countries: same region, exclude self, max 6
+  const region = palette.region || 'Other';
+  const similar = (regionMap.get(region) || [])
+    .filter(p => p.countryCode !== palette.countryCode)
+    .slice(0, 6)
+    .map(p => ({ name: p.name_en, slug: slugify(p.name_en), flagColors: p.flagColors as string[] }));
+
+  // Render country page
+  const data: CountryPageData = {
+    countryCode: palette.countryCode,
+    name: palette.name_en,
+    slug,
+    flagColors: palette.flagColors as string[],
+    region,
+    regionSlug: regionSlug(region),
+    tokens: allTokens,
+    defaultMode: DEFAULT_MODE,
+    similarCountries: similar,
+  };
+  writeFileSync(resolve(countryDir, 'index.html'), countryPage(data));
   sitemapUrls.push(`${SITE_URL}/countries/${slug}/`);
+
   count++;
-  if (count % 20 === 0) process.stdout.write(`  ${count}/${PALETTES.length}...\n`);
+  if (count % 20 === 0) process.stdout.write(`  ${count}/${palettes.length}...\n`);
 }
+console.log(`  ${palettes.length} country pages + ${palettes.length * MODES.length} Chrome themes generated`);
 
-console.log(`  ${PALETTES.length} country pages + Chrome themes generated`);
-
-// --- countries index ---
-const countriesIndex = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Country Themes — Flag Theme</title>
-  <style>body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
-  .card { padding: 1rem; border-radius: 0.5rem; border: 1px solid #ddd; text-decoration: none; color: inherit; }
-  .card:hover { background: #f5f5f5; }</style>
-</head>
-<body>
-  <h1>All Country Themes</h1>
-  <div class="grid">
-    ${(PALETTES as FlagPalette[]).map((p: FlagPalette) =>
-      `<a class="card" href="/countries/${slugify(p.name_en)}/">${p.name_en}</a>`
-    ).join('\n    ')}
-  </div>
-</body>
-</html>`;
-
-writeFileSync(resolve(DIST, 'countries', 'index.html'), countriesIndex);
+// --- catalog page ---
+const catalogData = {
+  countries: palettes.map(p => ({
+    name: p.name_en,
+    slug: slugify(p.name_en),
+    flagColors: p.flagColors as string[],
+    region: p.region || 'Other',
+  })),
+  regions: regionList,
+};
+writeFileSync(resolve(DIST, 'countries', 'index.html'), catalogPage(catalogData));
 sitemapUrls.push(`${SITE_URL}/countries/`);
+console.log('  Catalog page generated');
 
-// --- homepage (placeholder) ---
-const homepage = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flag Theme — Browser Themes Inspired by Country Flags</title>
-  <meta name="description" content="Free browser themes for Chrome and Firefox inspired by flags of 190+ countries. Download or apply instantly.">
-</head>
-<body>
-  <h1>Flag Theme</h1>
-  <p>Browser themes inspired by country flags. 190+ countries, dark and light modes.</p>
-  <p><a href="/countries/">Browse all countries →</a></p>
-</body>
-</html>`;
+// --- region pages ---
+for (const [rName, members] of regionMap) {
+  if (rName === 'Antarctica') continue;
+  const rSlug = regionSlug(rName);
+  const rDir = resolve(DIST, 'regions', rSlug);
+  ensureDir(rDir);
 
-writeFileSync(resolve(DIST, 'index.html'), homepage);
+  writeFileSync(resolve(rDir, 'index.html'), regionPage({
+    name: rName,
+    slug: rSlug,
+    countries: members.map(p => ({
+      name: p.name_en,
+      slug: slugify(p.name_en),
+      flagColors: p.flagColors as string[],
+    })),
+    allRegions: regionList,
+  }));
+  sitemapUrls.push(`${SITE_URL}/regions/${rSlug}/`);
+}
+console.log(`  ${regionMap.size - 1} region pages generated`);
+
+// --- homepage ---
+const popular = POPULAR_CODES
+  .map(code => palettes.find(p => p.countryCode === code))
+  .filter(Boolean)
+  .map(p => ({ name: p!.name_en, slug: slugify(p!.name_en), flagColors: p!.flagColors as string[] }));
+const allCountries = palettes.map(p => ({ name: p.name_en, slug: slugify(p.name_en), code: p.countryCode }));
+
+writeFileSync(resolve(DIST, 'index.html'), homePage({
+  popularCountries: popular,
+  regions: regionList,
+  allCountries,
+  totalCount: palettes.length,
+}));
+console.log('  Homepage generated');
 
 // --- sitemap.xml ---
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemapindex.org/schemas/sitemap/0.9">
 ${sitemapUrls.map(url => `  <url><loc>${url}</loc></url>`).join('\n')}
 </urlset>`;
-
 writeFileSync(resolve(DIST, 'sitemap.xml'), sitemap);
 
 // --- robots.txt ---

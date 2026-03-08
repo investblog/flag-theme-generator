@@ -14,6 +14,7 @@
     "country-flag-icons": "^1.5.13"
   },
   "devDependencies": {
+    "@mdi/svg": "^7.4.47",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "wrangler": "^4.0.0"

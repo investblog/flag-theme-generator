@@ -111,8 +111,8 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 /* === Footer === */
 .footer{max-width:960px;margin:0 auto;padding:2rem 1.5rem;text-align:center;color:var(--uc-muted-text);font-size:.8125rem;border-top:1px solid var(--uc-border)}
 .footer__sponsor{margin-top:.5rem;font-size:.75rem}
-.footer__sponsor a{display:inline-flex;align-items:center;gap:.25rem;color:var(--uc-muted-text)}
-.footer__sponsor .i{vertical-align:0}
+.footer__sponsor a{color:var(--uc-muted-text)}
+.footer__sponsor .i{vertical-align:-.1em;margin:0 .15em}
 .footer__sponsor a:hover{color:var(--uc-link);text-decoration:none}
 
 /* === Catalog / Region Grids === */

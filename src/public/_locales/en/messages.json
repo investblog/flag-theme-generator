@@ -142,8 +142,12 @@
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
   "chromeThemeNote": {
-    "message": "Live browser themes require Firefox. Use Export below to grab design tokens for your web projects.",
+    "message": "Chrome and Edge themes are available as downloadable .zip files on our website.",
     "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "Download Theme",
+    "description": "Button to download Chrome theme from flagtheme.com"
   },
   "searchPlaceholder": {
     "message": "Search countries...",

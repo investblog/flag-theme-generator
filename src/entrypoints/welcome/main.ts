@@ -17,6 +17,7 @@ import {
   pickMode,
   summarizeMode,
 } from '@shared/utils/quality';
+import { countryPageUrl } from '@shared/utils/site';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 const TOKEN_CARDS: { key: keyof ThemeTokens; label: string; bg: keyof ThemeTokens; fg: keyof ThemeTokens }[] = [
@@ -313,10 +314,19 @@ function init(): void {
       applyBtn.hidden = true;
       resetBtn.hidden = true;
 
+      const dlLink = document.createElement('a');
+      dlLink.className = 'btn btn--primary';
+      dlLink.id = 'btn-download-site';
+      dlLink.textContent = msg('downloadTheme');
+      dlLink.target = '_blank';
+      dlLink.rel = 'noopener';
+      dlLink.href = selectedPalette ? countryPageUrl(selectedPalette.name_en) : 'https://flagtheme.com/';
+      btnRow.insertBefore(dlLink, galleryLink);
+
       const note = document.createElement('p');
       note.className = 'toggle-row__hint';
       note.textContent = msg('chromeThemeNote');
-      btnRow.insertBefore(note, galleryLink);
+      btnRow.insertBefore(note, dlLink);
     } else if (selectedPalette) {
       applyBtn.disabled = false;
     }
@@ -371,6 +381,9 @@ function selectPalette(palette: FlagPalette, grid: HTMLElement): void {
 
   const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
   if (applyBtn && themeApiAvailable) applyBtn.disabled = false;
+
+  const dlLink = document.getElementById('btn-download-site') as HTMLAnchorElement | null;
+  if (dlLink) dlLink.href = countryPageUrl(palette.name_en);
 
   const exportBtnEl = document.getElementById('btn-export') as HTMLButtonElement | null;
   if (exportBtnEl) exportBtnEl.disabled = false;

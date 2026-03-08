@@ -19,6 +19,7 @@ import {
   pickMode,
   summarizeMode,
 } from '@shared/utils/quality';
+import { countryPageUrl } from '@shared/utils/site';
 import { evaluateCompatibility, generateTokens } from '@shared/utils/tokens';
 
 function svgIcon(pathD: string, size = 16): SVGSVGElement {
@@ -503,28 +504,30 @@ function openPaletteDrawer(palette: FlagPalette): void {
   const footerActions = document.createElement('div');
   footerActions.className = 'sp-actions';
 
-  const applyBtn = document.createElement('button');
   if (canApplyTheme) {
+    const applyBtn = document.createElement('button');
     applyBtn.className = 'btn btn--primary';
     applyBtn.textContent = msg('btnApply');
     applyBtn.addEventListener('click', () => handleApply(palette, applyBtn));
+    footerActions.appendChild(applyBtn);
+
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'btn btn--ghost';
+    resetBtn.textContent = msg('btnReset');
+    resetBtn.addEventListener('click', () => {
+      handleReset();
+      closeDrawer();
+    });
+    footerActions.appendChild(resetBtn);
   } else {
-    applyBtn.className = 'btn btn--ghost';
-    applyBtn.textContent = msg('themeUnavailable');
-    applyBtn.disabled = true;
+    const dlLink = document.createElement('a');
+    dlLink.className = 'btn btn--primary';
+    dlLink.textContent = msg('downloadTheme');
+    dlLink.href = countryPageUrl(palette.name_en);
+    dlLink.target = '_blank';
+    dlLink.rel = 'noopener';
+    footerActions.appendChild(dlLink);
   }
-
-  const resetBtn = document.createElement('button');
-  resetBtn.className = 'btn btn--ghost';
-  resetBtn.textContent = msg('btnReset');
-  resetBtn.disabled = !canApplyTheme;
-  resetBtn.addEventListener('click', () => {
-    handleReset();
-    closeDrawer();
-  });
-
-  footerActions.appendChild(applyBtn);
-  footerActions.appendChild(resetBtn);
   footer.appendChild(footerActions);
   panel.appendChild(footer);
 

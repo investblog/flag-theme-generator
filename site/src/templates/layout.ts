@@ -1,7 +1,7 @@
 /**
  * Shared HTML layout wrapper.
  */
-import { icon } from './helpers.js';
+import { logoSvg } from './helpers.js';
 
 export interface LayoutOpts {
   title: string;
@@ -28,7 +28,7 @@ export function layout(o: LayoutOpts): string {
 </head>
 <body${o.bodyAttrs ? ' ' + o.bodyAttrs : ''}>
   <nav class="nav">
-    <a href="/" class="nav__logo">${icon('palette', 24)}<span>Flag Theme</span></a>
+    <a href="/" class="nav__logo">${logoSvg(24)}<span>Flag Theme</span></a>
     <div class="nav__links">
       <a href="/countries/">Countries</a>
     </div>

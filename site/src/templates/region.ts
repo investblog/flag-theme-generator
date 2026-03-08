@@ -1,7 +1,7 @@
 /**
  * Region hub page.
  */
-import { SITE_URL, icon, esc } from './helpers.js';
+import { SITE_URL, icon, esc, breadcrumbLd } from './helpers.js';
 import { layout } from './layout.js';
 
 export interface RegionPageData {
@@ -12,7 +12,16 @@ export interface RegionPageData {
 }
 
 export function regionPage(d: RegionPageData): string {
+  const crumbs = [
+    { name: 'Home', url: SITE_URL + '/' },
+    { name: d.name, url: `${SITE_URL}/regions/${d.slug}/` },
+  ];
+
   const body = `
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span>/</span> <span>${esc(d.name)}</span>
+    </nav>
+
     <section class="region-hero">
       <h1>${esc(d.name)} Browser Themes</h1>
       <p>${d.countries.length} flag-inspired browser themes from ${esc(d.name)}.</p>
@@ -44,6 +53,7 @@ export function regionPage(d: RegionPageData): string {
     title: `${d.name} Browser Themes — Flag Theme`,
     description: `${d.countries.length} free browser themes inspired by flags of ${d.name}n countries. Chrome, Edge, Firefox, and Brave.`,
     canonical: `${SITE_URL}/regions/${d.slug}/`,
+    head: `\n  <script type="application/ld+json">${breadcrumbLd(crumbs)}</script>`,
     body,
   });
 }

@@ -3,7 +3,7 @@
  */
 import {
   SITE_URL, TOKEN_KEYS, TOKEN_CSS,
-  icon, brandIcon, cssVarsBlock, jsTokenMap, esc,
+  icon, brandIcon, cssVarsBlock, jsTokenMap, esc, breadcrumbLd,
 } from './helpers.js';
 import { layout } from './layout.js';
 
@@ -24,11 +24,11 @@ const MODE_LABELS: Record<string, string> = { dark: 'Dark', light: 'Light', amol
 const FAQ = [
   {
     q: 'How do I install a Chrome theme?',
-    a: 'Download the .zip file and unzip it. Open <code>chrome://extensions</code>, enable &ldquo;Developer mode&rdquo;, click &ldquo;Load unpacked&rdquo;, and select the unzipped folder.',
+    a: 'Download the .zip file and unzip it. Open <code>chrome://extensions</code> in your address bar, enable &ldquo;Developer mode&rdquo; (top-right toggle), then either click &ldquo;Load unpacked&rdquo; and select the unzipped folder, or simply drag the folder onto the extensions page.',
   },
   {
     q: 'Does this work on Microsoft Edge?',
-    a: 'Yes! Edge is Chromium-based and supports Chrome themes. Install the same way as Chrome.',
+    a: 'Yes! Edge supports Chrome themes natively. Open <code>edge://extensions</code>, enable &ldquo;Developer mode&rdquo; (bottom-left toggle), and click &ldquo;Load unpacked&rdquo; or drag the unzipped folder onto the page.',
   },
   {
     q: 'What about Firefox?',
@@ -44,6 +44,13 @@ export function countryPage(d: CountryPageData): string {
   const code = d.countryCode.toLowerCase();
   const modes = Object.keys(d.tokens);
   const defaultTokens = d.tokens[d.defaultMode];
+
+  // --- Breadcrumbs ---
+  const crumbs = [
+    { name: 'Home', url: SITE_URL + '/' },
+    { name: 'Countries', url: SITE_URL + '/countries/' },
+    { name: d.name, url: `${SITE_URL}/countries/${d.slug}/` },
+  ];
 
   // --- JSON-LD ---
   const jsonLd = JSON.stringify({
@@ -85,6 +92,10 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
 
   // --- Body ---
   const body = `
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span>/</span> <a href="/countries/">Countries</a> <span>/</span> <span>${esc(d.name)}</span>
+    </nav>
+
     <section class="hero">
       <h1>${esc(d.name)} Browser Theme</h1>
       <p class="hero__sub">A browser theme inspired by the flag of ${esc(d.name)}. Free, WCAG-accessible.</p>
@@ -169,7 +180,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
     description: `Download a free ${d.name} flag-inspired browser theme for Chrome, Edge, Firefox, and Brave. WCAG-accessible dark, light, and AMOLED modes.`,
     canonical: `${SITE_URL}/countries/${d.slug}/`,
     cssVars: cssVarsBlock(defaultTokens),
-    head: `\n  <script type="application/ld+json">${jsonLd}</script>\n  <script type="application/ld+json">${faqLd}</script>`,
+    head: `\n  <script type="application/ld+json">${jsonLd}</script>\n  <script type="application/ld+json">${faqLd}</script>\n  <script type="application/ld+json">${breadcrumbLd(crumbs)}</script>`,
     body,
     scripts,
     bodyAttrs: `data-code="${code}" data-mode="${d.defaultMode}"`,

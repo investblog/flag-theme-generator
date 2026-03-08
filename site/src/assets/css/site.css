@@ -129,6 +129,20 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 .region-hero h1{font-size:2rem;margin-bottom:.5rem}
 .region-hero p{color:var(--uc-muted-text)}
 
+/* === Steps === */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;text-align:center}
+.step{padding:1.5rem 1rem;background:var(--uc-surface);border:1px solid var(--uc-border);border-radius:.75rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.step__num{display:inline-flex;width:2rem;height:2rem;align-items:center;justify-content:center;border-radius:50%;background:var(--uc-accent);color:var(--uc-accent-text);font-weight:700;font-size:.875rem}
+.step .i{color:var(--uc-muted-text)}
+.step h3{font-size:1rem;margin:0}
+.step p{font-size:.875rem;color:var(--uc-muted-text);margin:0;line-height:1.5}
+
+/* === Breadcrumbs === */
+.breadcrumb{font-size:.8125rem;color:var(--uc-muted-text);margin-bottom:1.5rem}
+.breadcrumb a{color:var(--uc-muted-text)}
+.breadcrumb a:hover{color:var(--uc-link)}
+.breadcrumb span{margin:0 .25rem}
+
 /* === Responsive === */
 @media(max-width:640px){
   .hero h1,.home-hero h1{font-size:1.5rem}
@@ -138,4 +152,5 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
   .preview{margin-left:-.5rem;margin-right:-.5rem;border-radius:8px}
   .token-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
   .page-nav{flex-direction:column;gap:.75rem}
+  .steps{grid-template-columns:1fr}
 }

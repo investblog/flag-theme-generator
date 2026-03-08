@@ -45,3 +45,19 @@ export function jsTokenMap(tokens: Record<string, string>): string {
 export function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+/** Inline puzzle-piece logo SVG (branded). */
+export function logoSvg(size = 24): string {
+  return `<svg class="i" width="${size}" height="${size}" viewBox="0 0 512 512" fill="currentColor"><path d="M404.48 256c0 31.1 25.21 56.32 56.32 56.32V460.8H312.32c0-31.11-25.22-56.32-56.32-56.32s-56.32 25.21-56.32 56.32H51.2V312.32c31.1 0 56.32-25.22 56.32-56.32S82.3 199.68 51.2 199.68V51.2h148.48c0 31.1 25.21 56.32 56.32 56.32s56.32-25.22 56.32-56.32H460.8v148.48c-31.11 0-56.32 25.21-56.32 56.32Z"/></svg>`;
+}
+
+/** BreadcrumbList JSON-LD. */
+export function breadcrumbLd(items: { name: string; url: string }[]): string {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem', position: i + 1, name: it.name, item: it.url,
+    })),
+  });
+}

@@ -48,10 +48,25 @@ export function homePage(d: HomePageData): string {
 
     <section>
       <h2>How It Works</h2>
-      <div class="card-grid">
-        <div class="card">${icon('palette', 28)}<span class="card__name">Pick a country</span></div>
-        <div class="card">${icon('theme-toggle', 28)}<span class="card__name">Choose a mode</span></div>
-        <div class="card">${icon('download', 28)}<span class="card__name">Download &amp; install</span></div>
+      <div class="steps">
+        <div class="step">
+          <span class="step__num">1</span>
+          ${icon('globe', 32)}
+          <h3>Pick a country</h3>
+          <p>Browse ${d.totalCount}+ themes inspired by flags from around the world</p>
+        </div>
+        <div class="step">
+          <span class="step__num">2</span>
+          ${icon('theme-toggle', 32)}
+          <h3>Choose a mode</h3>
+          <p>Dark, Light, or AMOLED &mdash; preview instantly and switch anytime</p>
+        </div>
+        <div class="step">
+          <span class="step__num">3</span>
+          ${icon('download', 32)}
+          <h3>Download &amp; install</h3>
+          <p>Get a .zip for Chrome/Edge, or grab the Firefox add-on</p>
+        </div>
       </div>
     </section>`;
 

@@ -1,11 +1,13 @@
 /**
  * Country page template — main SEO surface.
+ * Supports localization via optional SiteStrings parameter.
  */
 import {
   SITE_URL, TOKEN_KEYS, TOKEN_CSS,
   icon, brandIcon, cssVarsBlock, jsTokenMap, esc, breadcrumbLd,
 } from './helpers.js';
-import { layout } from './layout.js';
+import { layout, type HreflangEntry } from './layout.js';
+import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 
 export interface CountryPageData {
   countryCode: string;
@@ -17,46 +19,47 @@ export interface CountryPageData {
   tokens: Record<string, Record<string, string>>;   // { dark: ThemeTokens, light: ..., amoled: ... }
   defaultMode: string;
   similarCountries: { name: string; slug: string; flagColors: string[] }[];
+  /** Localized country name (e.g., "Japón" for ES). Defaults to name. */
+  localizedName?: string;
+  /** Locale code for this page. Defaults to 'en'. */
+  lang?: string;
+  /** hreflang entries for alternate language versions. */
+  hreflang?: HreflangEntry[];
 }
 
-const MODE_LABELS: Record<string, string> = { dark: 'Dark', light: 'Light', amoled: 'AMOLED' };
-
-const FAQ = [
-  {
-    q: 'How do I install a Chrome theme?',
-    a: 'Download the .zip file and unzip it. Open <code>chrome://extensions</code> in your address bar, enable &ldquo;Developer mode&rdquo; (top-right toggle), then either click &ldquo;Load unpacked&rdquo; and select the unzipped folder, or simply drag the folder onto the extensions page.',
-  },
-  {
-    q: 'Does this work on Microsoft Edge?',
-    a: 'Yes! Edge supports Chrome themes natively. Open <code>edge://extensions</code>, enable &ldquo;Developer mode&rdquo; (bottom-left toggle), and click &ldquo;Load unpacked&rdquo; or drag the unzipped folder onto the page.',
-  },
-  {
-    q: 'What about Firefox?',
-    a: 'Firefox uses a different theme format. We&rsquo;re working on a Firefox add-on &mdash; stay tuned!',
-  },
-  {
-    q: 'What are the different modes?',
-    a: '<strong>Dark</strong> &mdash; balanced dark theme. <strong>Light</strong> &mdash; bright, easy on the eyes. <strong>AMOLED</strong> &mdash; pure black, saves battery on OLED screens.',
-  },
-];
-
 export function countryPage(d: CountryPageData): string {
+  const lang = d.lang || 'en';
+  const s = getStrings(lang);
+  const countryName = d.localizedName || d.name;
   const code = d.countryCode.toLowerCase();
   const modes = Object.keys(d.tokens);
   const defaultTokens = d.tokens[d.defaultMode];
+  const prefix = lang === 'en' ? '' : `/${lang}`;
+
+  const MODE_LABELS: Record<string, string> = {
+    dark: s.modeDark, light: s.modeLight, amoled: s.modeAmoled,
+  };
+
+  const FAQ = [
+    { q: s.faqChromeQ, a: s.faqChromeA },
+    { q: s.faqEdgeQ, a: s.faqEdgeA },
+    { q: s.faqFirefoxQ, a: s.faqFirefoxA },
+    { q: s.modeQuestion, a: s.modeAnswer },
+  ];
 
   // --- Breadcrumbs ---
+  const canonical = `${SITE_URL}${prefix}/countries/${d.slug}/`;
   const crumbs = [
-    { name: 'Home', url: SITE_URL + '/' },
-    { name: 'Countries', url: SITE_URL + '/countries/' },
-    { name: d.name, url: `${SITE_URL}/countries/${d.slug}/` },
+    { name: s.home, url: `${SITE_URL}${prefix}/` },
+    { name: s.countries, url: `${SITE_URL}${prefix}/countries/` },
+    { name: countryName, url: canonical },
   ];
 
   // --- JSON-LD ---
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: `${d.name} Browser Theme`,
+    name: t(s.countryH1, { country: countryName }),
     applicationCategory: 'BrowserApplication',
     operatingSystem: 'Chrome, Edge, Firefox, Brave',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -72,7 +75,7 @@ export function countryPage(d: CountryPageData): string {
 
   // --- Inline script ---
   const modesObj = modes.map(m => `${m}:${jsTokenMap(d.tokens[m])}`).join(',');
-  const copyIconHtml = icon('copy').replace(/'/g, "\\'");
+  const copiedText = s.copied.replace(/'/g, "\\'");
   const scripts = `(function(){
 var T={${modesObj}};
 var root=document.documentElement.style,dl=document.getElementById('dl-chrome'),code='${code}',cur='${d.defaultMode}';
@@ -86,24 +89,24 @@ if(dl)dl.href='/downloads/'+code+'-'+m+'.zip';
 var cb=document.getElementById('copy-css');
 if(cb)cb.addEventListener('click',function(){
 var t=T[cur],css=':root {\\n';for(var k in t)css+='  --uc-'+k+': '+t[k]+';\\n';css+='}';
-navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textContent='Copied!';setTimeout(function(){cb.innerHTML=o},2000)});
+navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textContent='${copiedText}';setTimeout(function(){cb.innerHTML=o},2000)});
 });
 })();`;
 
   // --- Body ---
   const body = `
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a> <span>/</span> <a href="/countries/">Countries</a> <span>/</span> <span>${esc(d.name)}</span>
+      <a href="${prefix}/">${esc(s.home)}</a> <span>/</span> <a href="${prefix}/countries/">${esc(s.countries)}</a> <span>/</span> <span>${esc(countryName)}</span>
     </nav>
 
     <section class="hero">
-      <h1>${esc(d.name)} Browser Theme</h1>
-      <p class="hero__sub">A browser theme inspired by the flag of ${esc(d.name)}. Free, WCAG-accessible.</p>
+      <h1>${t(s.countryH1, { country: esc(countryName) })}</h1>
+      <p class="hero__sub">${t(s.countryHeroSub, { country: esc(countryName) })}</p>
 
       <div class="preview">
         <div class="preview__bar">
           <span class="preview__dots"><i></i><i></i><i></i></span>
-          <span class="preview__tab--active">${esc(d.name)}</span>
+          <span class="preview__tab--active">${esc(countryName)}</span>
           <span class="preview__tab--inactive">New Tab</span>
         </div>
         <div class="preview__toolbar">
@@ -111,7 +114,7 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
         </div>
         <div class="preview__ntp">
           <div class="preview__flag">${d.flagColors.map(c => `<span style="background:${c}"></span>`).join('')}</div>
-          <span class="preview__ntp-label">${esc(d.name)} Theme</span>
+          <span class="preview__ntp-label">${esc(countryName)}</span>
         </div>
       </div>
 
@@ -124,22 +127,22 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
 
     <section class="cta">
       <a id="dl-chrome" href="/downloads/${code}-${d.defaultMode}.zip" class="btn btn--primary" download>
-        ${brandIcon('chrome')} Download for Chrome
+        ${brandIcon('chrome')} ${s.downloadChrome}
       </a>
       <a href="#" class="btn btn--secondary">
-        ${brandIcon('firefox')} Get for Firefox
+        ${brandIcon('firefox')} ${s.getFirefox}
       </a>
       <button id="copy-css" class="btn btn--outline" type="button">
-        ${icon('copy')} Copy CSS Variables
+        ${icon('copy')} ${s.copyCss}
       </button>
     </section>
 
     <section class="palette-section">
-      <h2>Flag Colors</h2>
+      <h2>${s.flagColors}</h2>
       <div class="swatches">
         ${d.flagColors.map(c => `<span class="swatch" style="background:${c}" title="${c}"></span>`).join('')}
       </div>
-      <h2>Design Tokens</h2>
+      <h2>${s.designTokens}</h2>
       <div class="token-grid">
         ${TOKEN_KEYS.map(k =>
           `<div class="token-card"><span class="token-card__swatch" style="background:var(--uc-${TOKEN_CSS[k]})"></span><span class="token-card__label">${TOKEN_CSS[k]}</span></div>`
@@ -148,7 +151,7 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
     </section>
 
     <section class="compat">
-      <h2>Browser Compatibility</h2>
+      <h2>${s.browserCompat}</h2>
       <div class="compat-grid">
         ${[['chrome', 'Chrome'], ['edge', 'Edge'], ['firefox', 'Firefox'], ['brave', 'Brave']].map(([id, label]) =>
           `<div class="compat-item">${brandIcon(id, 24)}<span>${label}</span>${icon('check-circle', 16)}</div>`
@@ -157,32 +160,37 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
     </section>
 
 ${d.similarCountries.length > 0 ? `    <section class="similar">
-      <h2>Similar Themes</h2>
+      <h2>${s.similarThemes}</h2>
       <div class="card-grid">
         ${d.similarCountries.map(c =>
-          `<a class="card" href="/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
+          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
         ).join('\n        ')}
       </div>
     </section>
 ` : ''}
     <section class="faq">
-      <h2>Frequently Asked Questions</h2>
+      <h2>${s.faqTitle}</h2>
       ${FAQ.map(f => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join('\n      ')}
     </section>
 
     <nav class="page-nav">
-      <a href="/regions/${d.regionSlug}/">${icon('chevron-left', 16)} ${esc(d.region)} Themes</a>
-      <a href="/countries/">All Countries ${icon('chevron-right', 16)}</a>
+      <a href="${prefix}/regions/${d.regionSlug}/">${icon('chevron-left', 16)} ${esc(d.region)}</a>
+      <a href="${prefix}/countries/">${s.allCountries} ${icon('chevron-right', 16)}</a>
     </nav>`;
 
   return layout({
-    title: `${d.name} Browser Theme — Free Chrome & Firefox Theme | Flag Theme`,
-    description: `Download a free ${d.name} flag-inspired browser theme for Chrome, Edge, Firefox, and Brave. WCAG-accessible dark, light, and AMOLED modes.`,
-    canonical: `${SITE_URL}/countries/${d.slug}/`,
+    lang,
+    dir: s.dir,
+    title: t(s.countryTitle, { country: countryName }),
+    description: t(s.countryDescription, { country: countryName }),
+    canonical,
     cssVars: cssVarsBlock(defaultTokens),
     head: `\n  <script type="application/ld+json">${jsonLd}</script>\n  <script type="application/ld+json">${faqLd}</script>\n  <script type="application/ld+json">${breadcrumbLd(crumbs)}</script>`,
+    hreflang: d.hreflang,
     body,
     scripts,
     bodyAttrs: `data-code="${code}" data-mode="${d.defaultMode}"`,
+    navCountriesLabel: s.countries,
+    footerText: t(s.footerText, { year: String(new Date().getFullYear()) }),
   });
 }

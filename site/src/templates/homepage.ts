@@ -50,20 +50,17 @@ export function homePage(d: HomePageData): string {
       <h2>How It Works</h2>
       <div class="steps">
         <div class="step">
-          <span class="step__num">1</span>
-          ${icon('globe', 32)}
+          <span class="step__num"><span>1</span>${icon('globe', 20)}</span>
           <h3>Pick a country</h3>
           <p>Browse ${d.totalCount}+ themes inspired by flags from around the world</p>
         </div>
         <div class="step">
-          <span class="step__num">2</span>
-          ${icon('theme-toggle', 32)}
+          <span class="step__num"><span>2</span>${icon('theme-toggle', 20)}</span>
           <h3>Choose a mode</h3>
           <p>Dark, Light, or AMOLED &mdash; preview instantly and switch anytime</p>
         </div>
         <div class="step">
-          <span class="step__num">3</span>
-          ${icon('download', 32)}
+          <span class="step__num"><span>3</span>${icon('download', 20)}</span>
           <h3>Download &amp; install</h3>
           <p>Get a .zip for Chrome/Edge, or grab the Firefox add-on</p>
         </div>

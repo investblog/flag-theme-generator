@@ -1,0 +1,21 @@
+{
+  "name": "flagtheme-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "preview": "npx wrangler pages dev dist",
+    "deploy": "npx wrangler pages deploy dist --project-name=flagtheme"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "archiver": "^7.0.1",
+    "country-flag-icons": "^1.5.13"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.0.0"
+  }
+}

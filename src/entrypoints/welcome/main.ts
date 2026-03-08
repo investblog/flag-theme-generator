@@ -244,7 +244,28 @@ function init(): void {
   const galleryLink = document.createElement('button');
   galleryLink.className = 'btn btn--ghost';
   galleryLink.textContent = msg('btnBrowsePalettes');
-  galleryLink.addEventListener('click', () => {
+  galleryLink.addEventListener('click', async () => {
+    // Firefox: open sidebar directly from extension page
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sa = (browser as any).sidebarAction;
+      if (sa?.open) {
+        await sa.open();
+        return;
+      }
+    } catch {
+      /* not Firefox or no sidebar access */
+    }
+
+    // Chrome/Edge: relay to background → sidePanel.open()
+    try {
+      const resp = (await browser.runtime.sendMessage({ type: 'OPEN_SIDEPANEL' })) as MessageResponse | undefined;
+      if (resp?.ok) return;
+    } catch {
+      /* background not ready */
+    }
+
+    // Fallback: show hint to click the extension icon
     galleryLink.textContent = msg('sidepanelHint');
     galleryLink.classList.add('text-ok');
     setTimeout(() => {
@@ -289,10 +310,13 @@ function init(): void {
   checkThemeApi().then((available) => {
     themeApiAvailable = available;
     if (!available) {
-      applyBtn.textContent = msg('themeUnavailable');
-      applyBtn.disabled = true;
-      applyBtn.classList.replace('btn--primary', 'btn--ghost');
-      resetBtn.disabled = true;
+      applyBtn.hidden = true;
+      resetBtn.hidden = true;
+
+      const note = document.createElement('p');
+      note.className = 'toggle-row__hint';
+      note.textContent = msg('chromeThemeNote');
+      btnRow.insertBefore(note, galleryLink);
     } else if (selectedPalette) {
       applyBtn.disabled = false;
     }

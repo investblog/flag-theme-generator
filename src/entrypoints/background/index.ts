@@ -116,6 +116,20 @@ async function resetTheme(): Promise<MessageResponse> {
   }
 }
 
+/** Try to open the side panel (Chrome/Edge only — Firefox uses sidebarAction directly). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function openSidePanel(sender: any): Promise<MessageResponse> {
+  try {
+    const sp = globalThis.chrome?.sidePanel;
+    if (!sp?.open) return { ok: false, error: 'Side panel API unavailable' };
+    const windowId = sender?.tab?.windowId;
+    await sp.open(windowId != null ? { windowId } : { windowId: 0 });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
 /** Re-apply saved theme on browser startup (if a palette is set). */
 async function reapplySavedTheme(): Promise<void> {
   if (!hasThemeApi()) return;
@@ -188,6 +202,8 @@ export default defineBackground(() => {
         return resetTheme();
       case 'HAS_THEME_API':
         return { ok: hasThemeApi() };
+      case 'OPEN_SIDEPANEL':
+        return openSidePanel(sender);
       default:
         return undefined;
     }

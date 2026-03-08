@@ -141,6 +141,10 @@
     "message": "Export only - theme API unavailable",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
+  "chromeThemeNote": {
+    "message": "Live browser themes require Firefox. Use Export below to grab design tokens for your web projects.",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
   "searchPlaceholder": {
     "message": "Search countries...",
     "description": "Placeholder for country search input"

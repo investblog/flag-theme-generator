@@ -1,7 +1,7 @@
 import type { ThemeMode } from './theme';
 
 /** Messages sent from UI pages to the background service worker */
-export type ExtensionMessage = ApplyThemeMessage | ResetThemeMessage | HasThemeApiMessage;
+export type ExtensionMessage = ApplyThemeMessage | ResetThemeMessage | HasThemeApiMessage | OpenSidepanelMessage;
 
 export interface ApplyThemeMessage {
   type: 'APPLY_THEME';
@@ -16,6 +16,10 @@ export interface ResetThemeMessage {
 
 export interface HasThemeApiMessage {
   type: 'HAS_THEME_API';
+}
+
+export interface OpenSidepanelMessage {
+  type: 'OPEN_SIDEPANEL';
 }
 
 /** Possible response from the background worker */

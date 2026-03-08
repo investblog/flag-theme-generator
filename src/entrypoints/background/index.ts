@@ -17,50 +17,66 @@ function hasThemeApi(): boolean {
   }
 }
 
-/** Map our 10 design tokens to the browser.theme.update() manifest format. */
+/**
+ * Firefox browser.theme color schema — maps each key to a ThemeToken role.
+ * Grouped by visual layer for contrast auditing at a glance.
+ */
+const FIREFOX_THEME_SCHEMA: Record<string, keyof ThemeTokens> = {
+  /* ── bg layer (frame, recessed fields) ── */
+  frame: 'bg',
+  frame_inactive: 'bg',
+  toolbar_field: 'bg',
+  ntp_background: 'bg',
+
+  /* ── surface layer (panels, focused fields) ── */
+  toolbar_field_focus: 'surface',
+  popup: 'surface',
+  sidebar: 'surface',
+  ntp_card_background: 'surface',
+
+  /* ── text layer (on bg / surface) ── */
+  tab_background_text: 'text',
+  toolbar_field_text: 'text',
+  toolbar_field_text_focus: 'text',
+  popup_text: 'text',
+  sidebar_text: 'text',
+  ntp_text: 'text',
+
+  /* ── accent layer (toolbar, active tab — flag color) ── */
+  toolbar: 'accent',
+  tab_selected: 'accent',
+  popup_highlight: 'accent',
+  sidebar_highlight: 'accent',
+
+  /* ── accentText layer (on accent) ── */
+  toolbar_text: 'accentText',
+  tab_text: 'accentText',
+  icons: 'accentText',
+  popup_highlight_text: 'accentText',
+  sidebar_highlight_text: 'accentText',
+
+  /* ── accent2 layer (secondary flag detail) ── */
+  tab_line: 'accent2',
+  icons_attention: 'accent2',
+
+  /* ── border layer ── */
+  toolbar_top_separator: 'border',
+  toolbar_bottom_separator: 'border',
+  toolbar_field_border: 'border',
+  popup_border: 'border',
+  sidebar_border: 'border',
+
+  /* ── focusRing layer ── */
+  toolbar_field_border_focus: 'focusRing',
+};
+
+/** Build a browser.theme.update() manifest from design tokens. */
 function tokensToThemeManifest(tokens: ThemeTokens): object {
-  return {
-    colors: {
-      // Frame (tab strip area)
-      frame: tokens.bg,
-      frame_inactive: tokens.bg,
-      // Tabs
-      tab_background_text: tokens.text,
-      tab_selected: tokens.accent,
-      tab_text: tokens.accentText,
-      tab_line: tokens.accent2,
-      // Toolbar — flag accent color
-      toolbar: tokens.accent,
-      toolbar_text: tokens.accentText,
-      icons: tokens.accentText,
-      icons_attention: tokens.accent2,
-      toolbar_top_separator: tokens.border,
-      toolbar_bottom_separator: tokens.border,
-      // URL bar (recessed into toolbar)
-      toolbar_field: tokens.bg,
-      toolbar_field_text: tokens.text,
-      toolbar_field_focus: tokens.surface,
-      toolbar_field_text_focus: tokens.text,
-      toolbar_field_border: tokens.border,
-      toolbar_field_border_focus: tokens.focusRing,
-      // Popups
-      popup: tokens.surface,
-      popup_text: tokens.text,
-      popup_border: tokens.border,
-      popup_highlight: tokens.accent,
-      popup_highlight_text: tokens.accentText,
-      // Sidebar
-      sidebar: tokens.surface,
-      sidebar_text: tokens.text,
-      sidebar_border: tokens.border,
-      sidebar_highlight: tokens.accent,
-      sidebar_highlight_text: tokens.accentText,
-      // New tab page
-      ntp_background: tokens.bg,
-      ntp_text: tokens.text,
-      ntp_card_background: tokens.surface,
-    },
-  };
+  const colors: Record<string, string> = {};
+  for (const [key, role] of Object.entries(FIREFOX_THEME_SCHEMA)) {
+    colors[key] = tokens[role];
+  }
+  return { colors };
 }
 
 async function applyTheme(paletteCode: string, mode: string, strictness: number): Promise<MessageResponse> {

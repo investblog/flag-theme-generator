@@ -536,14 +536,6 @@ async function handleApply(): Promise<void> {
 
   const applyBtn = document.getElementById('btn-apply') as HTMLButtonElement | null;
 
-  try {
-    await currentPaletteCode.setValue(selectedPalette.countryCode);
-    await currentMode.setValue(selectedMode);
-    await strictness.setValue(currentStrictness);
-  } catch {
-    // Storage may be unavailable in dev
-  }
-
   let response: MessageResponse | undefined;
   try {
     response = (await browser.runtime.sendMessage({
@@ -556,15 +548,27 @@ async function handleApply(): Promise<void> {
     response = { ok: false, error: 'Background not ready' };
   }
 
+  const applied = !response || response.ok;
+
+  if (applied) {
+    try {
+      await currentPaletteCode.setValue(selectedPalette.countryCode);
+      await currentMode.setValue(selectedMode);
+      await strictness.setValue(currentStrictness);
+    } catch {
+      // Storage may be unavailable in dev
+    }
+  }
+
   if (applyBtn) {
     const origText = applyBtn.textContent;
-    if (!response || response.ok) {
+    if (applied) {
       applyBtn.textContent = msg('themeApplied');
       setTimeout(() => {
         applyBtn.textContent = origText;
       }, 1500);
     } else {
-      applyBtn.textContent = response.error ?? msg('themeUnavailable');
+      applyBtn.textContent = response?.error ?? msg('themeUnavailable');
       applyBtn.classList.replace('btn--primary', 'btn--ghost');
       setTimeout(() => {
         applyBtn.textContent = origText;

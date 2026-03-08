@@ -293,6 +293,8 @@ function init(): void {
       applyBtn.disabled = true;
       applyBtn.classList.replace('btn--primary', 'btn--ghost');
       resetBtn.disabled = true;
+    } else if (selectedPalette) {
+      applyBtn.disabled = false;
     }
   });
 }
@@ -542,23 +544,33 @@ async function handleApply(): Promise<void> {
     // Storage may be unavailable in dev
   }
 
+  let response: MessageResponse | undefined;
   try {
-    await browser.runtime.sendMessage({
+    response = (await browser.runtime.sendMessage({
       type: 'APPLY_THEME',
       paletteCode: selectedPalette.countryCode,
       mode: selectedMode,
       strictness: currentStrictness,
-    });
+    })) as MessageResponse | undefined;
   } catch {
-    // background not ready
+    response = { ok: false, error: 'Background not ready' };
   }
 
   if (applyBtn) {
     const origText = applyBtn.textContent;
-    applyBtn.textContent = msg('themeApplied');
-    setTimeout(() => {
-      applyBtn.textContent = origText;
-    }, 1500);
+    if (!response || response.ok) {
+      applyBtn.textContent = msg('themeApplied');
+      setTimeout(() => {
+        applyBtn.textContent = origText;
+      }, 1500);
+    } else {
+      applyBtn.textContent = response.error ?? msg('themeUnavailable');
+      applyBtn.classList.replace('btn--primary', 'btn--ghost');
+      setTimeout(() => {
+        applyBtn.textContent = origText;
+        applyBtn.classList.replace('btn--ghost', 'btn--primary');
+      }, 3000);
+    }
   }
 }
 

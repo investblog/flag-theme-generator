@@ -21,39 +21,44 @@ function hasThemeApi(): boolean {
 function tokensToThemeManifest(tokens: ThemeTokens): object {
   return {
     colors: {
-      // Frame (title bar area)
+      // Frame (tab strip area)
       frame: tokens.bg,
       frame_inactive: tokens.bg,
-      // Toolbar
-      toolbar: tokens.surface,
-      toolbar_text: tokens.text,
-      toolbar_field: tokens.bg,
-      toolbar_field_text: tokens.text,
-      toolbar_field_border: tokens.border,
-      toolbar_field_focus: tokens.focusRing,
       // Tabs
       tab_background_text: tokens.text,
-      tab_selected: tokens.surface,
-      tab_text: tokens.text,
-      tab_line: tokens.accent,
-      // Sidebar
-      sidebar: tokens.surface,
-      sidebar_text: tokens.text,
-      sidebar_border: tokens.border,
-      // Popups (URL bar suggestions etc.)
+      tab_selected: tokens.accent,
+      tab_text: tokens.accentText,
+      tab_line: tokens.accent2,
+      // Toolbar — flag accent color
+      toolbar: tokens.accent,
+      toolbar_text: tokens.accentText,
+      icons: tokens.accentText,
+      icons_attention: tokens.accent2,
+      toolbar_top_separator: tokens.border,
+      toolbar_bottom_separator: tokens.border,
+      // URL bar (recessed into toolbar)
+      toolbar_field: tokens.bg,
+      toolbar_field_text: tokens.text,
+      toolbar_field_focus: tokens.surface,
+      toolbar_field_text_focus: tokens.text,
+      toolbar_field_border: tokens.border,
+      toolbar_field_border_focus: tokens.focusRing,
+      // Popups
       popup: tokens.surface,
       popup_text: tokens.text,
       popup_border: tokens.border,
       popup_highlight: tokens.accent,
       popup_highlight_text: tokens.accentText,
-      // Bookmark text
-      bookmark_text: tokens.text,
-      // Button / focus
-      button_background_hover: tokens.accent2,
-      icons_attention: tokens.accent,
+      // Sidebar
+      sidebar: tokens.surface,
+      sidebar_text: tokens.text,
+      sidebar_border: tokens.border,
+      sidebar_highlight: tokens.accent,
+      sidebar_highlight_text: tokens.accentText,
       // New tab page
       ntp_background: tokens.bg,
       ntp_text: tokens.text,
+      ntp_card_background: tokens.surface,
     },
   };
 }

@@ -4,14 +4,20 @@
  *
  * Run: npm run build (from site/)
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { generateChromeThemeZip, type ThemeInput, type ThemeAssets } from './chrome-theme.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MONO_ROOT = resolve(ROOT, '..');
 const shared = (p: string) => resolve(MONO_ROOT, 'src/shared', p);
 const DIST = resolve(ROOT, 'dist');
+
+const THEME_ASSETS: ThemeAssets = {
+  mapSvgPath: resolve(MONO_ROOT, 'temp/world-map.min.svg'),
+  fontPath: resolve(MONO_ROOT, 'temp/fonts/NotoSans-Regular.ttf'),
+};
 
 // Dynamic imports for shared modules (TS source via tsx)
 const { PALETTES } = await import(pathToFileURL(shared('data/palettes.ts')).href);
@@ -44,7 +50,8 @@ ensureDir(resolve(DIST, 'downloads'));
 // Track all pages for sitemap
 const sitemapUrls: string[] = [SITE_URL + '/'];
 
-// --- generate country pages ---
+// --- generate country pages + Chrome themes ---
+let count = 0;
 for (const palette of PALETTES as FlagPalette[]) {
   const slug = slugify(palette.name_en);
   const countryDir = resolve(DIST, 'countries', slug);
@@ -53,11 +60,19 @@ for (const palette of PALETTES as FlagPalette[]) {
   for (const mode of MODES) {
     const tokens = generateTokens(palette, mode, STRICTNESS);
 
-    // TODO: render country page HTML from template
-    // TODO: generate Chrome theme .zip
-    // TODO: generate NTP map PNG
+    // Generate Chrome theme .zip
+    const themeInput: ThemeInput = {
+      countryCode: palette.countryCode,
+      name: palette.name_en,
+      mode,
+      flagColors: palette.flagColors,
+      tokens,
+    };
+    const zipBuffer = await generateChromeThemeZip(themeInput, THEME_ASSETS);
+    const zipName = `${palette.countryCode.toLowerCase()}-${mode.toLowerCase()}.zip`;
+    writeFileSync(resolve(DIST, 'downloads', zipName), zipBuffer);
 
-    // Placeholder page
+    // Country page
     const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -100,9 +115,11 @@ for (const palette of PALETTES as FlagPalette[]) {
   }
 
   sitemapUrls.push(`${SITE_URL}/countries/${slug}/`);
+  count++;
+  if (count % 20 === 0) process.stdout.write(`  ${count}/${PALETTES.length}...\n`);
 }
 
-console.log(`  ${PALETTES.length} country pages generated`);
+console.log(`  ${PALETTES.length} country pages + Chrome themes generated`);
 
 // --- countries index ---
 const countriesIndex = `<!doctype html>

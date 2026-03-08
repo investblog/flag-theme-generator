@@ -3,6 +3,5 @@
 # Preview: npm run preview
 
 name = "flagtheme"
-account_id = "3bb60e3ad39f4e536b7d84922606f8f6e2bec"
 compatibility_date = "2024-12-01"
 pages_build_output_dir = "dist"

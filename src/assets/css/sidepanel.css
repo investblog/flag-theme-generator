@@ -642,20 +642,21 @@
   text-align: center;
 }
 
-.drawer__promo-text {
+.drawer__promo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
   font-size: var(--fs-xs);
   color: var(--text-muted);
-  margin: 0 0 var(--space-2);
-}
-
-.drawer__promo-link {
-  font-size: var(--fs-xs);
-  color: var(--primary);
   text-decoration: none;
-  font-weight: var(--fw-semibold);
 }
 
 .drawer__promo-link:hover {
-  text-decoration: underline;
+  color: var(--primary);
+}
+
+.drawer__promo-icon {
+  vertical-align: -0.15em;
+  flex-shrink: 0;
 }
 

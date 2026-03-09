@@ -3,6 +3,8 @@ import { getRecommendedPalette } from '@shared/services/locale';
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { ExtensionMessage, MessageResponse } from '@shared/types/messages';
 import type { ThemeTokens } from '@shared/types/theme';
+import { evaluateCompatibility } from '@shared/utils/contrast';
+import { getBestMode } from '@shared/utils/quality';
 import { generateTokens } from '@shared/utils/tokens';
 
 /**
@@ -166,8 +168,12 @@ async function autoApplyByLocale(): Promise<void> {
     if (!recommended) return;
 
     const s = await strictness.getValue();
+    const report = evaluateCompatibility(recommended, s);
+    const best = getBestMode(report);
+    const mode = best === 'DOMINANT_ONLY' ? 'DARK' : best;
     await currentPaletteCode.setValue(recommended.countryCode);
-    await applyTheme(recommended.countryCode, 'DOMINANT_ONLY', s);
+    await currentMode.setValue(mode);
+    await applyTheme(recommended.countryCode, mode, s);
   } catch {
     /* locale detection or storage error — silently skip */
   }

@@ -222,10 +222,10 @@ function createPaletteCard(palette: FlagPalette): HTMLElement {
 
   const report = evaluateCompatibility(palette, currentStrictness);
   const bestMode = getBestMode(report);
-  const bestQuality = bestMode === 'DOMINANT_ONLY' ? null : report.quality[bestMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  const bestQuality = bestMode !== 'DOMINANT_ONLY' ? report.quality[bestMode as 'AMOLED' | 'DARK' | 'LIGHT'] : null;
   const summary = document.createElement('div');
   summary.className = 'sp-card__summary';
-  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} - ${bestQuality.score}/100` : msg('modeDominantOnly');
+  summary.textContent = bestQuality ? `${getModeLabel(bestMode)} - ${bestQuality.score}/100` : getModeLabel('DARK');
   info.appendChild(summary);
   card.appendChild(info);
 
@@ -258,24 +258,22 @@ function createQualityBlock(report: CompatibilityReport, mode: ThemeMode, compac
   const block = document.createElement('section');
   block.className = `sp-quality${compact ? ' sp-quality--compact' : ''}`;
   const activeMode = mode === 'DOMINANT_ONLY' ? getBestMode(report) : mode;
-  const quality = activeMode === 'DOMINANT_ONLY' ? null : report.quality[activeMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  const resolvedMode = activeMode === 'DOMINANT_ONLY' ? 'DARK' : activeMode;
+  const quality = report.quality[resolvedMode as 'AMOLED' | 'DARK' | 'LIGHT'];
   const bestMode = getBestMode(report);
 
   const header = document.createElement('div');
   header.className = 'sp-quality__header';
   header.innerHTML = `
-    <span class="sp-quality__eyebrow">${bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent')}</span>
-    <strong class="sp-quality__title">${getModeLabel(activeMode)}</strong>
-    <span class="sp-quality__meta">${quality ? `${quality.score}/100 - ${getQualityTone(quality.score)}` : msg('qualitySafeMeta')}</span>
+    <span class="sp-quality__eyebrow">${bestMode === resolvedMode ? msg('qualityRecommended') : msg('qualityCurrent')}</span>
+    <strong class="sp-quality__title">${getModeLabel(resolvedMode)}</strong>
+    <span class="sp-quality__meta">${quality.score}/100 - ${getQualityTone(quality.score)}</span>
   `;
   block.appendChild(header);
 
   const body = document.createElement('p');
   body.className = 'sp-quality__body';
-  body.textContent =
-    activeMode === 'DOMINANT_ONLY'
-      ? msg('qualitySafeBody')
-      : msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, activeMode));
+  body.textContent = msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, resolvedMode));
   block.appendChild(body);
 
   if (quality) {
@@ -440,11 +438,8 @@ function openPaletteDrawer(palette: FlagPalette): void {
     for (const { mode, msgKey } of MODE_KEYS) {
       const btn = document.createElement('button');
       btn.className = `sp-modes__btn${mode === selectedMode ? ' sp-modes__btn--active' : ''}`;
-      const isSupported = mode === 'DOMINANT_ONLY' || report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
-      btn.textContent =
-        mode === 'DOMINANT_ONLY' || !report
-          ? msg(msgKey)
-          : `${msg(msgKey)} - ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
+      const isSupported = report.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
+      btn.textContent = `${msg(msgKey)} - ${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}`;
 
       if (!isSupported) btn.disabled = true;
       btn.title = summarizeMode(report, mode);

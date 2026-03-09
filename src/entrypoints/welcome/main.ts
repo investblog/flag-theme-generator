@@ -396,14 +396,14 @@ function updateModeGrid(): void {
 
   const report = selectedPalette ? evaluateCompatibility(selectedPalette, currentStrictness) : null;
   if (report) selectedMode = pickMode(selectedMode, report);
-  const bestMode = report ? getBestMode(report) : 'DOMINANT_ONLY';
+  const bestMode = report ? getBestMode(report) : 'DARK';
 
   for (const { mode, msgKey } of MODE_KEYS) {
     const card = document.createElement('div');
     card.className = 'mode-card';
     card.dataset.mode = mode;
 
-    const isSupported = mode === 'DOMINANT_ONLY' || report?.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'];
+    const isSupported = report?.supports[mode as 'AMOLED' | 'DARK' | 'LIGHT'] ?? true;
 
     if (!isSupported) {
       card.classList.add('mode-card--disabled');
@@ -422,7 +422,7 @@ function updateModeGrid(): void {
     label.textContent = msg(msgKey);
     labelRow.appendChild(label);
 
-    if (mode === bestMode && mode !== 'DOMINANT_ONLY') {
+    if (mode === bestMode) {
       const badge = document.createElement('span');
       badge.className = 'mode-card__badge';
       badge.textContent = msg('qualityTop');
@@ -431,10 +431,9 @@ function updateModeGrid(): void {
 
     const score = document.createElement('span');
     score.className = 'mode-card__score';
-    score.textContent =
-      mode === 'DOMINANT_ONLY' || !report
-        ? msg('qualitySafeShort')
-        : `${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}/100`;
+    score.textContent = !report
+      ? msg('pickCountryPreview')
+      : `${report.quality[mode as 'AMOLED' | 'DARK' | 'LIGHT'].score}/100`;
 
     const hint = document.createElement('span');
     hint.className = 'mode-card__hint';
@@ -469,32 +468,28 @@ function updateQualitySummary(): void {
   const report = evaluateCompatibility(selectedPalette, currentStrictness);
   selectedMode = pickMode(selectedMode, report);
   const activeMode = selectedMode === 'DOMINANT_ONLY' ? getBestMode(report) : selectedMode;
+  const resolvedMode = activeMode === 'DOMINANT_ONLY' ? 'DARK' : activeMode;
   const bestMode = getBestMode(report);
-  const quality = activeMode === 'DOMINANT_ONLY' ? null : report.quality[activeMode as 'AMOLED' | 'DARK' | 'LIGHT'];
+  const quality = report.quality[resolvedMode as 'AMOLED' | 'DARK' | 'LIGHT'];
 
   const hero = document.createElement('div');
   hero.className = 'quality-panel__hero';
 
   const heroLabel = document.createElement('span');
   heroLabel.className = 'quality-panel__eyebrow';
-  heroLabel.textContent = bestMode === activeMode ? msg('qualityRecommended') : msg('qualityCurrent');
+  heroLabel.textContent = bestMode === resolvedMode ? msg('qualityRecommended') : msg('qualityCurrent');
 
   const heroTitle = document.createElement('div');
   heroTitle.className = 'quality-panel__title';
-  heroTitle.textContent = getModeLabel(activeMode);
+  heroTitle.textContent = getModeLabel(resolvedMode);
 
   const heroMeta = document.createElement('div');
   heroMeta.className = 'quality-panel__meta';
-  heroMeta.textContent = quality
-    ? msg('qualityMeta', String(quality.score), getQualityTone(quality.score))
-    : msg('qualitySafeMeta');
+  heroMeta.textContent = msg('qualityMeta', String(quality.score), getQualityTone(quality.score));
 
   const heroBody = document.createElement('p');
   heroBody.className = 'quality-panel__body';
-  heroBody.textContent =
-    activeMode === 'DOMINANT_ONLY'
-      ? msg('qualitySafeBody')
-      : msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, activeMode));
+  heroBody.textContent = msg('qualityBestPick', getModeLabel(bestMode), summarizeMode(report, resolvedMode));
 
   hero.appendChild(heroLabel);
   hero.appendChild(heroTitle);

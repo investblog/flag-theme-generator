@@ -6,7 +6,6 @@ export const MODE_KEYS: { mode: ThemeMode; msgKey: string }[] = [
   { mode: 'AMOLED', msgKey: 'modeAmoled' },
   { mode: 'DARK', msgKey: 'modeDark' },
   { mode: 'LIGHT', msgKey: 'modeLight' },
-  { mode: 'DOMINANT_ONLY', msgKey: 'modeDominantOnly' },
 ];
 
 export function msg(key: string, ...subs: string[]): string {

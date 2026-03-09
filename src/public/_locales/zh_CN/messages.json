@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Flag Theme Generator",
+    "description": "Extension display name"
+  },
+  "extDescription": {
+    "message": "\u4ece\u56fd\u65d7\u914d\u8272\u65b9\u6848\u751f\u6210\u6d4f\u89c8\u5668\u4e3b\u9898\uff0c\u5e76\u8fdb\u884c WCAG \u5bf9\u6bd4\u5ea6\u9a8c\u8bc1\u3002",
+    "description": "Extension description for the browser store listing"
+  }
+}

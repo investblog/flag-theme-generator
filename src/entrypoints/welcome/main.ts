@@ -3,7 +3,6 @@ import { getRecommendedPalette, isAmbiguousLocale, matchPalettesForLocale } from
 import { autoByLocale, currentMode, currentPaletteCode, strictness } from '@shared/services/storage';
 import type { MessageResponse } from '@shared/types/messages';
 import type { FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
-import { exportCSS } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
 import {
   getBestMode,
@@ -202,26 +201,7 @@ function init(): void {
   previewSection.appendChild(previewContainer);
   app.appendChild(previewSection);
 
-  const exportRow = document.createElement('div');
-  exportRow.className = 'welcome__section';
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'btn btn--ghost';
-  exportBtn.id = 'btn-export';
-  exportBtn.textContent = msg('btnExportCss');
-  exportBtn.disabled = true;
-  exportBtn.addEventListener('click', () => {
-    if (!selectedPalette) return;
-    const tokens = generateTokens(selectedPalette, selectedMode, currentStrictness);
-    const css = exportCSS(tokens);
-    navigator.clipboard.writeText(css).then(() => {
-      exportBtn.textContent = msg('btnCopied');
-      setTimeout(() => {
-        exportBtn.textContent = msg('btnExportCss');
-      }, 1500);
-    });
-  });
-  exportRow.appendChild(exportBtn);
-  app.appendChild(exportRow);
+  app.appendChild(document.createElement('hr'));
 
   const actions = document.createElement('div');
   actions.className = 'welcome__section';
@@ -246,6 +226,18 @@ function init(): void {
   galleryLink.className = 'btn btn--ghost';
   galleryLink.textContent = msg('btnBrowsePalettes');
   galleryLink.addEventListener('click', async () => {
+    // Chrome/Edge: open side panel directly (requires user gesture context)
+    try {
+      const sp = globalThis.chrome?.sidePanel;
+      if (sp?.open) {
+        const win = await chrome.windows.getCurrent();
+        await sp.open({ windowId: win.id! });
+        return;
+      }
+    } catch {
+      /* side panel API unavailable */
+    }
+
     // Firefox: open sidebar directly from extension page
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -256,14 +248,6 @@ function init(): void {
       }
     } catch {
       /* not Firefox or no sidebar access */
-    }
-
-    // Chrome/Edge: relay to background → sidePanel.open()
-    try {
-      const resp = (await browser.runtime.sendMessage({ type: 'OPEN_SIDEPANEL' })) as MessageResponse | undefined;
-      if (resp?.ok) return;
-    } catch {
-      /* background not ready */
     }
 
     // Fallback: show hint to click the extension icon
@@ -314,6 +298,12 @@ function init(): void {
       applyBtn.hidden = true;
       resetBtn.hidden = true;
 
+      // Note above buttons
+      const note = document.createElement('p');
+      note.className = 'toggle-row__hint';
+      note.textContent = msg('chromeThemeNote');
+      actions.insertBefore(note, btnRow);
+
       const dlLink = document.createElement('a');
       dlLink.className = 'btn btn--primary';
       dlLink.id = 'btn-download-site';
@@ -323,10 +313,9 @@ function init(): void {
       dlLink.href = selectedPalette ? countryPageUrl(selectedPalette.name_en) : 'https://flagtheme.com/';
       btnRow.insertBefore(dlLink, galleryLink);
 
-      const note = document.createElement('p');
-      note.className = 'toggle-row__hint';
-      note.textContent = msg('chromeThemeNote');
-      btnRow.insertBefore(note, dlLink);
+      // Promote gallery button on Chrome/Edge — side panel is the main export UI
+      galleryLink.className = 'btn btn--primary';
+      galleryLink.textContent = msg('btnBrowseExport');
     } else if (selectedPalette) {
       applyBtn.disabled = false;
     }

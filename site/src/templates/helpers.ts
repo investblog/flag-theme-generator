@@ -28,7 +28,7 @@ export function icon(id: string, size = 20): string {
 }
 
 export function brandIcon(id: string, size = 20): string {
-  return `<svg class="i" width="${size}" height="${size}"><use href="/assets/brand-icons.svg#${id}"/></svg>`;
+  return `<svg class="i i--${id}" width="${size}" height="${size}"><use href="/assets/brand-icons.svg#${id}"/></svg>`;
 }
 
 /** Generates `:root { --uc-bg: #...; ... }` content (no wrapper). */

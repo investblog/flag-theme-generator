@@ -66,6 +66,18 @@ function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
 
+/** Build hreflang entries for a page that exists in all 12 languages.
+ *  pathFn receives lang and returns the path portion (e.g. '/countries/'). */
+function buildFullHreflang(pathFn: (lang: string) => string): HreflangEntry[] {
+  const entries: HreflangEntry[] = [
+    { lang: 'x-default', href: `${SITE_URL}${pathFn('en')}` },
+  ];
+  for (const lang of SUPPORTED_LANGS) {
+    entries.push({ lang, href: `${SITE_URL}${pathFn(lang)}` });
+  }
+  return entries;
+}
+
 /** Extract the primary non-EN base language from recommendedLocales. */
 function getPrimaryLang(locales: string[]): string | null {
   for (const loc of locales) {
@@ -96,7 +108,9 @@ ensureDir(resolve(DIST, 'assets'));
 writeFileSync(resolve(DIST, 'assets', 'ui-icons.svg'), buildUISprite());
 writeFileSync(resolve(DIST, 'assets', 'brand-icons.svg'), buildBrandSprite());
 copyFileSync(CSS_SRC, resolve(DIST, 'assets', 'site.css'));
-console.log('  Static assets copied (sprites + CSS)');
+const ogSrc = resolve(ROOT, 'src/assets/og.png');
+if (existsSync(ogSrc)) copyFileSync(ogSrc, resolve(DIST, 'assets', 'og.png'));
+console.log('  Static assets copied (sprites + CSS + OG)');
 
 // --- precompute region data ---
 const regionMap = new Map<string, FlagPalette[]>();
@@ -135,7 +149,7 @@ interface SitemapEntry {
   loc: string;
   alternates?: { lang: string; href: string }[];
 }
-const sitemapEntries: SitemapEntry[] = [{ loc: SITE_URL + '/' }];
+const sitemapEntries: SitemapEntry[] = [];
 
 // --- generate country pages + Chrome themes ---
 let count = 0;
@@ -268,8 +282,9 @@ const catalogData = {
   })),
   regions: regionList,
 };
-writeFileSync(resolve(DIST, 'countries', 'index.html'), catalogPage(catalogData));
-sitemapEntries.push({ loc: `${SITE_URL}/countries/` });
+const catalogHreflang = buildFullHreflang(lang => lang === 'en' ? '/countries/' : `/${lang}/countries/`);
+writeFileSync(resolve(DIST, 'countries', 'index.html'), catalogPage({ ...catalogData, hreflang: catalogHreflang }));
+sitemapEntries.push({ loc: `${SITE_URL}/countries/`, alternates: catalogHreflang });
 console.log('  Catalog page generated');
 
 // --- region pages ---
@@ -279,6 +294,7 @@ for (const [rName, members] of regionMap) {
   const rDir = resolve(DIST, 'regions', rSlug);
   ensureDir(rDir);
 
+  const rHreflang = buildFullHreflang(lang => lang === 'en' ? `/regions/${rSlug}/` : `/${lang}/regions/${rSlug}/`);
   writeFileSync(resolve(rDir, 'index.html'), regionPage({
     name: rName,
     slug: rSlug,
@@ -288,8 +304,9 @@ for (const [rName, members] of regionMap) {
       flagColors: p.flagColors as string[],
     })),
     allRegions: regionList,
+    hreflang: rHreflang,
   }));
-  sitemapEntries.push({ loc: `${SITE_URL}/regions/${rSlug}/` });
+  sitemapEntries.push({ loc: `${SITE_URL}/regions/${rSlug}/`, alternates: rHreflang });
 }
 console.log(`  ${regionMap.size - 1} region pages generated`);
 
@@ -300,12 +317,15 @@ const popular = POPULAR_CODES
   .map(p => ({ name: p!.name_en, slug: slugify(p!.name_en), flagColors: p!.flagColors as string[] }));
 const allCountries = palettes.map(p => ({ name: p.name_en, slug: slugify(p.name_en), code: p.countryCode }));
 
+const homeHreflang = buildFullHreflang(lang => lang === 'en' ? '/' : `/${lang}/`);
 writeFileSync(resolve(DIST, 'index.html'), homePage({
   popularCountries: popular,
   regions: regionList,
   allCountries,
   totalCount: palettes.length,
+  hreflang: homeHreflang,
 }));
+sitemapEntries.push({ loc: `${SITE_URL}/`, alternates: homeHreflang });
 console.log('  Homepage generated');
 
 // --- privacy page ---
@@ -327,16 +347,18 @@ for (const lang of nonEnLangs) {
     allCountries,
     totalCount: palettes.length,
     lang,
+    hreflang: homeHreflang,
   }));
-  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/` });
+  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/`, alternates: homeHreflang });
 
   // Catalog
   ensureDir(resolve(langPrefix, 'countries'));
   writeFileSync(resolve(langPrefix, 'countries', 'index.html'), catalogPage({
     ...catalogData,
     lang,
+    hreflang: catalogHreflang,
   }));
-  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/countries/` });
+  sitemapEntries.push({ loc: `${SITE_URL}/${lang}/countries/`, alternates: catalogHreflang });
 
   // Region pages
   for (const [rName, members] of regionMap) {
@@ -345,6 +367,7 @@ for (const lang of nonEnLangs) {
     const rDir = resolve(langPrefix, 'regions', rSlug);
     ensureDir(rDir);
 
+    const rHreflangL = buildFullHreflang(l => l === 'en' ? `/regions/${rSlug}/` : `/${l}/regions/${rSlug}/`);
     writeFileSync(resolve(rDir, 'index.html'), regionPage({
       name: rName,
       slug: rSlug,
@@ -355,8 +378,9 @@ for (const lang of nonEnLangs) {
       })),
       allRegions: regionList,
       lang,
+      hreflang: rHreflangL,
     }));
-    sitemapEntries.push({ loc: `${SITE_URL}/${lang}/regions/${rSlug}/` });
+    sitemapEntries.push({ loc: `${SITE_URL}/${lang}/regions/${rSlug}/`, alternates: rHreflangL });
   }
 }
 console.log(`  ${nonEnLangs.length} localized homepage + catalog + region sets generated`);

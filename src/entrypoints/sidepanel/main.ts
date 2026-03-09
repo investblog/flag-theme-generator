@@ -5,7 +5,7 @@ import type { MessageResponse } from '@shared/types/messages';
 import type { CompatibilityReport, FlagPalette, ThemeMode, ThemeTokens } from '@shared/types/theme';
 import { REQUIRED_PAIRS } from '@shared/types/theme';
 import { contrast } from '@shared/utils/contrast';
-import { exportCSS, exportJSON, exportTailwind } from '@shared/utils/export';
+import { exportCSS, exportJSON, exportShadcn, exportTailwind, exportTokensStudio } from '@shared/utils/export';
 import { getFlagSvg } from '@shared/utils/flags';
 import {
   getBestMode,
@@ -44,6 +44,10 @@ const ICON_DOWNLOAD = 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12
 const ICON_X = 'M18 6 6 18M6 6l12 12';
 const ICON_PIPETTE =
   'm12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12M18 9l.4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3zM2 22l.414-.414';
+const ICON_EXTERNAL = 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3';
+const ICON_STAR = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
+const ICON_GITHUB =
+  'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22';
 
 const MODE_NAMES: Record<string, string> = {
   AMOLED: 'A',
@@ -583,7 +587,7 @@ function createTokenGrid(tokens: ThemeTokens): HTMLElement {
   return grid;
 }
 
-type ExportTab = 'css' | 'tailwind' | 'json';
+type ExportTab = 'css' | 'tailwind' | 'json' | 'shadcn' | 'tokens-studio';
 
 function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLElement {
   const section = document.createElement('div');
@@ -615,6 +619,10 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
         return exportTailwind(tokens);
       case 'json':
         return exportJSON(tokens, palette.countryCode, selectedMode, currentStrictness);
+      case 'shadcn':
+        return exportShadcn(tokens);
+      case 'tokens-studio':
+        return exportTokensStudio(tokens, palette.countryCode, selectedMode);
     }
   }
 
@@ -632,6 +640,8 @@ function createExportSection(palette: FlagPalette, tokens: ThemeTokens): HTMLEle
     ['css', 'CSS'],
     ['tailwind', 'Tailwind'],
     ['json', 'JSON'],
+    ['shadcn', 'shadcn/ui'],
+    ['tokens-studio', 'Tokens Studio'],
   ] as [ExportTab, string][]) {
     const tabBtn = document.createElement('button');
     tabBtn.className = `sp-export__tab${key === activeTab ? ' sp-export__tab--active' : ''}`;
@@ -871,6 +881,60 @@ function openSettingsDrawer(): void {
   });
 
   body.appendChild(autoSection);
+
+  const linksSection = document.createElement('div');
+  linksSection.className = 'drawer__section';
+  const linksTitle = document.createElement('h3');
+  linksTitle.className = 'drawer__section-title';
+  linksTitle.textContent = msg('settingsLinksTitle');
+  linksSection.appendChild(linksTitle);
+
+  const linksList = document.createElement('div');
+  linksList.className = 'settings__links';
+
+  const ghLink = document.createElement('a');
+  ghLink.className = 'settings__link';
+  ghLink.href = 'https://github.com/investblog/flag-theme-generator';
+  ghLink.target = '_blank';
+  ghLink.rel = 'noopener';
+  ghLink.appendChild(svgIcon(ICON_GITHUB));
+  const ghLabel = document.createElement('span');
+  ghLabel.textContent = msg('settingsSourceCode');
+  ghLink.appendChild(ghLabel);
+  ghLink.appendChild(svgIcon(ICON_EXTERNAL, 12));
+  linksList.appendChild(ghLink);
+
+  const ua = navigator.userAgent;
+  const isEdge = ua.includes('Edg/');
+  const isFirefox = ua.includes('Firefox/');
+
+  let storeUrl = '';
+  let storeName = '';
+  if (isFirefox) {
+    storeUrl = 'https://addons.mozilla.org/addon/flag-theme-generator/reviews/';
+    storeName = 'Firefox Add-ons';
+  } else if (isEdge) {
+    storeUrl = 'https://microsoftedge.microsoft.com/addons/detail/flag-theme-generator/';
+    storeName = 'Edge Add-ons';
+  } else {
+    storeUrl = 'https://chromewebstore.google.com/detail/flag-theme-generator/';
+    storeName = 'Chrome Web Store';
+  }
+
+  const rateLink = document.createElement('a');
+  rateLink.className = 'settings__link';
+  rateLink.href = storeUrl;
+  rateLink.target = '_blank';
+  rateLink.rel = 'noopener';
+  rateLink.appendChild(svgIcon(ICON_STAR));
+  const rateLabel = document.createElement('span');
+  rateLabel.textContent = `${msg('settingsRateExtension')} — ${storeName}`;
+  rateLink.appendChild(rateLabel);
+  rateLink.appendChild(svgIcon(ICON_EXTERNAL, 12));
+  linksList.appendChild(rateLink);
+
+  linksSection.appendChild(linksList);
+  body.appendChild(linksSection);
 
   const promo = document.createElement('div');
   promo.className = 'drawer__promo';

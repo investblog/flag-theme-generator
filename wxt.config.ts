@@ -12,10 +12,10 @@ export default defineConfig({
   manifest: ({ browser }) => ({
     name: '__MSG_extName__',
     description: '__MSG_extDescription__',
-    version: '0.1.0',
+    version: '1.0.0',
     default_locale: 'en',
     author: '301.st — Smart Traffic <support@301.st>',
-    homepage_url: 'https://301.st',
+    homepage_url: 'https://flagtheme.com',
 
     ...(browser === 'chrome' && { minimum_chrome_version: '116' }),
 

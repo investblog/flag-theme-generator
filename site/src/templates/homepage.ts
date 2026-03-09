@@ -3,6 +3,7 @@
  */
 import { SITE_URL, icon, brandIcon } from './helpers.js';
 import { layout } from './layout.js';
+import type { HreflangEntry } from './layout.js';
 import { t, getStrings } from '../i18n/strings.js';
 
 export interface HomePageData {
@@ -11,6 +12,7 @@ export interface HomePageData {
   allCountries: { name: string; slug: string; code: string }[];
   totalCount: number;
   lang?: string;
+  hreflang?: HreflangEntry[];
 }
 
 export function homePage(d: HomePageData): string {
@@ -82,7 +84,7 @@ export function homePage(d: HomePageData): string {
           <a href="#" class="btn btn--primary btn--soon">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} ${s.installExtEdge}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} ${s.installExtFirefox}</a>
-          <a href="https://github.com/investblog/flag-theme-generator/releases" class="btn btn--outline" target="_blank" rel="noopener">${icon('external', 16)} GitHub</a>
+          <a href="https://github.com/investblog/flag-theme-generator/releases" class="btn btn--outline" target="_blank" rel="noopener">${brandIcon('github', 16)} GitHub</a>
         </div>
       </div>
     </section>
@@ -93,6 +95,7 @@ export function homePage(d: HomePageData): string {
         <div class="about-seo__body">
           <p>${s.aboutSummary}</p>
           <p>${s.aboutDetails}</p>
+          <p>${s.aboutExports}</p>
         </div>
       </details>
     </section>`;
@@ -115,6 +118,7 @@ document.addEventListener('click',function(e){if(!inp.contains(e.target)&&!res.c
     title: 'Flag Theme — Browser Themes Inspired by Country Flags',
     description: `Free browser themes for Chrome, Edge, Firefox & Brave inspired by flags of ${d.totalCount}+ countries. Download or apply instantly.`,
     canonical: SITE_URL + `${prefix}/`,
+    hreflang: d.hreflang,
     body,
     scripts,
     navCountriesLabel: s.countries,

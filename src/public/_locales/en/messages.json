@@ -73,6 +73,10 @@
     "message": "Browse Palettes",
     "description": "Button to open side panel with palette browser"
   },
+  "btnBrowseExport": {
+    "message": "Browse & Export",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
   "btnExportCss": {
     "message": "Export CSS",
     "description": "Export CSS button text"
@@ -142,7 +146,7 @@
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
   "chromeThemeNote": {
-    "message": "Chrome and Edge themes are available as downloadable .zip files on our website.",
+    "message": "Chrome and Edge themes are available as .zip files on our website. Use Browse & Export for CSS, Tailwind, shadcn/ui, Tokens Studio, and JSON exports.",
     "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
   },
   "downloadTheme": {
@@ -432,5 +436,17 @@
   "promoOpen": {
     "message": "Open",
     "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "Links",
+    "description": "Settings section title for links"
+  },
+  "settingsSourceCode": {
+    "message": "Source Code",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "Rate Extension",
+    "description": "Store review link label"
   }
 }

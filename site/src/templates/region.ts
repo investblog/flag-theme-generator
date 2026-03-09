@@ -3,6 +3,7 @@
  */
 import { SITE_URL, icon, esc, breadcrumbLd } from './helpers.js';
 import { layout } from './layout.js';
+import type { HreflangEntry } from './layout.js';
 import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 
 export interface RegionPageData {
@@ -11,6 +12,7 @@ export interface RegionPageData {
   countries: { name: string; slug: string; flagColors: string[] }[];
   allRegions: { name: string; slug: string; count: number }[];
   lang?: string;
+  hreflang?: HreflangEntry[];
 }
 
 export function regionPage(d: RegionPageData): string {
@@ -61,6 +63,7 @@ export function regionPage(d: RegionPageData): string {
     title: t(s.regionH1, { region: d.name }),
     description: t(s.regionDesc, { count: d.countries.length, region: d.name }),
     canonical: `${SITE_URL}${prefix}/regions/${d.slug}/`,
+    hreflang: d.hreflang,
     head: `\n  <script type="application/ld+json">${breadcrumbLd(crumbs)}</script>`,
     body,
     navCountriesLabel: s.countries,

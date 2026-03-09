@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ThemeTokens } from '../types/theme';
-import { exportCSS, exportJSON, exportTailwind } from './export';
+import { exportCSS, exportJSON, exportShadcn, exportTailwind, exportTokensStudio } from './export';
 
 const SAMPLE_TOKENS: ThemeTokens = {
   bg: '#1a1a2e',
@@ -80,6 +80,61 @@ describe('exportJSON', () => {
 
   it('produces valid JSON', () => {
     const json = exportJSON(SAMPLE_TOKENS, 'JP', 'AMOLED', 0.95);
+    expect(() => JSON.parse(json)).not.toThrow();
+  });
+});
+
+describe('exportShadcn', () => {
+  it('produces @layer base with shadcn/ui variable names', () => {
+    const css = exportShadcn(SAMPLE_TOKENS);
+    expect(css).toContain('@layer base {');
+    expect(css).toContain(':root {');
+    expect(css).toContain('--background:');
+    expect(css).toContain('--foreground:');
+    expect(css).toContain('--primary:');
+    expect(css).toContain('--primary-foreground:');
+    expect(css).toContain('--muted-foreground:');
+    expect(css).toContain('--border:');
+    expect(css).toContain('--ring:');
+  });
+
+  it('uses HSL values without hsl() wrapper', () => {
+    const css = exportShadcn(SAMPLE_TOKENS);
+    // Should contain "H S% L%" format, not hex or hsl()
+    expect(css).not.toContain('#');
+    expect(css).not.toContain('hsl(');
+    // White (#ffffff) should be "0 0% 100%"
+    expect(css).toContain('0 0% 100%');
+  });
+
+  it('has all 17 shadcn/ui variables', () => {
+    const css = exportShadcn(SAMPLE_TOKENS);
+    const vars = css.match(/--[\w-]+:/g);
+    expect(vars).toHaveLength(17);
+  });
+});
+
+describe('exportTokensStudio', () => {
+  it('produces valid W3C DTCG JSON', () => {
+    const json = exportTokensStudio(SAMPLE_TOKENS, 'IN', 'DARK');
+    const parsed = JSON.parse(json);
+    expect(parsed['flag-theme']).toBeDefined();
+    expect(parsed['flag-theme'].$description).toBe('IN DARK');
+  });
+
+  it('contains all 10 token roles with $value and $type', () => {
+    const json = exportTokensStudio(SAMPLE_TOKENS, 'US', 'LIGHT');
+    const parsed = JSON.parse(json);
+    const group = parsed['flag-theme'];
+    expect(group.bg.$value).toBe('#1a1a2e');
+    expect(group.bg.$type).toBe('color');
+    expect(group.surface.$value).toBe('#22223a');
+    expect(group.accent.$value).toBe('#ff9933');
+    expect(group.focus.$value).toBe('#138808');
+  });
+
+  it('produces valid JSON', () => {
+    const json = exportTokensStudio(SAMPLE_TOKENS, 'JP', 'AMOLED');
     expect(() => JSON.parse(json)).not.toThrow();
   });
 });

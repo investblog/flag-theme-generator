@@ -3,12 +3,14 @@
  */
 import { SITE_URL, icon, esc } from './helpers.js';
 import { layout } from './layout.js';
+import type { HreflangEntry } from './layout.js';
 import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 
 export interface CatalogPageData {
   countries: { name: string; slug: string; flagColors: string[]; region: string }[];
   regions: { name: string; slug: string; count: number }[];
   lang?: string;
+  hreflang?: HreflangEntry[];
 }
 
 export function catalogPage(d: CatalogPageData): string {
@@ -38,6 +40,7 @@ export function catalogPage(d: CatalogPageData): string {
     title: s.catalogH1,
     description: t(s.catalogDesc, { count: d.countries.length }),
     canonical: `${SITE_URL}${prefix}/countries/`,
+    hreflang: d.hreflang,
     body,
     navCountriesLabel: s.countries,
     footerText: t(s.footerText, { year: String(new Date().getFullYear()) }),

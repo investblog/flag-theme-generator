@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Flag Theme Generator",
+    "description": "Extension display name"
+  },
+  "extDescription": {
+    "message": "Génère des thèmes de navigateur à partir de palettes de couleurs inspirées de drapeaux avec validation du contraste WCAG.",
+    "description": "Extension description for the browser store listing"
+  }
+}

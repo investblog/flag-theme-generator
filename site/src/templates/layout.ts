@@ -1,6 +1,7 @@
 /**
  * Shared HTML layout wrapper.
  */
+import * as allFlags from 'country-flag-icons/string/3x2';
 import { logoSvg, brandIcon, icon } from './helpers.js';
 
 export interface HreflangEntry {
@@ -30,17 +31,32 @@ const LANG_LABELS: Record<string, string> = {
   it: 'IT', nl: 'NL', zh: '中文', ja: '日本語', ko: '한국어', tr: 'TR',
 };
 
+/** Map language code → representative country code for flag icon. */
+const LANG_FLAGS: Record<string, string> = {
+  en: 'GB', es: 'ES', fr: 'FR', ar: 'SA', pt: 'PT', de: 'DE',
+  it: 'IT', nl: 'NL', zh: 'CN', ja: 'JP', ko: 'KR', tr: 'TR',
+};
+
+const FLAGS = allFlags as Record<string, string>;
+
+function langFlag(lang: string): string {
+  const code = LANG_FLAGS[lang];
+  const svg = code ? FLAGS[code] : undefined;
+  if (!svg) return '';
+  return `<span class="lang-dd__flag">${svg}</span>`;
+}
+
 function langSwitcher(currentLang: string, entries: HreflangEntry[]): string {
   // Filter to real language alternates (skip x-default, keep distinct langs)
   const alts = entries.filter(h => h.lang !== 'x-default');
   if (alts.length < 2) return '';
 
   const items = alts.map(h =>
-    `<a class="lang-dd__item${h.lang === currentLang ? ' is-active' : ''}" href="${h.href}" hreflang="${h.lang}">${LANG_LABELS[h.lang] || h.lang.toUpperCase()}</a>`
+    `<a class="lang-dd__item${h.lang === currentLang ? ' is-active' : ''}" href="${h.href}" hreflang="${h.lang}">${langFlag(h.lang)}${LANG_LABELS[h.lang] || h.lang.toUpperCase()}</a>`
   ).join('');
 
   return `<div class="lang-dd" id="lang-dd">
-        <button class="lang-dd__btn" type="button" aria-expanded="false">${icon('translate', 16)}<span>${LANG_LABELS[currentLang] || currentLang.toUpperCase()}</span>${icon('chevron-right', 14)}</button>
+        <button class="lang-dd__btn" type="button" aria-expanded="false">${langFlag(currentLang)}<span>${LANG_LABELS[currentLang] || currentLang.toUpperCase()}</span>${icon('chevron-right', 14)}</button>
         <div class="lang-dd__menu">${items}</div>
       </div>`;
 }
@@ -64,6 +80,14 @@ export function layout(o: LayoutOpts): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${o.title}</title>
   <meta name="description" content="${o.description}">
+  <meta property="og:title" content="${o.title}">
+  <meta property="og:description" content="${o.description}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${o.canonical}">
+  <meta property="og:image" content="https://flagtheme.com/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="${o.canonical}">${hreflangTags}
   <link rel="stylesheet" href="/assets/site.css">${o.cssVars ? `
   <style>:root{${o.cssVars}}</style>` : ''}${o.head ?? ''}

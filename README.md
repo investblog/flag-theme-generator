@@ -87,6 +87,12 @@ src/
 site/                     # flagtheme.com static site generator
 ```
 
+## Contributing
+
+Flag Theme Generator is sponsored by [301.st](https://301.st) — advanced domain management with redirects and traffic distribution.
+
+Found a bug or have a feature idea? [Open an issue](https://github.com/investblog/flag-theme-generator/issues). Pull requests welcome.
+
 ## Privacy
 
 Flag Theme Generator makes zero network requests. No analytics, no telemetry, no remote code. Theme preferences are stored in `browser.storage.local` and never leave the browser.
@@ -95,7 +101,6 @@ Flag Theme Generator makes zero network requests. No analytics, no telemetry, no
 
 - [flagtheme.com](https://flagtheme.com) — browse and download themes online (12 languages)
 - [Redirect Inspector](https://github.com/investblog/redirect-inspector) — real-time redirect console for developers
-- [301.st](https://301.st) — advanced domain management with redirects and traffic distribution
 
 ## License
 

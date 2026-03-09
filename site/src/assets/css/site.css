@@ -182,9 +182,10 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 
 /* === SEO About === */
 .about-seo details{border:1px solid var(--uc-border);border-radius:.5rem;background:var(--uc-surface)}
-.about-seo summary{padding:.75rem 1rem;cursor:pointer;list-style:none}
-.about-seo summary::-webkit-details-marker{display:none}
-.about-seo summary h2{font-size:1.125rem;margin:0;display:inline}
+.about-seo summary{padding:.75rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-weight:500;font-size:1.125rem;color:var(--uc-text)}
+.about-seo summary::marker,.about-seo summary::-webkit-details-marker{display:none}
+.about-seo summary::before{content:'';border:5px solid transparent;border-left:7px solid var(--uc-muted-text);transition:transform .2s}
+.about-seo details[open] summary::before{transform:rotate(90deg)}
 .about-seo__body{padding:0 1rem 1rem;color:var(--uc-muted-text);font-size:.9375rem;line-height:1.7}
 .about-seo__body p{margin-bottom:.75rem}
 .about-seo__body p:last-child{margin-bottom:0}

@@ -82,13 +82,14 @@ export function homePage(d: HomePageData): string {
           <a href="#" class="btn btn--primary btn--soon">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} ${s.installExtEdge}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} ${s.installExtFirefox}</a>
+          <a href="https://github.com/investblog/flag-theme-generator/releases" class="btn btn--outline" target="_blank" rel="noopener">${icon('external', 16)} GitHub</a>
         </div>
       </div>
     </section>
 
     <section class="about-seo">
       <details>
-        <summary><h2>${s.aboutTitle}</h2></summary>
+        <summary>${s.aboutTitle}</summary>
         <div class="about-seo__body">
           <p>${s.aboutSummary}</p>
           <p>${s.aboutDetails}</p>

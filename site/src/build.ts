@@ -17,6 +17,7 @@ import { countryPage, type CountryPageData } from './templates/country.js';
 import { homePage } from './templates/homepage.js';
 import { catalogPage } from './templates/catalog.js';
 import { regionPage } from './templates/region.js';
+import { privacyPage } from './templates/privacy.js';
 import { registerLang, getCountryName } from './i18n/countries.js';
 import { strings } from './i18n/strings.js';
 import type { HreflangEntry } from './templates/layout.js';
@@ -306,6 +307,12 @@ writeFileSync(resolve(DIST, 'index.html'), homePage({
   totalCount: palettes.length,
 }));
 console.log('  Homepage generated');
+
+// --- privacy page ---
+ensureDir(resolve(DIST, 'privacy'));
+writeFileSync(resolve(DIST, 'privacy', 'index.html'), privacyPage({}));
+sitemapEntries.push({ loc: `${SITE_URL}/privacy/` });
+console.log('  Privacy page generated');
 
 // --- localized homepage, catalog, region pages ---
 const nonEnLangs = [...SUPPORTED_LANGS].filter(l => l !== 'en');

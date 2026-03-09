@@ -1,7 +1,7 @@
 /**
  * Homepage template.
  */
-import { SITE_URL, icon } from './helpers.js';
+import { SITE_URL, icon, brandIcon } from './helpers.js';
 import { layout } from './layout.js';
 import { t, getStrings } from '../i18n/strings.js';
 
@@ -70,6 +70,30 @@ export function homePage(d: HomePageData): string {
           <p>${s.step3Desc}</p>
         </div>
       </div>
+    </section>
+
+    <section class="ext-install">
+      <div class="ext-install__card">
+        <div class="ext-install__text">
+          <h2>${icon('download', 20)} ${s.installExtTitle}</h2>
+          <p>${s.installExtDesc}</p>
+        </div>
+        <div class="ext-install__actions">
+          <a href="#" class="btn btn--primary btn--soon">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
+          <a href="#" class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} ${s.installExtEdge}</a>
+          <a href="#" class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} ${s.installExtFirefox}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-seo">
+      <details>
+        <summary><h2>${s.aboutTitle}</h2></summary>
+        <div class="about-seo__body">
+          <p>${s.aboutSummary}</p>
+          <p>${s.aboutDetails}</p>
+        </div>
+      </details>
     </section>`;
 
   const scripts = `(function(){

@@ -82,6 +82,7 @@ ${o.body}
   <footer class="footer">
     <p>${o.footerText || 'Flag Theme &mdash; Free browser themes inspired by country flags.'}</p>
     <p class="footer__sponsor">Sponsored by <a href="https://301.st" target="_blank" rel="noopener">${brandIcon('301st', 16)} 301.st</a></p>
+    <p class="footer__links"><a href="${prefix}/privacy/">Privacy Policy</a> &middot; <a href="https://github.com/investblog/flag-theme-generator" target="_blank" rel="noopener">GitHub</a></p>
   </footer>${allScripts ? `
   <script>${allScripts}</script>` : ''}
 </body>

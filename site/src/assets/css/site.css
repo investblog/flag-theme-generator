@@ -114,6 +114,9 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 .footer__sponsor a{color:var(--uc-muted-text)}
 .footer__sponsor .i{vertical-align:-.1em;margin:0 .15em}
 .footer__sponsor a:hover{color:var(--uc-link);text-decoration:none}
+.footer__links{margin-top:.5rem;font-size:.75rem}
+.footer__links a{color:var(--uc-muted-text)}
+.footer__links a:hover{color:var(--uc-link);text-decoration:none}
 
 /* === Catalog / Region Grids === */
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
@@ -171,6 +174,21 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 .btn--soon{opacity:.6;cursor:default;font-size:.8125rem}
 .btn--soon:hover{opacity:.6}
 
+/* === Extension Install CTA (homepage) === */
+.ext-install__card{background:var(--uc-surface);border:1px solid var(--uc-border);border-radius:.75rem;padding:1.5rem;display:flex;gap:1.5rem;align-items:center;justify-content:space-between}
+.ext-install__text h2{font-size:1.125rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.ext-install__text p{color:var(--uc-muted-text);font-size:.9375rem;margin:0}
+.ext-install__actions{display:flex;gap:.5rem;flex-shrink:0}
+
+/* === SEO About === */
+.about-seo details{border:1px solid var(--uc-border);border-radius:.5rem;background:var(--uc-surface)}
+.about-seo summary{padding:.75rem 1rem;cursor:pointer;list-style:none}
+.about-seo summary::-webkit-details-marker{display:none}
+.about-seo summary h2{font-size:1.125rem;margin:0;display:inline}
+.about-seo__body{padding:0 1rem 1rem;color:var(--uc-muted-text);font-size:.9375rem;line-height:1.7}
+.about-seo__body p{margin-bottom:.75rem}
+.about-seo__body p:last-child{margin-bottom:0}
+
 /* === Breadcrumbs === */
 .breadcrumb{font-size:.8125rem;color:var(--uc-muted-text);margin-bottom:1.5rem}
 .breadcrumb a{color:var(--uc-muted-text)}
@@ -189,4 +207,6 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
   .steps{grid-template-columns:1fr}
   .ext-promo__card{flex-direction:column}
   .ext-promo__actions{flex-direction:row;flex-wrap:wrap}
+  .ext-install__card{flex-direction:column;align-items:stretch}
+  .ext-install__actions{flex-wrap:wrap}
 }

@@ -81,7 +81,7 @@ export function homePage(d: HomePageData): string {
           <p>${s.installExtDesc}</p>
         </div>
         <div class="ext-install__actions">
-          <a href="#" class="btn btn--primary btn--soon">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
+          <a href="https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm" class="btn btn--primary" target="_blank" rel="noopener">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} ${s.installExtEdge}</a>
           <a href="#" class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} ${s.installExtFirefox}</a>
           <a href="https://github.com/investblog/flag-theme-generator/releases" class="btn btn--outline" target="_blank" rel="noopener">${brandIcon('github', 16)} GitHub</a>
@@ -115,8 +115,8 @@ document.addEventListener('click',function(e){if(!inp.contains(e.target)&&!res.c
   return layout({
     lang,
     dir: s.dir,
-    title: 'Flag Theme — Browser Themes Inspired by Country Flags',
-    description: `Free browser themes for Chrome, Edge, Firefox & Brave inspired by flags of ${d.totalCount}+ countries. Download or apply instantly.`,
+    title: s.homeTitle,
+    description: t(s.homeDescription, { count: String(d.totalCount) }),
     canonical: SITE_URL + `${prefix}/`,
     hreflang: d.hreflang,
     body,

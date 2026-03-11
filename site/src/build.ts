@@ -32,7 +32,6 @@ const CSS_SRC = resolve(ROOT, 'src/assets/css/site.css');
 
 const THEME_ASSETS: ThemeAssets = {
   mapSvgPath: resolve(MONO_ROOT, 'temp/world-map.min.svg'),
-  fontPath: resolve(MONO_ROOT, 'temp/fonts/NotoSans-Regular.ttf'),
 };
 
 // Dynamic imports for shared modules (TS source via tsx)
@@ -110,7 +109,11 @@ writeFileSync(resolve(DIST, 'assets', 'brand-icons.svg'), buildBrandSprite());
 copyFileSync(CSS_SRC, resolve(DIST, 'assets', 'site.css'));
 const ogSrc = resolve(ROOT, 'src/assets/og.png');
 if (existsSync(ogSrc)) copyFileSync(ogSrc, resolve(DIST, 'assets', 'og.png'));
-console.log('  Static assets copied (sprites + CSS + OG)');
+for (const fav of ['favicon-32.png', 'favicon-128.png']) {
+  const favSrc = resolve(ROOT, 'src/assets', fav);
+  if (existsSync(favSrc)) copyFileSync(favSrc, resolve(DIST, 'assets', fav));
+}
+console.log('  Static assets copied (sprites + CSS + OG + favicons)');
 
 // --- precompute region data ---
 const regionMap = new Map<string, FlagPalette[]>();

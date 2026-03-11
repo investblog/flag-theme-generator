@@ -88,6 +88,8 @@ export function layout(o: LayoutOpts): string {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/assets/favicon-128.png">
   <link rel="canonical" href="${o.canonical}">${hreflangTags}
   <link rel="stylesheet" href="/assets/site.css">${o.cssVars ? `
   <style>:root{${o.cssVars}}</style>` : ''}${o.head ?? ''}

@@ -917,7 +917,7 @@ function openSettingsDrawer(): void {
     storeUrl = 'https://microsoftedge.microsoft.com/addons/detail/flag-theme-generator/';
     storeName = 'Edge Add-ons';
   } else {
-    storeUrl = 'https://chromewebstore.google.com/detail/flag-theme-generator/';
+    storeUrl = 'https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm';
     storeName = 'Chrome Web Store';
   }
 

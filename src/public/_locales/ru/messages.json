@@ -44,7 +44,7 @@
     "description": "Light mode name"
   },
   "modeDominantOnly": {
-    "message": "\u0422\u043e\u043b\u044c\u043a\u043e \u0430\u043a\u0446\u0435\u043d\u0442",
+    "message": "\u0410\u043a\u0446\u0435\u043d\u0442",
     "description": "Dominant-only mode name"
   },
   "modeDisabledTooltip": {
@@ -126,7 +126,7 @@
     "description": "Token label"
   },
   "tokenAccentText": {
-    "message": "\u0422\u0435\u043a\u0441\u0442 \u0430\u043a\u0446\u0435\u043d\u0442\u0430",
+    "message": "\u0410\u043a\u0446. \u0442\u0435\u043a\u0441\u0442",
     "description": "Token label"
   },
   "tokenLink": {
@@ -194,7 +194,7 @@
     "description": "Empty quality state"
   },
   "qualityRecommended": {
-    "message": "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u0442\u0441\u044f",
+    "message": "\u0420\u0435\u043a\u043e\u043c\u0435\u043d\u0434.",
     "description": "Recommended mode label"
   },
   "qualityCurrent": {

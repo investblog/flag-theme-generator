@@ -41,6 +41,18 @@ export function jsTokenMap(tokens: Record<string, string>): string {
   return '{' + TOKEN_KEYS.map(k => `'${TOKEN_CSS[k]}':'${tokens[k]}'`).join(',') + '}';
 }
 
+/** AMO locale prefix mapping (site lang → AMO path segment). */
+const AMO_LOCALE: Record<string, string> = {
+  en: 'en-US', es: 'es-ES', fr: 'fr', ar: 'en-US', pt: 'pt-PT',
+  de: 'de', it: 'it', nl: 'nl', zh: 'zh-CN', ja: 'ja', ko: 'ko', tr: 'tr',
+};
+
+/** Localized AMO addon URL. */
+export function amoUrl(lang: string): string {
+  const loc = AMO_LOCALE[lang] || 'en-US';
+  return `https://addons.mozilla.org/${loc}/firefox/addon/flag-theme-generator/`;
+}
+
 /** Escape HTML special chars in text content. */
 export function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

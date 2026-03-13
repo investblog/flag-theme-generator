@@ -4,7 +4,7 @@
  */
 import {
   SITE_URL, TOKEN_KEYS, TOKEN_CSS,
-  icon, brandIcon, cssVarsBlock, jsTokenMap, esc, breadcrumbLd,
+  icon, brandIcon, cssVarsBlock, jsTokenMap, esc, breadcrumbLd, amoUrl,
 } from './helpers.js';
 import { layout, type HreflangEntry } from './layout.js';
 import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
@@ -45,7 +45,7 @@ export function countryPage(d: CountryPageData): string {
   const FAQ = [
     { q: s.faqChromeQ, a: s.faqChromeA },
     { q: s.faqEdgeQ, a: s.faqEdgeA },
-    { q: s.faqFirefoxQ, a: s.faqFirefoxA },
+    { q: s.faqFirefoxQ, a: s.faqFirefoxA.replace('%AMO_URL%', amoUrl(lang)) },
     { q: s.modeQuestion, a: s.modeAnswer },
   ];
 
@@ -131,7 +131,7 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
       <a id="dl-chrome" href="/downloads/${code}-${d.defaultMode}.zip" class="btn btn--primary" download>
         ${brandIcon('chrome')} ${s.downloadChrome}
       </a>
-      <a href="https://addons.mozilla.org/firefox/addon/flag-theme-generator/" class="btn btn--secondary" target="_blank" rel="noopener">
+      <a href="${amoUrl(lang)}" class="btn btn--secondary" target="_blank" rel="noopener">
         ${brandIcon('firefox')} ${s.getFirefox}
       </a>
       <button id="copy-css" class="btn btn--outline" type="button">
@@ -184,7 +184,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
         </div>
         <div class="ext-promo__actions">
           <a href="https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('chrome', 18)} Chrome</a>
-          <a href="https://addons.mozilla.org/firefox/addon/flag-theme-generator/" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('firefox', 18)} Firefox</a>
+          <a href="${amoUrl(lang)}" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('firefox', 18)} Firefox</a>
         </div>
       </div>
     </section>

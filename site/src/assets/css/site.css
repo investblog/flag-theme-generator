@@ -175,8 +175,6 @@ section h2{font-size:1.25rem;margin-bottom:1rem}
 .ext-promo__text li{font-size:.875rem;color:var(--uc-text);display:flex;align-items:center;gap:.4rem}
 .ext-promo__text li .i{color:var(--uc-accent);flex-shrink:0}
 .ext-promo__actions{display:flex;flex-direction:column;gap:.5rem;flex-shrink:0}
-.btn--soon{opacity:.6;cursor:default;font-size:.8125rem}
-.btn--soon:hover{opacity:.6}
 
 /* === Extension Install CTA (homepage) === */
 .ext-install__card{background:var(--uc-surface);border:1px solid var(--uc-border);border-radius:.75rem;padding:1.5rem;display:flex;gap:1.5rem;align-items:center;justify-content:space-between}

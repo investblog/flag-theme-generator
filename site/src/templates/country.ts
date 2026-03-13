@@ -184,8 +184,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
         </div>
         <div class="ext-promo__actions">
           <a href="https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('chrome', 18)} Chrome</a>
-          <span class="btn btn--secondary btn--soon">${brandIcon('edge', 18)} Edge &mdash; ${s.extensionComingSoon}</span>
-          <span class="btn btn--secondary btn--soon">${brandIcon('firefox', 18)} Firefox &mdash; ${s.extensionComingSoon}</span>
+          <a href="https://addons.mozilla.org/firefox/addon/flag-theme-generator/" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('firefox', 18)} Firefox</a>
         </div>
       </div>
     </section>

@@ -441,6 +441,10 @@
     "message": "Links",
     "description": "Settings section title for links"
   },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
   "settingsSourceCode": {
     "message": "Source Code",
     "description": "GitHub source code link label"

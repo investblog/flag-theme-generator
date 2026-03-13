@@ -46,6 +46,8 @@ const ICON_PIPETTE =
   'm12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12M18 9l.4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3zM2 22l.414-.414';
 const ICON_EXTERNAL = 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3';
 const ICON_STAR = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
+const ICON_GLOBE =
+  'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z';
 const ICON_GITHUB =
   'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22';
 
@@ -145,9 +147,16 @@ async function init(): Promise<void> {
   const allChip = createFilterChip(msg('searchAllRegions'), '', filters);
   allChip.classList.add('filter-chip--active');
   filters.appendChild(allChip);
+  const REGION_MSG: Record<string, string> = {
+    Africa: 'regionAfrica',
+    Americas: 'regionAmericas',
+    Asia: 'regionAsia',
+    Europe: 'regionEurope',
+    Oceania: 'regionOceania',
+  };
   for (const region of getRegions()) {
     if (region === 'Antarctica') continue;
-    filters.appendChild(createFilterChip(region, region, filters));
+    filters.appendChild(createFilterChip(msg(REGION_MSG[region] ?? '') || region, region, filters));
   }
   app.appendChild(filters);
 
@@ -892,6 +901,18 @@ function openSettingsDrawer(): void {
   const linksList = document.createElement('div');
   linksList.className = 'settings__links';
 
+  const siteLink = document.createElement('a');
+  siteLink.className = 'settings__link';
+  siteLink.href = 'https://flagtheme.com';
+  siteLink.target = '_blank';
+  siteLink.rel = 'noopener';
+  siteLink.appendChild(svgIcon(ICON_GLOBE));
+  const siteLabel = document.createElement('span');
+  siteLabel.textContent = msg('settingsWebsite');
+  siteLink.appendChild(siteLabel);
+  siteLink.appendChild(svgIcon(ICON_EXTERNAL, 12));
+  linksList.appendChild(siteLink);
+
   const ghLink = document.createElement('a');
   ghLink.className = 'settings__link';
   ghLink.href = 'https://github.com/investblog/flag-theme-generator';
@@ -905,7 +926,6 @@ function openSettingsDrawer(): void {
   linksList.appendChild(ghLink);
 
   const ua = navigator.userAgent;
-  const isEdge = ua.includes('Edg/');
   const isFirefox = ua.includes('Firefox/');
 
   let storeUrl = '';

@@ -57,7 +57,7 @@ function init(): void {
   header.className = 'welcome__header';
   header.innerHTML = `
     <h1 class="welcome__title">${msg('welcomeHeading')}</h1>
-    <p class="welcome__subtitle">${msg('welcomeSubtitle')}</p>
+    <p class="welcome__subtitle">${msg('welcomeSubtitle')} <a href="https://flagtheme.com" target="_blank" rel="noopener">flagtheme.com</a></p>
   `;
   app.appendChild(header);
 
@@ -80,6 +80,13 @@ function init(): void {
   countrySection.appendChild(searchInput);
 
   const regions = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'];
+  const REGION_MSG: Record<string, string> = {
+    Africa: 'regionAfrica',
+    Americas: 'regionAmericas',
+    Asia: 'regionAsia',
+    Europe: 'regionEurope',
+    Oceania: 'regionOceania',
+  };
   const filtersRow = document.createElement('div');
   filtersRow.className = 'welcome__filters';
   let activeRegion: string | null = null;
@@ -87,7 +94,7 @@ function init(): void {
   for (const region of regions) {
     const chip = document.createElement('button');
     chip.className = 'filter-chip';
-    chip.textContent = region;
+    chip.textContent = msg(REGION_MSG[region] ?? '') || region;
     chip.dataset.region = region;
     chip.addEventListener('click', () => {
       activeRegion = activeRegion === region ? null : region;

@@ -131,7 +131,7 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
       <a id="dl-chrome" href="/downloads/${code}-${d.defaultMode}.zip" class="btn btn--primary" download>
         ${brandIcon('chrome')} ${s.downloadChrome}
       </a>
-      <a href="#" class="btn btn--secondary">
+      <a href="https://addons.mozilla.org/firefox/addon/flag-theme-generator/" class="btn btn--secondary" target="_blank" rel="noopener">
         ${brandIcon('firefox')} ${s.getFirefox}
       </a>
       <button id="copy-css" class="btn btn--outline" type="button">

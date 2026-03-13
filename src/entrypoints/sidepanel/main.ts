@@ -911,13 +911,10 @@ function openSettingsDrawer(): void {
   let storeUrl = '';
   let storeName = '';
   if (isFirefox) {
-    storeUrl = 'https://addons.mozilla.org/addon/flag-theme-generator/reviews/';
+    storeUrl = 'https://addons.mozilla.org/en-US/firefox/addon/flag-theme-generator/reviews/';
     storeName = 'Firefox Add-ons';
-  } else if (isEdge) {
-    storeUrl = 'https://microsoftedge.microsoft.com/addons/detail/flag-theme-generator/';
-    storeName = 'Edge Add-ons';
   } else {
-    storeUrl = 'https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm';
+    storeUrl = 'https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm/reviews';
     storeName = 'Chrome Web Store';
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "flag-theme-generator",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Generate browser themes from flag-inspired color palettes with WCAG contrast validation.",
   "type": "module",
   "scripts": {

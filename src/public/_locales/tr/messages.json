@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "Bayraklardan ilham alan renk paletleriyle WCAG kontrast do\u011frulamal\u0131 taray\u0131c\u0131 temalar\u0131 olu\u015fturun.",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "Bu uzant\u0131, bayraklardan ilham alan renk paletleriyle taray\u0131c\u0131 teman\u0131z\u0131 de\u011fi\u015ftirir.",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "Bir \u00fclke se\u00e7in",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "Sizin i\u00e7in \u00f6nerilen",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "Tema modunu se\u00e7in",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "\u00d6nizleme",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "Koyu",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "A\u00e7\u0131k",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "Tek Vurgu",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "Bu palet $MODE$ modunda kontrast hedeflerini kar\u015f\u0131layam\u0131yor.",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "A\u00e7\u0131k"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "Tema Uygula",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "S\u0131f\u0131rla",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "Galeriyi Ke\u015ffet",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "Paletlere Bak",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "G\u00f6z At ve Aktar",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "CSS Aktar",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "Kopyaland\u0131!",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "Yan paneli a\u00e7mak i\u00e7in ara\u00e7 \u00e7ubu\u011fundaki uzant\u0131 simgesine t\u0131klay\u0131n",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "Dile g\u00f6re otomatik se\u00e7",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "Taray\u0131c\u0131 diliniz de\u011fi\u015fti\u011finde tema otomatik de\u011fi\u015febilir.",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "Arka Plan",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "Y\u00fczey",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "Metin",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "Soluk",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "Kenarl\u0131k",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "Vurgu",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "Vurgu 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "Vurgu Metni",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "Ba\u011flant\u0131",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "Odak",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Tema uyguland\u0131!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Yaln\u0131zca d\u0131\u015fa aktarma - tema API\u2019si kullan\u0131lam\u0131yor",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "Chrome ve Edge temalar\u0131 web sitemizde .zip olarak mevcuttur. CSS, Tailwind, shadcn/ui, Tokens Studio ve JSON d\u0131\u015fa aktarmalar\u0131 i\u00e7in G\u00f6z At ve Aktar\u2019\u0131 kullan\u0131n.",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "Tema \u0130ndir",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "\u00dclke ara...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "T\u00fcm\u00fc",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "Afrika",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "Amerikalar",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "Asya",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "Avrupa",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "Okyanusya",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "Araman\u0131zla e\u015fle\u015fen \u00fclke bulunamad\u0131.",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "Mod uyumu",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "En iyi modu ve \u00f6d\u00fcnle\u015fimlerini g\u00f6rmek i\u00e7in bir \u00fclke se\u00e7in.",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "\u00d6nerilen",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "Mevcut",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "En \u0130yi",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "G\u00fcvenli",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "En kararl\u0131 varsay\u0131lanlarla g\u00fcvenli yedek se\u00e7enek",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "En g\u00fcvenli paleti istedi\u011finizde kullan\u0131n; \u00f6zel modlardan daha az uzmanla\u015fm\u0131\u015f olsa bile.",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "Bu modda belirgin bir \u00f6d\u00fcnle\u015fim yok.",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "En iyi otomatik se\u00e7im: $MODE$. $SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Koyu"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "Net kontrastla g\u00fc\u00e7l\u00fc uyum."
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "M\u00fckemmel",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "G\u00fc\u00e7l\u00fc",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "Dengeli",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "K\u0131r\u0131lgan",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "Bu palet i\u00e7in en g\u00fcvenli yedek se\u00e7enek.",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "Bu modda kontrast hedefleri kar\u015f\u0131lanam\u0131yor.",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "Net kontrastla $TONE$ uyum.",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "G\u00fc\u00e7l\u00fc"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "$COUNT$ \u00f6d\u00fcnle\u015fimle $TONE$ uyum.",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Dengeli"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - $TONE$ uyum",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "G\u00fc\u00e7l\u00fc"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "Sadakat",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "Pay",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "Ayr\u0131\u015f\u0131m",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "Ayr\u0131\u015f\u0131m",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "Sentetik destek",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "D\u00fc\u015f\u00fck ayr\u0131m",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "\u0130nce pay",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "A\u011f\u0131r d\u00fczeltme",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "N\u00f6tr kaynak",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "Paleti tamamlamak i\u00e7in bir etkile\u015fimli renk sentetik olarak \u00fcretildi.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "Etkile\u015fimli roller g\u00f6rsel olarak yak\u0131n, bu y\u00fczden ba\u011flant\u0131lar ve vurgular daha az ayr\u0131\u015f\u0131yor.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "Kontrast ge\u00e7iyor, ancak s\u0131n\u0131rl\u0131 payla.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "Bayrak renkleri okunabilir kalmak i\u00e7in daha g\u00fc\u00e7l\u00fc d\u00fczeltme gerektirdi.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "Kaynak bayrak \u00e7o\u011funlukla n\u00f6tr, bu y\u00fczden sonu\u00e7 renge daha az sad\u0131k.",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "Yedek",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "\u00d6nizlemek i\u00e7in bir \u00fclke se\u00e7in.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "Ayarlar",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "Renk Kat\u0131l\u0131\u011f\u0131",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "Kontrast gereksinimlerini kar\u015f\u0131lamak i\u00e7in bayrak renklerinin ne kadar ayarlanabilece\u011fini kontrol eder.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "Esnek",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "Kat\u0131",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "Dile G\u00f6re Otomatik",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "D\u0131\u015fa Aktar",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "Kopyala",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "SVG Kopyala",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "SVG \u0130ndir",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "Kontrast analizi",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "Kontrast",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "Kapat",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "\u00c7ift",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "Oran",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "Gerek",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "Ge\u00e7ti",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "Kald\u0131",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "A\u00e7",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "Ba\u011flant\u0131lar",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "Kaynak Kodu",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "Uzant\u0131y\u0131 Puanla",
+    "description": "Store review link label"
   }
 }

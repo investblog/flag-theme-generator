@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "\u0623\u0646\u0634\u0626 \u0633\u0645\u0627\u062a \u0645\u062a\u0635\u0641\u062d \u0645\u0633\u062a\u0648\u062d\u0627\u0629 \u0645\u0646 \u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0623\u0639\u0644\u0627\u0645 \u0645\u0639 \u0627\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u062a\u0628\u0627\u064a\u0646 WCAG.",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "\u064a\u063a\u064a\u0651\u0631 \u0647\u0630\u0627 \u0627\u0644\u0627\u0645\u062a\u062f\u0627\u062f \u0633\u0645\u0629 \u0627\u0644\u0645\u062a\u0635\u0641\u062d \u0628\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0644\u0648\u062d\u0627\u062a \u0623\u0644\u0648\u0627\u0646 \u0645\u0633\u062a\u0648\u062d\u0627\u0629 \u0645\u0646 \u0627\u0644\u0623\u0639\u0644\u0627\u0645.",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "\u0627\u062e\u062a\u0631 \u062f\u0648\u0644\u0629",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "\u0645\u0648\u0635\u0649 \u0628\u0647 \u0644\u0643",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "\u0627\u062e\u062a\u0631 \u0648\u0636\u0639 \u0627\u0644\u0633\u0645\u0629",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "\u0645\u0639\u0627\u064a\u0646\u0629",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "\u062f\u0627\u0643\u0646",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "\u0641\u0627\u062a\u062d",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "\u062a\u0645\u064a\u064a\u0632 \u0641\u0642\u0637",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "\u0647\u0630\u0647 \u0627\u0644\u0644\u0648\u062d\u0629 \u0644\u0627 \u062a\u0633\u062a\u0648\u0641\u064a \u0623\u0647\u062f\u0627\u0641 \u0627\u0644\u062a\u0628\u0627\u064a\u0646 \u0641\u064a \u0648\u0636\u0639 $MODE$.",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u0641\u0627\u062a\u062d"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "\u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u0633\u0645\u0629",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "\u0625\u0639\u0627\u062f\u0629 \u0636\u0628\u0637",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "\u0627\u0633\u062a\u0639\u0631\u0627\u0636 \u0627\u0644\u0645\u0639\u0631\u0636",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "\u062a\u0635\u0641\u062d \u0627\u0644\u0644\u0648\u062d\u0627\u062a",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "\u062a\u0635\u0641\u062d \u0648\u062a\u0635\u062f\u064a\u0631",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "\u062a\u0635\u062f\u064a\u0631 CSS",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e!",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "\u0627\u0646\u0642\u0631 \u0639\u0644\u0649 \u0623\u064a\u0642\u0648\u0646\u0629 \u0627\u0644\u0627\u0645\u062a\u062f\u0627\u062f \u0641\u064a \u0634\u0631\u064a\u0637 \u0627\u0644\u0623\u062f\u0648\u0627\u062a \u0644\u0641\u062a\u062d \u0627\u0644\u0644\u0648\u062d\u0629 \u0627\u0644\u062c\u0627\u0646\u0628\u064a\u0629",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "\u062a\u062d\u062f\u064a\u062f \u062a\u0644\u0642\u0627\u0626\u064a \u062d\u0633\u0628 \u0627\u0644\u0644\u063a\u0629",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "\u0642\u062f \u062a\u062a\u063a\u064a\u0631 \u0627\u0644\u0633\u0645\u0629 \u062a\u0644\u0642\u0627\u0626\u064a\u064b\u0627 \u0639\u0646\u062f \u062a\u063a\u064a\u064a\u0631 \u0644\u063a\u0629 \u0627\u0644\u0645\u062a\u0635\u0641\u062d.",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "\u0627\u0644\u062e\u0644\u0641\u064a\u0629",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "\u0627\u0644\u0633\u0637\u062d",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "\u0627\u0644\u0646\u0635",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "\u0635\u0627\u0645\u062a",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "\u0627\u0644\u062d\u062f",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "\u062a\u0645\u064a\u064a\u0632",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "\u062a\u0645\u064a\u064a\u0632 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "\u0646\u0635 \u0627\u0644\u062a\u0645\u064a\u064a\u0632",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "\u0631\u0627\u0628\u0637",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "\u062a\u0631\u0643\u064a\u0632",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "\u062a\u0645 \u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u0633\u0645\u0629!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "\u062a\u0635\u062f\u064a\u0631 \u0641\u0642\u0637 - \u0648\u0627\u062c\u0647\u0629 \u0627\u0644\u0633\u0645\u0627\u062a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d\u0629",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "\u0633\u0645\u0627\u062a Chrome \u0648Edge \u0645\u062a\u0627\u062d\u0629 \u0643\u0645\u0644\u0641\u0627\u062a .zip \u0639\u0644\u0649 \u0645\u0648\u0642\u0639\u0646\u0627. \u0627\u0633\u062a\u062e\u062f\u0645 \u062a\u0635\u0641\u062d \u0648\u062a\u0635\u062f\u064a\u0631 \u0644\u062a\u0635\u062f\u064a\u0631 CSS \u0648Tailwind \u0648shadcn/ui \u0648Tokens Studio \u0648JSON.",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "\u062a\u0646\u0632\u064a\u0644 \u0627\u0644\u0633\u0645\u0629",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "\u0627\u0628\u062d\u062b \u0639\u0646 \u062f\u0648\u0644\u0629...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "\u0627\u0644\u0643\u0644",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "\u0623\u0641\u0631\u064a\u0642\u064a\u0627",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "\u0627\u0644\u0623\u0645\u0631\u064a\u0643\u064a\u062a\u0627\u0646",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "\u0622\u0633\u064a\u0627",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "\u0623\u0648\u0631\u0648\u0628\u0627",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "\u0623\u0648\u0642\u064a\u0627\u0646\u0648\u0633\u064a\u0627",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "\u0644\u0627 \u062a\u0648\u062c\u062f \u062f\u0648\u0644 \u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0628\u062d\u062b\u0643.",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "\u0645\u0644\u0627\u0621\u0645\u0629 \u0627\u0644\u0648\u0636\u0639",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "\u0627\u062e\u062a\u0631 \u062f\u0648\u0644\u0629 \u0644\u0631\u0624\u064a\u0629 \u0623\u0641\u0636\u0644 \u0648\u0636\u0639 \u0648\u0645\u0642\u0627\u064a\u0636\u0627\u062a\u0647.",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "\u0645\u0648\u0635\u0649 \u0628\u0647",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "\u0627\u0644\u062d\u0627\u0644\u064a",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "\u0627\u0644\u0623\u0641\u0636\u0644",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "\u0622\u0645\u0646",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "\u062e\u064a\u0627\u0631 \u0627\u062d\u062a\u064a\u0627\u0637\u064a \u0622\u0645\u0646 \u0628\u0623\u0643\u062b\u0631 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0633\u062a\u0642\u0631\u0627\u0631\u064b\u0627",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "\u0627\u0633\u062a\u062e\u062f\u0645\u0647 \u0639\u0646\u062f\u0645\u0627 \u062a\u0631\u064a\u062f \u0623\u0643\u062b\u0631 \u0644\u0648\u062d\u0629 \u0623\u0645\u0627\u0646\u064b\u0627\u060c \u062d\u062a\u0649 \u0644\u0648 \u0643\u0627\u0646\u062a \u0623\u0642\u0644 \u062a\u062e\u0635\u0635\u064b\u0627 \u0645\u0646 \u0627\u0644\u0623\u0648\u0636\u0627\u0639 \u0627\u0644\u0645\u062e\u0635\u0635\u0629.",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0642\u0627\u064a\u0636\u0627\u062a \u0645\u0644\u062d\u0648\u0638\u0629 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0648\u0636\u0639.",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "\u0623\u0641\u0636\u0644 \u0627\u062e\u062a\u064a\u0627\u0631 \u062a\u0644\u0642\u0627\u0626\u064a \u0647\u0648 $MODE$. $SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u062f\u0627\u0643\u0646"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "\u062a\u0648\u0627\u0641\u0642 \u0642\u0648\u064a \u0645\u0639 \u062a\u0628\u0627\u064a\u0646 \u0648\u0627\u0636\u062d."
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "\u0645\u0645\u062a\u0627\u0632",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "\u0642\u0648\u064a",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "\u0645\u062a\u0648\u0627\u0632\u0646",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "\u0647\u0634",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "\u0623\u0643\u062b\u0631 \u062e\u064a\u0627\u0631 \u0627\u062d\u062a\u064a\u0627\u0637\u064a \u0623\u0645\u0627\u0646\u064b\u0627 \u0644\u0647\u0630\u0647 \u0627\u0644\u0644\u0648\u062d\u0629.",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "\u0644\u0627 \u064a\u0645\u0643\u0646 \u062a\u062d\u0642\u064a\u0642 \u0623\u0647\u062f\u0627\u0641 \u0627\u0644\u062a\u0628\u0627\u064a\u0646 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0648\u0636\u0639.",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "\u062a\u0648\u0627\u0641\u0642 $TONE$ \u0645\u0639 \u062a\u0628\u0627\u064a\u0646 \u0648\u0627\u0636\u062d.",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u0642\u0648\u064a"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "\u062a\u0648\u0627\u0641\u0642 $TONE$ \u0645\u0639 $COUNT$ \u0645\u0642\u0627\u064a\u0636\u0629.",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u0645\u062a\u0648\u0627\u0632\u0646"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - \u062a\u0648\u0627\u0641\u0642 $TONE$",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "\u0642\u0648\u064a"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "\u0627\u0644\u062f\u0642\u0629",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "\u0627\u0644\u0647\u0627\u0645\u0634",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "\u0627\u0644\u062a\u0645\u0627\u064a\u0632",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "\u062a\u0645\u0627\u064a\u0632",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "\u0645\u0633\u0627\u0639\u062f\u0629 \u0627\u0635\u0637\u0646\u0627\u0639\u064a\u0629",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "\u0641\u0635\u0644 \u0636\u0639\u064a\u0641",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "\u0647\u0627\u0645\u0634 \u0636\u064a\u0642",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "\u062a\u0639\u062f\u064a\u0644 \u0642\u0648\u064a",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "\u0645\u0635\u062f\u0631 \u0645\u062d\u0627\u064a\u062f",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "\u062a\u0645 \u062a\u0648\u0644\u064a\u062f \u0644\u0648\u0646 \u062a\u0641\u0627\u0639\u0644\u064a \u0648\u0627\u062d\u062f \u0627\u0635\u0637\u0646\u0627\u0639\u064a\u064b\u0627 \u0644\u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u0644\u0648\u062d\u0629.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "\u0627\u0644\u0623\u062f\u0648\u0627\u0631 \u0627\u0644\u062a\u0641\u0627\u0639\u0644\u064a\u0629 \u0645\u062a\u0642\u0627\u0631\u0628\u0629 \u0628\u0635\u0631\u064a\u064b\u0627\u060c \u0644\u0630\u0627 \u0627\u0644\u0631\u0648\u0627\u0628\u0637 \u0648\u0627\u0644\u062a\u0645\u064a\u064a\u0632\u0627\u062a \u0623\u0642\u0644 \u0627\u0646\u0641\u0635\u0627\u0644\u064b\u0627.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "\u0627\u0644\u062a\u0628\u0627\u064a\u0646 \u0646\u0627\u062c\u062d\u060c \u0644\u0643\u0646 \u0645\u0639 \u0647\u0627\u0645\u0634 \u0645\u062d\u062f\u0648\u062f.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "\u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0639\u0644\u0645 \u0627\u062d\u062a\u0627\u062c\u062a \u0625\u0644\u0649 \u062a\u0635\u062d\u064a\u062d \u0623\u0642\u0648\u0649 \u0644\u0644\u062d\u0641\u0627\u0638 \u0639\u0644\u0649 \u0627\u0644\u0642\u0631\u0627\u0621\u0629.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "\u0627\u0644\u0639\u0644\u0645 \u0627\u0644\u0645\u0635\u062f\u0631 \u0645\u062d\u0627\u064a\u062f \u0641\u064a \u0627\u0644\u063a\u0627\u0644\u0628\u060c \u0644\u0630\u0627 \u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0623\u0642\u0644 \u0648\u0641\u0627\u0621\u064b \u0644\u0644\u0623\u0644\u0648\u0627\u0646.",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "\u0627\u062d\u062a\u064a\u0627\u0637\u064a",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "\u0627\u062e\u062a\u0631 \u062f\u0648\u0644\u0629 \u0644\u0644\u0645\u0639\u0627\u064a\u0646\u0629.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "\u0635\u0631\u0627\u0645\u0629 \u0627\u0644\u0623\u0644\u0648\u0627\u0646",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "\u064a\u062a\u062d\u0643\u0645 \u0641\u064a \u0645\u062f\u0649 \u062a\u0639\u062f\u064a\u0644 \u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0639\u0644\u0645 \u0644\u062a\u0644\u0628\u064a\u0629 \u0645\u062a\u0637\u0644\u0628\u0627\u062a \u0627\u0644\u062a\u0628\u0627\u064a\u0646.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "\u0645\u0631\u0646",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "\u0635\u0627\u0631\u0645",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "\u062a\u0644\u0642\u0627\u0626\u064a \u062d\u0633\u0628 \u0627\u0644\u0644\u063a\u0629",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "\u062a\u0635\u062f\u064a\u0631",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "\u0646\u0633\u062e",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "\u0646\u0633\u062e SVG",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "\u062a\u0646\u0632\u064a\u0644 SVG",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u062a\u0628\u0627\u064a\u0646",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "\u0627\u0644\u062a\u0628\u0627\u064a\u0646",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "\u0625\u063a\u0644\u0627\u0642",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "\u0632\u0648\u062c",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "\u0646\u0633\u0628\u0629",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "\u0645\u0637\u0644\u0648\u0628",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "\u0646\u062c\u062d",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "\u0641\u0634\u0644",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "\u0641\u062a\u062d",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "\u0631\u0648\u0627\u0628\u0637",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "\u0627\u0644\u0643\u0648\u062f \u0627\u0644\u0645\u0635\u062f\u0631\u064a",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "\u0642\u064a\u0651\u0645 \u0627\u0644\u0627\u0645\u062a\u062f\u0627\u062f",
+    "description": "Store review link label"
   }
 }

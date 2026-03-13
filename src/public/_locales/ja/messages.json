@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "\u56fd\u65d7\u306b\u30a4\u30f3\u30b9\u30d1\u30a4\u30a2\u3055\u308c\u305f\u914d\u8272\u304b\u3089\u30d6\u30e9\u30a6\u30b6\u30c6\u30fc\u30de\u3092\u751f\u6210\u3057\u3001WCAG\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u691c\u8a3c\u3092\u884c\u3044\u307e\u3059\u3002",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "\u3053\u306e\u62e1\u5f35\u6a5f\u80fd\u306f\u56fd\u65d7\u306e\u914d\u8272\u3092\u4f7f\u3063\u3066\u30d6\u30e9\u30a6\u30b6\u30c6\u30fc\u30de\u3092\u5909\u66f4\u3057\u307e\u3059\u3002",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "\u56fd\u3092\u9078\u629e",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "\u304a\u3059\u3059\u3081",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "\u30c6\u30fc\u30de\u30e2\u30fc\u30c9\u3092\u9078\u629e",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "\u30d7\u30ec\u30d3\u30e5\u30fc",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "\u30c0\u30fc\u30af",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "\u30e9\u30a4\u30c8",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "\u30a2\u30af\u30bb\u30f3\u30c8\u306e\u307f",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "\u3053\u306e\u30d1\u30ec\u30c3\u30c8\u306f $MODE$ \u30e2\u30fc\u30c9\u3067\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u76ee\u6a19\u3092\u6e80\u305f\u305b\u307e\u305b\u3093\u3002",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u30e9\u30a4\u30c8"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "\u30c6\u30fc\u30de\u3092\u9069\u7528",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "\u30ea\u30bb\u30c3\u30c8",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "\u30ae\u30e3\u30e9\u30ea\u30fc\u3092\u898b\u308b",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "\u30d1\u30ec\u30c3\u30c8\u4e00\u89a7",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "\u95b2\u89a7\uff06\u30a8\u30af\u30b9\u30dd\u30fc\u30c8",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "CSS \u30a8\u30af\u30b9\u30dd\u30fc\u30c8",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "\u30b3\u30d4\u30fc\u6e08\u307f\uff01",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "\u30c4\u30fc\u30eb\u30d0\u30fc\u306e\u62e1\u5f35\u30a2\u30a4\u30b3\u30f3\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u30b5\u30a4\u30c9\u30d1\u30cd\u30eb\u3092\u958b\u304f",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "\u30ed\u30b1\u30fc\u30eb\u3067\u81ea\u52d5\u9078\u629e",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "\u30d6\u30e9\u30a6\u30b6\u306e\u8a00\u8a9e\u304c\u5909\u308f\u308b\u3068\u30c6\u30fc\u30de\u304c\u81ea\u52d5\u5909\u66f4\u3055\u308c\u308b\u5834\u5408\u304c\u3042\u308a\u307e\u3059\u3002",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "\u80cc\u666f",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "\u30b5\u30fc\u30d5\u30a7\u30b9",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "\u30c6\u30ad\u30b9\u30c8",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "\u6de1\u8272",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "\u30dc\u30fc\u30c0\u30fc",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "\u30a2\u30af\u30bb\u30f3\u30c8",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "\u30a2\u30af\u30bb\u30f3\u30c8 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "\u30a2\u30af\u30bb\u30f3\u30c8\u6587\u5b57",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "\u30ea\u30f3\u30af",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "\u30d5\u30a9\u30fc\u30ab\u30b9",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "\u30c6\u30fc\u30de\u3092\u9069\u7528\u3057\u307e\u3057\u305f\uff01",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u306e\u307f - \u30c6\u30fc\u30de API \u5229\u7528\u4e0d\u53ef",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "Chrome \u3068 Edge \u306e\u30c6\u30fc\u30de\u306f\u5f53\u30b5\u30a4\u30c8\u304b\u3089 .zip \u3067\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9\u3067\u304d\u307e\u3059\u3002\u300c\u95b2\u89a7\uff06\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u300d\u3067 CSS\u3001Tailwind\u3001shadcn/ui\u3001Tokens Studio\u3001JSON \u3092\u51fa\u529b\u3067\u304d\u307e\u3059\u3002",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "\u30c6\u30fc\u30de\u3092\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "\u56fd\u3092\u691c\u7d22...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "\u3059\u3079\u3066",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "\u30a2\u30d5\u30ea\u30ab",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "\u30a2\u30e1\u30ea\u30ab",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "\u30a2\u30b8\u30a2",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "\u30e8\u30fc\u30ed\u30c3\u30d1",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "\u30aa\u30bb\u30a2\u30cb\u30a2",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "\u4e00\u81f4\u3059\u308b\u56fd\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "\u30e2\u30fc\u30c9\u9069\u5408",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "\u56fd\u3092\u9078\u629e\u3057\u3066\u6700\u9069\u306a\u30e2\u30fc\u30c9\u3068\u30c8\u30ec\u30fc\u30c9\u30aa\u30d5\u3092\u78ba\u8a8d\u3057\u307e\u3057\u3087\u3046\u3002",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "\u63a8\u5968",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "\u73fe\u5728",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "\u6700\u9069",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "\u5b89\u5168",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "\u6700\u3082\u5b89\u5b9a\u3057\u305f\u30c7\u30d5\u30a9\u30eb\u30c8\u306e\u5b89\u5168\u306a\u30d5\u30a9\u30fc\u30eb\u30d0\u30c3\u30af",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "\u5c02\u7528\u30e2\u30fc\u30c9\u3088\u308a\u7279\u5316\u306f\u4f4e\u304f\u3066\u3082\u3001\u6700\u3082\u5b89\u5168\u306a\u30d1\u30ec\u30c3\u30c8\u304c\u5fc5\u8981\u306a\u5834\u5408\u306b\u4f7f\u7528\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "\u3053\u306e\u30e2\u30fc\u30c9\u306b\u76ee\u7acb\u3063\u305f\u30c8\u30ec\u30fc\u30c9\u30aa\u30d5\u306f\u3042\u308a\u307e\u305b\u3093\u3002",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "\u6700\u9069\u306a\u81ea\u52d5\u9078\u629e\u306f $MODE$ \u3067\u3059\u3002$SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u30c0\u30fc\u30af"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "\u5f37\u3044\u9069\u5408\u3001\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u826f\u597d\u3002"
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "\u512a\u79c0",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "\u5f37\u3044",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "\u30d0\u30e9\u30f3\u30b9",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "\u8106\u5f31",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "\u3053\u306e\u30d1\u30ec\u30c3\u30c8\u306e\u6700\u3082\u5b89\u5168\u306a\u30d5\u30a9\u30fc\u30eb\u30d0\u30c3\u30af\u3002",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "\u3053\u306e\u30e2\u30fc\u30c9\u3067\u306f\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u76ee\u6a19\u3092\u6e80\u305f\u305b\u307e\u305b\u3093\u3002",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "$TONE$\u9069\u5408\u3001\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u826f\u597d\u3002",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u5f37\u3044"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "$TONE$\u9069\u5408\u3001\u30c8\u30ec\u30fc\u30c9\u30aa\u30d5 $COUNT$ \u4ef6\u3002",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u30d0\u30e9\u30f3\u30b9"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - $TONE$\u9069\u5408",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "\u5f37\u3044"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "\u5fe0\u5b9f\u5ea6",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "\u4f59\u88d5",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "\u5206\u96e2\u5ea6",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "\u5206\u96e2",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "\u5408\u6210\u88dc\u52a9",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "\u5206\u96e2\u4e0d\u8db3",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "\u4f59\u88d5\u5c11",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "\u5927\u5e45\u8abf\u6574",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "\u4e2d\u6027\u30bd\u30fc\u30b9",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "\u30d1\u30ec\u30c3\u30c8\u3092\u5b8c\u6210\u3055\u305b\u308b\u305f\u3081\u3001\u30a4\u30f3\u30bf\u30e9\u30af\u30c6\u30a3\u30d6\u30ab\u30e9\u30fc\u304c1\u3064\u5408\u6210\u3055\u308c\u3066\u3044\u307e\u3059\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "\u30a4\u30f3\u30bf\u30e9\u30af\u30c6\u30a3\u30d6\u30ed\u30fc\u30eb\u304c\u8996\u899a\u7684\u306b\u8fd1\u304f\u3001\u30ea\u30f3\u30af\u3068\u30a2\u30af\u30bb\u30f3\u30c8\u306e\u533a\u5225\u304c\u5f31\u3044\u3067\u3059\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u306f\u901a\u904e\u3057\u307e\u3059\u304c\u3001\u4f59\u88d5\u304c\u9650\u3089\u308c\u3066\u3044\u307e\u3059\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "\u53ef\u8aad\u6027\u3092\u4fdd\u3064\u305f\u3081\u3001\u56fd\u65d7\u306e\u8272\u3092\u5927\u304d\u304f\u88dc\u6b63\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3057\u305f\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "\u5143\u306e\u56fd\u65d7\u304c\u307b\u307c\u4e2d\u6027\u8272\u306e\u305f\u3081\u3001\u8272\u306e\u518d\u73fe\u5ea6\u304c\u4f4e\u304f\u306a\u3063\u3066\u3044\u307e\u3059\u3002",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "\u4ee3\u66ff",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "\u56fd\u3092\u9078\u629e\u3057\u3066\u30d7\u30ec\u30d3\u30e5\u30fc\u3002",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "\u8a2d\u5b9a",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "\u8272\u306e\u53b3\u5bc6\u5ea6",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u8981\u4ef6\u3092\u6e80\u305f\u3059\u305f\u3081\u306b\u56fd\u65d7\u306e\u8272\u3092\u3069\u306e\u7a0b\u5ea6\u8abf\u6574\u3067\u304d\u308b\u304b\u3092\u5236\u5fa1\u3057\u307e\u3059\u3002",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "\u7de9\u3084\u304b",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "\u53b3\u5bc6",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "\u30ed\u30b1\u30fc\u30eb\u3067\u81ea\u52d5",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "\u30a8\u30af\u30b9\u30dd\u30fc\u30c8",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "\u30b3\u30d4\u30fc",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "SVG \u30b3\u30d4\u30fc",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "SVG \u30c0\u30a6\u30f3\u30ed\u30fc\u30c9",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8\u5206\u6790",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "\u30b3\u30f3\u30c8\u30e9\u30b9\u30c8",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "\u9589\u3058\u308b",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "\u30da\u30a2",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "\u6bd4\u7387",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "\u8981\u4ef6",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "\u5408\u683c",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "\u4e0d\u5408\u683c",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "\u958b\u304f",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "\u30ea\u30f3\u30af",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "\u30bd\u30fc\u30b9\u30b3\u30fc\u30c9",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "\u62e1\u5f35\u3092\u8a55\u4fa1",
+    "description": "Store review link label"
   }
 }

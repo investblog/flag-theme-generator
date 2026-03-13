@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "\u4ece\u56fd\u65d7\u914d\u8272\u65b9\u6848\u751f\u6210\u6d4f\u89c8\u5668\u4e3b\u9898\uff0c\u5e76\u8fdb\u884c WCAG \u5bf9\u6bd4\u5ea6\u9a8c\u8bc1\u3002",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "\u6b64\u6269\u5c55\u4f7f\u7528\u56fd\u65d7\u914d\u8272\u65b9\u6848\u66f4\u6539\u6d4f\u89c8\u5668\u4e3b\u9898\u3002",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "\u9009\u62e9\u56fd\u5bb6",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "\u4e3a\u4f60\u63a8\u8350",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "\u9009\u62e9\u4e3b\u9898\u6a21\u5f0f",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "\u9884\u89c8",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "\u6df1\u8272",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "\u6d45\u8272",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "\u4ec5\u5f3a\u8c03\u8272",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "\u6b64\u8c03\u8272\u677f\u65e0\u6cd5\u5728 $MODE$ \u6a21\u5f0f\u4e0b\u8fbe\u5230\u5bf9\u6bd4\u5ea6\u76ee\u6807\u3002",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u6d45\u8272"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "\u5e94\u7528\u4e3b\u9898",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "\u91cd\u7f6e",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "\u6d4f\u89c8\u753b\u5eca",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "\u6d4f\u89c8\u8c03\u8272\u677f",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "\u6d4f\u89c8\u548c\u5bfc\u51fa",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "\u5bfc\u51fa CSS",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "\u5df2\u590d\u5236\uff01",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "\u70b9\u51fb\u5de5\u5177\u680f\u4e2d\u7684\u6269\u5c55\u56fe\u6807\u6253\u5f00\u4fa7\u8fb9\u680f",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "\u6309\u8bed\u8a00\u81ea\u52a8\u9009\u62e9",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "\u66f4\u6539\u6d4f\u89c8\u5668\u8bed\u8a00\u65f6\uff0c\u4e3b\u9898\u53ef\u80fd\u4f1a\u81ea\u52a8\u5207\u6362\u3002",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "\u80cc\u666f",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "\u8868\u9762",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "\u6587\u672c",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "\u6de1\u5316",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "\u8fb9\u6846",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "\u5f3a\u8c03",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "\u5f3a\u8c03 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "\u5f3a\u8c03\u6587\u672c",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "\u94fe\u63a5",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "\u7126\u70b9",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "\u4e3b\u9898\u5df2\u5e94\u7528\uff01",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "\u4ec5\u5bfc\u51fa - \u4e3b\u9898 API \u4e0d\u53ef\u7528",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "Chrome \u548c Edge \u4e3b\u9898\u53ef\u4ee5\u5728\u6211\u4eec\u7684\u7f51\u7ad9\u4e0a\u4ee5 .zip \u6587\u4ef6\u4e0b\u8f7d\u3002\u4f7f\u7528\u201c\u6d4f\u89c8\u548c\u5bfc\u51fa\u201d\u5bfc\u51fa CSS\u3001Tailwind\u3001shadcn/ui\u3001Tokens Studio \u548c JSON\u3002",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "\u4e0b\u8f7d\u4e3b\u9898",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "\u641c\u7d22\u56fd\u5bb6...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "\u5168\u90e8",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "\u975e\u6d32",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "\u7f8e\u6d32",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "\u4e9a\u6d32",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "\u6b27\u6d32",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "\u5927\u6d0b\u6d32",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "\u6ca1\u6709\u5339\u914d\u7684\u56fd\u5bb6\u3002",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "\u6a21\u5f0f\u9002\u914d",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "\u9009\u62e9\u4e00\u4e2a\u56fd\u5bb6\uff0c\u67e5\u770b\u6700\u4f73\u6a21\u5f0f\u53ca\u5176\u6743\u8861\u3002",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "\u63a8\u8350",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "\u5f53\u524d",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "\u6700\u4f73",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "\u5b89\u5168",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "\u5b89\u5168\u56de\u9000\u65b9\u6848\uff0c\u4f7f\u7528\u6700\u7a33\u5b9a\u7684\u9ed8\u8ba4\u503c",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "\u5f53\u60a8\u9700\u8981\u6700\u5b89\u5168\u7684\u8c03\u8272\u677f\u65f6\u4f7f\u7528\u6b64\u6a21\u5f0f\uff0c\u5373\u4f7f\u5b83\u4e0d\u5982\u5176\u4ed6\u6a21\u5f0f\u90a3\u4e48\u4e13\u4e1a\u3002",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "\u6b64\u6a21\u5f0f\u6ca1\u6709\u660e\u663e\u7684\u6743\u8861\u3002",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "\u6700\u4f73\u81ea\u52a8\u9009\u62e9\u662f $MODE$\u3002$SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "\u6df1\u8272"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "\u5f3a\u9002\u914d\uff0c\u5bf9\u6bd4\u5ea6\u6e05\u6670\u3002"
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "\u4f18\u79c0",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "\u5f3a",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "\u5747\u8861",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "\u8106\u5f31",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "\u6b64\u8c03\u8272\u677f\u7684\u6700\u5b89\u5168\u56de\u9000\u65b9\u6848\u3002",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "\u6b64\u6a21\u5f0f\u65e0\u6cd5\u8fbe\u5230\u5bf9\u6bd4\u5ea6\u76ee\u6807\u3002",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "$TONE$\u9002\u914d\uff0c\u5bf9\u6bd4\u5ea6\u6e05\u6670\u3002",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u5f3a"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "$TONE$\u9002\u914d\uff0c\u6709 $COUNT$ \u4e2a\u6743\u8861\u3002",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "\u5747\u8861"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - $TONE$\u9002\u914d",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "\u5f3a"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "\u4fdd\u771f\u5ea6",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "\u4f59\u91cf",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "\u533a\u5206\u5ea6",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "\u533a\u5206",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "\u5408\u6210\u8f85\u52a9",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "\u5206\u79bb\u5ea6\u4f4e",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "\u4f59\u91cf\u4e0d\u8db3",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "\u5927\u5e45\u8c03\u6574",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "\u4e2d\u6027\u6765\u6e90",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "\u4e00\u4e2a\u4ea4\u4e92\u8272\u662f\u5408\u6210\u7684\uff0c\u7528\u4e8e\u5b8c\u6210\u8c03\u8272\u677f\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "\u4ea4\u4e92\u89d2\u8272\u5728\u89c6\u89c9\u4e0a\u5f88\u63a5\u8fd1\uff0c\u94fe\u63a5\u548c\u5f3a\u8c03\u8272\u7684\u533a\u5206\u5ea6\u8f83\u4f4e\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "\u5bf9\u6bd4\u5ea6\u901a\u8fc7\uff0c\u4f46\u4f59\u91cf\u6709\u9650\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "\u56fd\u65d7\u989c\u8272\u9700\u8981\u8f83\u5927\u7684\u8c03\u6574\u624d\u80fd\u4fdd\u6301\u53ef\u8bfb\u6027\u3002",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "\u6e90\u56fd\u65d7\u5927\u591a\u662f\u4e2d\u6027\u8272\uff0c\u7ed3\u679c\u5bf9\u8272\u5f69\u7684\u8fd8\u539f\u5ea6\u8f83\u4f4e\u3002",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "\u56de\u9000",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "\u9009\u62e9\u4e00\u4e2a\u56fd\u5bb6\u8fdb\u884c\u9884\u89c8\u3002",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "\u8bbe\u7f6e",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "\u8272\u5f69\u4e25\u683c\u5ea6",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "\u63a7\u5236\u56fd\u65d7\u989c\u8272\u53ef\u4ee5\u8c03\u6574\u591a\u5c11\u4ee5\u6ee1\u8db3\u5bf9\u6bd4\u5ea6\u8981\u6c42\u3002",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "\u5bbd\u677e",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "\u4e25\u683c",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "\u6309\u8bed\u8a00\u81ea\u52a8",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "\u5bfc\u51fa",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "\u590d\u5236",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "\u590d\u5236 SVG",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "\u4e0b\u8f7d SVG",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "\u5bf9\u6bd4\u5ea6\u5206\u6790",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "\u5bf9\u6bd4\u5ea6",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "\u5173\u95ed",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "\u914d\u5bf9",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "\u6bd4\u7387",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "\u8981\u6c42",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "\u901a\u8fc7",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "\u5931\u8d25",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "\u6253\u5f00",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "\u94fe\u63a5",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "\u6e90\u4ee3\u7801",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "\u8bc4\u4ef7\u6269\u5c55",
+    "description": "Store review link label"
   }
 }

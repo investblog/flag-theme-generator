@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "Gere temas de navegador a partir de paletas de cores inspiradas em bandeiras com valida\u00e7\u00e3o de contraste WCAG.",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "Esta extens\u00e3o altera o tema do navegador usando paletas de cores inspiradas em bandeiras.",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "Escolha um pa\u00eds",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "Recomendado para voc\u00ea",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "Escolha um modo de tema",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "Pr\u00e9via",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "Escuro",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "Claro",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "S\u00f3 acento",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "Esta paleta n\u00e3o atinge as metas de contraste no modo $MODE$.",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Claro"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "Aplicar tema",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "Redefinir",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "Explorar galeria",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "Ver paletas",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "Ver e exportar",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "Exportar CSS",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "Copiado!",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "Clique no \u00edcone da extens\u00e3o na barra de ferramentas para abrir o painel lateral",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "Auto por idioma",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "O tema pode mudar quando o idioma do navegador mudar.",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "Fundo",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "Superf\u00edcie",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "Texto",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "Suave",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "Borda",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "Acento",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "Acento 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "Texto acento",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "Link",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "Foco",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Tema aplicado!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Somente exportar - API de temas indispon\u00edvel",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "Temas para Chrome e Edge est\u00e3o dispon\u00edveis como arquivos .zip no nosso site. Use Ver e exportar para CSS, Tailwind, shadcn/ui, Tokens Studio e JSON.",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "Baixar tema",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "Pesquisar pa\u00edses...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "Todos",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "\u00c1frica",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "Am\u00e9ricas",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "\u00c1sia",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "Europa",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "Oceania",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "Nenhum pa\u00eds corresponde \u00e0 sua pesquisa.",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "Ajuste de modo",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "Escolha um pa\u00eds para ver o melhor modo e seus compromissos.",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "Recomendado",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "Atual",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "Melhor",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "Seguro",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "Reserva segura com os padr\u00f5es mais est\u00e1veis",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "Use quando quiser a paleta mais segura, mesmo que seja menos especializada que os modos dedicados.",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "Sem compromissos not\u00e1veis neste modo.",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "Melhor escolha autom\u00e1tica: $MODE$. $SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Escuro"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "Bom ajuste com contraste claro."
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "Excelente",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "Forte",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "Equilibrado",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "Fr\u00e1gil",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "A reserva mais segura para esta paleta.",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "N\u00e3o \u00e9 poss\u00edvel atingir as metas de contraste neste modo.",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "Ajuste $TONE$ com contraste n\u00edtido.",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Forte"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "Ajuste $TONE$ com $COUNT$ compromisso(s).",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Equilibrado"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 - Ajuste $TONE$",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "Forte"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "Fidelidade",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "Margem",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "Distin\u00e7\u00e3o",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "Dist.",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "Cor sint\u00e9tica",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "Baixa separa\u00e7\u00e3o",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "Margem estreita",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "Ajuste forte",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "Fonte neutra",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "Uma cor interativa \u00e9 sintetizada para completar a paleta.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "Os pap\u00e9is interativos s\u00e3o visualmente pr\u00f3ximos, ent\u00e3o links e acentos parecem menos separados.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "O contraste passa, mas com margem limitada.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "As cores da bandeira precisaram de uma corre\u00e7\u00e3o mais forte para manter a legibilidade.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "A bandeira de origem \u00e9 principalmente neutra, ent\u00e3o o resultado \u00e9 menos fiel \u00e0s cores.",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "Reserva",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "Escolha um pa\u00eds para pr\u00e9via.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "Configura\u00e7\u00f5es",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "Rigor das cores",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "Controla o quanto as cores da bandeira podem ser ajustadas para atender aos requisitos de contraste.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "Relaxado",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "Rigoroso",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "Auto por idioma",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "Exportar",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "Copiar",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "Copiar SVG",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "Baixar SVG",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "An\u00e1lise de contraste",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "Contraste",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "Fechar",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "Par",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "Raz\u00e3o",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "Req",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "OK",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "Falha",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "Abrir",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "Links",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "C\u00f3digo-fonte",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "Avaliar extens\u00e3o",
+    "description": "Store review link label"
   }
 }

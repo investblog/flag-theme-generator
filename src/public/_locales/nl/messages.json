@@ -6,5 +6,451 @@
   "extDescription": {
     "message": "Genereer browserthema's van op vlaggen ge\u00efnspireerde kleurenpaletten met WCAG-contrastvalidatie.",
     "description": "Extension description for the browser store listing"
+  },
+  "welcomeHeading": {
+    "message": "Flag Theme Generator",
+    "description": "Welcome page main heading"
+  },
+  "welcomeSubtitle": {
+    "message": "Deze extensie past uw browserthema aan met op vlaggen ge\u00efnspireerde kleurenpaletten.",
+    "description": "Welcome page subtitle"
+  },
+  "welcomeChooseCountry": {
+    "message": "Kies een land",
+    "description": "Country picker section label"
+  },
+  "welcomeRecommended": {
+    "message": "Aanbevolen voor u",
+    "description": "Label for auto-detected palette"
+  },
+  "welcomeChooseMode": {
+    "message": "Kies een themamodus",
+    "description": "Mode picker section label"
+  },
+  "welcomePreview": {
+    "message": "Voorbeeld",
+    "description": "Preview section label"
+  },
+  "modeAmoled": {
+    "message": "AMOLED",
+    "description": "AMOLED mode name"
+  },
+  "modeDark": {
+    "message": "Donker",
+    "description": "Dark mode name"
+  },
+  "modeLight": {
+    "message": "Licht",
+    "description": "Light mode name"
+  },
+  "modeDominantOnly": {
+    "message": "Accent",
+    "description": "Dominant-only mode name"
+  },
+  "modeDisabledTooltip": {
+    "message": "Dit palet kan de contrastdoelen in de modus $MODE$ niet halen.",
+    "description": "Tooltip when a mode is disabled",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Licht"
+      }
+    }
+  },
+  "btnApply": {
+    "message": "Toepassen",
+    "description": "Apply button text"
+  },
+  "btnReset": {
+    "message": "Herstellen",
+    "description": "Reset button text"
+  },
+  "btnOpenGallery": {
+    "message": "Galerij verkennen",
+    "description": "Link to gallery page"
+  },
+  "btnBrowsePalettes": {
+    "message": "Paletten",
+    "description": "Button to open side panel with palette browser"
+  },
+  "btnBrowseExport": {
+    "message": "Export & meer",
+    "description": "Button to open side panel for browsing and exporting tokens (Chrome/Edge)"
+  },
+  "btnExportCss": {
+    "message": "CSS-export",
+    "description": "Export CSS button text"
+  },
+  "btnCopied": {
+    "message": "Gekopieerd!",
+    "description": "Short clipboard success feedback"
+  },
+  "sidepanelHint": {
+    "message": "Klik op het extensiepictogram in de werkbalk om het zijpaneel te openen",
+    "description": "Hint shown when user clicks Browse Palettes"
+  },
+  "autoByLocale": {
+    "message": "Auto op taal",
+    "description": "Toggle label for auto locale"
+  },
+  "autoByLocaleHint": {
+    "message": "Het thema kan veranderen wanneer uw browsertaal wijzigt.",
+    "description": "Hint text for auto-by-locale toggle"
+  },
+  "tokenBg": {
+    "message": "Achtergrond",
+    "description": "Token label"
+  },
+  "tokenSurface": {
+    "message": "Oppervlak",
+    "description": "Token label"
+  },
+  "tokenText": {
+    "message": "Tekst",
+    "description": "Token label"
+  },
+  "tokenMutedText": {
+    "message": "Gedempt",
+    "description": "Token label"
+  },
+  "tokenBorder": {
+    "message": "Rand",
+    "description": "Token label"
+  },
+  "tokenAccent": {
+    "message": "Accent",
+    "description": "Token label"
+  },
+  "tokenAccent2": {
+    "message": "Accent 2",
+    "description": "Token label"
+  },
+  "tokenAccentText": {
+    "message": "Accenttekst",
+    "description": "Token label"
+  },
+  "tokenLink": {
+    "message": "Link",
+    "description": "Token label"
+  },
+  "tokenFocusRing": {
+    "message": "Focus",
+    "description": "Token label"
+  },
+  "themeApplied": {
+    "message": "Thema toegepast!",
+    "description": "Feedback when theme is applied successfully"
+  },
+  "themeUnavailable": {
+    "message": "Alleen export \u2013 thema-API niet beschikbaar",
+    "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
+  },
+  "chromeThemeNote": {
+    "message": "Chrome- en Edge-thema's zijn beschikbaar als .zip-bestanden op onze website. Gebruik Export & meer voor CSS-, Tailwind-, shadcn/ui-, Tokens Studio- en JSON-exports.",
+    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  },
+  "downloadTheme": {
+    "message": "Thema laden",
+    "description": "Button to download Chrome theme from flagtheme.com"
+  },
+  "searchPlaceholder": {
+    "message": "Landen zoeken...",
+    "description": "Placeholder for country search input"
+  },
+  "searchAllRegions": {
+    "message": "Alle",
+    "description": "Region filter chip for all regions"
+  },
+  "regionAfrica": {
+    "message": "Afrika",
+    "description": "Region label"
+  },
+  "regionAmericas": {
+    "message": "Amerika",
+    "description": "Region label"
+  },
+  "regionAsia": {
+    "message": "Azi\u00eb",
+    "description": "Region label"
+  },
+  "regionEurope": {
+    "message": "Europa",
+    "description": "Region label"
+  },
+  "regionOceania": {
+    "message": "Oceani\u00eb",
+    "description": "Region label"
+  },
+  "noResults": {
+    "message": "Geen landen gevonden.",
+    "description": "Empty state when search/filter yields no results"
+  },
+  "qualitySection": {
+    "message": "Modusgeschiktheid",
+    "description": "Section label for mode quality summary"
+  },
+  "qualityEmpty": {
+    "message": "Kies een land om de beste modus en de afwegingen te zien.",
+    "description": "Empty quality state"
+  },
+  "qualityRecommended": {
+    "message": "Aanbevolen",
+    "description": "Recommended mode label"
+  },
+  "qualityCurrent": {
+    "message": "Huidig",
+    "description": "Current mode label"
+  },
+  "qualityTop": {
+    "message": "Beste",
+    "description": "Badge for top mode"
+  },
+  "qualitySafeShort": {
+    "message": "Veilig",
+    "description": "Short fallback label"
+  },
+  "qualitySafeMeta": {
+    "message": "Veilige terugval met de meest stabiele standaardwaarden",
+    "description": "Fallback meta text"
+  },
+  "qualitySafeBody": {
+    "message": "Gebruik deze modus als u het meest stabiele resultaat wilt, ook al is het minder gespecialiseerd dan de specifieke modi.",
+    "description": "Fallback body text"
+  },
+  "qualityNoTradeoffs": {
+    "message": "Geen noemenswaardige afwegingen in deze modus.",
+    "description": "No warnings message"
+  },
+  "qualityBestPick": {
+    "message": "Beste automatische keuze is $MODE$. $SUMMARY$",
+    "description": "Recommended mode body",
+    "placeholders": {
+      "mode": {
+        "content": "$1",
+        "example": "Donker"
+      },
+      "summary": {
+        "content": "$2",
+        "example": "Sterke passing met helder contrast."
+      }
+    }
+  },
+  "qualityToneExcellent": {
+    "message": "Uitstekend",
+    "description": "Quality tone label"
+  },
+  "qualityToneStrong": {
+    "message": "Sterk",
+    "description": "Quality tone label"
+  },
+  "qualityToneBalanced": {
+    "message": "Evenwichtig",
+    "description": "Quality tone label"
+  },
+  "qualityToneFragile": {
+    "message": "Fragiel",
+    "description": "Quality tone label"
+  },
+  "qualitySummaryFallback": {
+    "message": "Veiligste terugval voor dit palet.",
+    "description": "Fallback summary"
+  },
+  "qualitySummaryUnavailable": {
+    "message": "Kan contrastdoelen in deze modus niet halen.",
+    "description": "Unavailable summary"
+  },
+  "qualitySummaryClear": {
+    "message": "$TONE$ passing met helder contrast.",
+    "description": "Clear contrast summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Sterk"
+      }
+    }
+  },
+  "qualitySummaryTradeoffs": {
+    "message": "$TONE$ passing met $COUNT$ afweging(en).",
+    "description": "Tradeoff summary",
+    "placeholders": {
+      "tone": {
+        "content": "$1",
+        "example": "Evenwichtig"
+      },
+      "count": {
+        "content": "$2",
+        "example": "2"
+      }
+    }
+  },
+  "qualityMeta": {
+    "message": "$SCORE$/100 \u2013 $TONE$ passing",
+    "description": "Quality meta line",
+    "placeholders": {
+      "score": {
+        "content": "$1",
+        "example": "86"
+      },
+      "tone": {
+        "content": "$2",
+        "example": "Sterk"
+      }
+    }
+  },
+  "qualityStatFidelity": {
+    "message": "Kleurtreue",
+    "description": "Quality stat label"
+  },
+  "qualityStatHeadroom": {
+    "message": "Speelruimte",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinctness": {
+    "message": "Onderscheid",
+    "description": "Quality stat label"
+  },
+  "qualityStatDistinct": {
+    "message": "Ondersch.",
+    "description": "Compact quality stat label"
+  },
+  "qualityWarningTagSynthetic": {
+    "message": "Synthetische hulp",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagDiversity": {
+    "message": "Lage scheiding",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagHeadroom": {
+    "message": "Krappe speelruimte",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagAdjustment": {
+    "message": "Zware aanpassing",
+    "description": "Warning tag"
+  },
+  "qualityWarningTagNeutral": {
+    "message": "Neutrale bron",
+    "description": "Warning tag"
+  },
+  "qualityWarningCopySynthetic": {
+    "message": "E\u00e9n interactieve kleur is gesynthetiseerd om het palet te voltooien.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyDiversity": {
+    "message": "Interactieve rollen liggen visueel dicht bij elkaar, waardoor links en accenten minder gescheiden lijken.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyHeadroom": {
+    "message": "Contrast geslaagd, maar met beperkte speelruimte.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyAdjustment": {
+    "message": "Vlagkleuren moesten sterker gecorrigeerd worden om leesbaar te blijven.",
+    "description": "Warning explanation"
+  },
+  "qualityWarningCopyNeutral": {
+    "message": "De bronvlag is overwegend neutraal, waardoor het resultaat minder kleurgetrouw is.",
+    "description": "Warning explanation"
+  },
+  "fallbackMode": {
+    "message": "Terugval",
+    "description": "Short fallback label in mode cards"
+  },
+  "pickCountryPreview": {
+    "message": "Kies een land voor een voorbeeld.",
+    "description": "Placeholder hint before a palette is selected"
+  },
+  "settingsTitle": {
+    "message": "Instellingen",
+    "description": "Settings drawer title"
+  },
+  "settingsColorStrictness": {
+    "message": "Kleurstriktheid",
+    "description": "Settings section title"
+  },
+  "settingsColorStrictnessHint": {
+    "message": "Bepaalt hoeveel vlagkleuren mogen worden aangepast om aan contrastvereisten te voldoen.",
+    "description": "Settings description"
+  },
+  "settingsRelaxed": {
+    "message": "Soepel",
+    "description": "Relaxed strictness label"
+  },
+  "settingsStrict": {
+    "message": "Strikt",
+    "description": "Strict strictness label"
+  },
+  "settingsAutoByLocaleTitle": {
+    "message": "Auto op taal",
+    "description": "Settings section title"
+  },
+  "exportTitle": {
+    "message": "Export",
+    "description": "Export section title"
+  },
+  "exportCopy": {
+    "message": "Kopi\u00ebren",
+    "description": "Copy action label"
+  },
+  "copySvg": {
+    "message": "SVG kopi\u00ebren",
+    "description": "Copy SVG button label"
+  },
+  "downloadSvg": {
+    "message": "SVG downloaden",
+    "description": "Download SVG button label"
+  },
+  "contrastAnalysis": {
+    "message": "Contrastanalyse",
+    "description": "Contrast analysis button label"
+  },
+  "contrastTitle": {
+    "message": "Contrast",
+    "description": "Contrast section title"
+  },
+  "close": {
+    "message": "Sluiten",
+    "description": "Close button label"
+  },
+  "wcagPair": {
+    "message": "Paar",
+    "description": "WCAG table header"
+  },
+  "wcagRatio": {
+    "message": "Verh.",
+    "description": "WCAG table header"
+  },
+  "wcagReq": {
+    "message": "Eis",
+    "description": "WCAG table header"
+  },
+  "wcagPass": {
+    "message": "OK",
+    "description": "WCAG pass status"
+  },
+  "wcagFail": {
+    "message": "Nee",
+    "description": "WCAG fail status"
+  },
+  "promoOpen": {
+    "message": "Openen",
+    "description": "Promo link label"
+  },
+  "settingsLinksTitle": {
+    "message": "Links",
+    "description": "Settings section title for links"
+  },
+  "settingsWebsite": {
+    "message": "flagtheme.com",
+    "description": "Website link label in settings"
+  },
+  "settingsSourceCode": {
+    "message": "Broncode",
+    "description": "GitHub source code link label"
+  },
+  "settingsRateExtension": {
+    "message": "Beoordelen",
+    "description": "Store review link label"
   }
 }

@@ -145,9 +145,17 @@
     "message": "Yaln\u0131zca d\u0131\u015fa aktarma - tema API\u2019si kullan\u0131lam\u0131yor",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
-  "chromeThemeNote": {
-    "message": "Chrome ve Edge temalar\u0131 web sitemizde .zip olarak mevcuttur. CSS, Tailwind, shadcn/ui, Tokens Studio ve JSON d\u0131\u015fa aktarmalar\u0131 i\u00e7in G\u00f6z At ve Aktar\u2019\u0131 kullan\u0131n.",
-    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  "themeNoteChrome": {
+    "message": "Chrome\u2019da canl\u0131 uygulama kullan\u0131lam\u0131yor. .zip temay\u0131 indirin ve y\u00fcklemek i\u00e7in chrome://extensions \u00fczerine s\u00fcr\u00fckleyin.",
+    "description": "Install instructions for Chrome users"
+  },
+  "themeNoteEdge": {
+    "message": "Edge\u2019de canl\u0131 uygulama kullan\u0131lam\u0131yor. .zip temay\u0131 indirin ve y\u00fcklemek i\u00e7in edge://extensions \u00fczerine s\u00fcr\u00fckleyin.",
+    "description": "Install instructions for Edge users"
+  },
+  "themeNoteExport": {
+    "message": "CSS, Tailwind, shadcn/ui, Tokens Studio ve JSON tokenlar\u0131 i\u00e7in G\u00f6z At ve Aktar\u2019\u0131 kullan\u0131n.",
+    "description": "Export hint shown below install instructions"
   },
   "downloadTheme": {
     "message": "Tema \u0130ndir",

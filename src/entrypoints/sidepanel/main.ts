@@ -535,6 +535,12 @@ function openPaletteDrawer(palette: FlagPalette): void {
     dlLink.target = '_blank';
     dlLink.rel = 'noopener';
     footerActions.appendChild(dlLink);
+
+    const isEdge = navigator.userAgent.includes('Edg/');
+    const hint = document.createElement('p');
+    hint.className = 'drawer__hint';
+    hint.textContent = msg(isEdge ? 'themeNoteEdge' : 'themeNoteChrome');
+    footerActions.appendChild(hint);
   }
   footer.appendChild(footerActions);
   panel.appendChild(footer);

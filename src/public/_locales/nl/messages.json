@@ -145,9 +145,17 @@
     "message": "Alleen export \u2013 thema-API niet beschikbaar",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
-  "chromeThemeNote": {
-    "message": "Chrome- en Edge-thema's zijn beschikbaar als .zip-bestanden op onze website. Gebruik Export & meer voor CSS-, Tailwind-, shadcn/ui-, Tokens Studio- en JSON-exports.",
-    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  "themeNoteChrome": {
+    "message": "Live toepassen is niet beschikbaar in Chrome. Download het .zip-thema en sleep het naar chrome://extensions om te installeren.",
+    "description": "Install instructions for Chrome users"
+  },
+  "themeNoteEdge": {
+    "message": "Live toepassen is niet beschikbaar in Edge. Download het .zip-thema en sleep het naar edge://extensions om te installeren.",
+    "description": "Install instructions for Edge users"
+  },
+  "themeNoteExport": {
+    "message": "Gebruik Export & meer voor CSS-, Tailwind-, shadcn/ui-, Tokens Studio- en JSON-tokens.",
+    "description": "Export hint shown below install instructions"
   },
   "downloadTheme": {
     "message": "Thema laden",

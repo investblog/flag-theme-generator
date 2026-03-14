@@ -145,9 +145,17 @@
     "message": "Nur Export \u2013 Theme-API nicht verf\u00fcgbar",
     "description": "Feedback when browser.theme API is not available (Chrome/Edge)"
   },
-  "chromeThemeNote": {
-    "message": "Chrome- und Edge-Themes sind als .zip-Dateien auf unserer Website verf\u00fcgbar. Verwenden Sie Export & mehr f\u00fcr CSS-, Tailwind-, shadcn/ui-, Tokens Studio- und JSON-Exporte.",
-    "description": "Explanatory note shown in Chrome/Edge where theme API is unavailable"
+  "themeNoteChrome": {
+    "message": "Live-Anwendung ist in Chrome nicht verf\u00fcgbar. Laden Sie das .zip-Theme herunter und ziehen Sie es auf chrome://extensions, um es zu installieren.",
+    "description": "Install instructions for Chrome users"
+  },
+  "themeNoteEdge": {
+    "message": "Live-Anwendung ist in Edge nicht verf\u00fcgbar. Laden Sie das .zip-Theme herunter und ziehen Sie es auf edge://extensions, um es zu installieren.",
+    "description": "Install instructions for Edge users"
+  },
+  "themeNoteExport": {
+    "message": "Verwenden Sie Export & mehr f\u00fcr CSS-, Tailwind-, shadcn/ui-, Tokens Studio- und JSON-Tokens.",
+    "description": "Export hint shown below install instructions"
   },
   "downloadTheme": {
     "message": "Theme laden",

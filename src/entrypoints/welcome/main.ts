@@ -302,14 +302,20 @@ function init(): void {
   checkThemeApi().then((available) => {
     themeApiAvailable = available;
     if (!available) {
-      applyBtn.hidden = true;
+      applyBtn.disabled = true;
+      applyBtn.title = msg('themeUnavailable');
       resetBtn.hidden = true;
 
-      // Note above buttons
+      const isEdge = navigator.userAgent.includes('Edg/');
       const note = document.createElement('p');
       note.className = 'toggle-row__hint';
-      note.textContent = msg('chromeThemeNote');
+      note.textContent = msg(isEdge ? 'themeNoteEdge' : 'themeNoteChrome');
       actions.insertBefore(note, btnRow);
+
+      const exportNote = document.createElement('p');
+      exportNote.className = 'toggle-row__hint';
+      exportNote.textContent = msg('themeNoteExport');
+      actions.insertBefore(exportNote, btnRow);
 
       const dlLink = document.createElement('a');
       dlLink.className = 'btn btn--primary';

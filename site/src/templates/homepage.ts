@@ -1,7 +1,7 @@
 /**
  * Homepage template.
  */
-import { SITE_URL, icon, brandIcon, amoUrl } from './helpers.js';
+import { SITE_URL, EDGE_URL, icon, brandIcon, amoUrl } from './helpers.js';
 import { layout } from './layout.js';
 import type { HreflangEntry } from './layout.js';
 import { t, getStrings } from '../i18n/strings.js';
@@ -82,6 +82,7 @@ export function homePage(d: HomePageData): string {
         </div>
         <div class="ext-install__actions">
           <a href="https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm" class="btn btn--primary" target="_blank" rel="noopener">${brandIcon('chrome', 18)} ${s.installExtChrome}</a>
+          <a href="${EDGE_URL}" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('edge', 18)} ${s.installExtEdge}</a>
           <a href="${amoUrl(lang)}" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('firefox', 18)} ${s.installExtFirefox}</a>
           <a href="https://github.com/investblog/flag-theme-generator/releases" class="btn btn--outline" target="_blank" rel="noopener">${brandIcon('github', 16)} GitHub</a>
         </div>

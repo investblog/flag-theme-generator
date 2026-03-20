@@ -41,6 +41,10 @@ export function jsTokenMap(tokens: Record<string, string>): string {
   return '{' + TOKEN_KEYS.map(k => `'${TOKEN_CSS[k]}':'${tokens[k]}'`).join(',') + '}';
 }
 
+/** Edge Add-ons store URL (not locale-dependent). */
+export const EDGE_URL =
+  'https://microsoftedge.microsoft.com/addons/detail/flag-theme-generator/ipgnlgkihghpceocjaefclmkcjpfillo';
+
 /** AMO locale prefix mapping (site lang → AMO path segment). */
 const AMO_LOCALE: Record<string, string> = {
   en: 'en-US', es: 'es-ES', fr: 'fr', ar: 'en-US', pt: 'pt-PT',

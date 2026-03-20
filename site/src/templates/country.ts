@@ -3,7 +3,7 @@
  * Supports localization via optional SiteStrings parameter.
  */
 import {
-  SITE_URL, TOKEN_KEYS, TOKEN_CSS,
+  SITE_URL, EDGE_URL, TOKEN_KEYS, TOKEN_CSS,
   icon, brandIcon, cssVarsBlock, jsTokenMap, esc, breadcrumbLd, amoUrl,
 } from './helpers.js';
 import { layout, type HreflangEntry } from './layout.js';
@@ -44,7 +44,7 @@ export function countryPage(d: CountryPageData): string {
 
   const FAQ = [
     { q: s.faqChromeQ, a: s.faqChromeA },
-    { q: s.faqEdgeQ, a: s.faqEdgeA },
+    { q: s.faqEdgeQ, a: s.faqEdgeA.replace('%EDGE_URL%', EDGE_URL) },
     { q: s.faqFirefoxQ, a: s.faqFirefoxA.replace('%AMO_URL%', amoUrl(lang)) },
     { q: s.modeQuestion, a: s.modeAnswer },
   ];
@@ -131,6 +131,9 @@ navigator.clipboard.writeText(css).then(function(){var o=cb.innerHTML;cb.textCon
       <a id="dl-chrome" href="/downloads/${code}-${d.defaultMode}.zip" class="btn btn--primary" download>
         ${brandIcon('chrome')} ${s.downloadChrome}
       </a>
+      <a href="${EDGE_URL}" class="btn btn--secondary" target="_blank" rel="noopener">
+        ${brandIcon('edge')} Edge
+      </a>
       <a href="${amoUrl(lang)}" class="btn btn--secondary" target="_blank" rel="noopener">
         ${brandIcon('firefox')} ${s.getFirefox}
       </a>
@@ -184,6 +187,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
         </div>
         <div class="ext-promo__actions">
           <a href="https://chromewebstore.google.com/detail/flag-theme-generator/gkjdcopdcbkhbnppkglananilngnfcbm" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('chrome', 18)} Chrome</a>
+          <a href="${EDGE_URL}" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('edge', 18)} Edge</a>
           <a href="${amoUrl(lang)}" class="btn btn--secondary" target="_blank" rel="noopener">${brandIcon('firefox', 18)} Firefox</a>
         </div>
       </div>

@@ -7,9 +7,9 @@ import type { HreflangEntry } from './layout.js';
 import { t, getStrings } from '../i18n/strings.js';
 
 export interface HomePageData {
-  popularCountries: { name: string; slug: string; flagColors: string[] }[];
+  popularCountries: { name: string; slug: string; flagColors: string[]; href?: string }[];
   regions: { name: string; slug: string; count: number }[];
-  allCountries: { name: string; slug: string; code: string }[];
+  allCountries: { name: string; slug: string; code: string; href?: string }[];
   totalCount: number;
   lang?: string;
   hreflang?: HreflangEntry[];
@@ -39,7 +39,7 @@ export function homePage(d: HomePageData): string {
       </div>
       <div class="card-grid">
         ${d.popularCountries.map(c =>
-          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${c.name}</span></a>`
+          `<a class="card" href="${c.href ?? `${prefix}/countries/${c.slug}/`}"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${c.name}</span></a>`
         ).join('\n        ')}
       </div>
     </section>
@@ -107,7 +107,7 @@ inp.addEventListener('input',function(){
 var q=inp.value.toLowerCase();
 if(q.length<2){res.innerHTML='';return}
 var m=C.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0}).slice(0,8);
-res.innerHTML=m.map(function(c){return '<a href="${prefix}/countries/'+c.slug+'/">'+c.name+'</a>'}).join('');
+res.innerHTML=m.map(function(c){return '<a href="'+(c.href||'${prefix}/countries/'+c.slug+'/')+'">'+c.name+'</a>'}).join('');
 });
 document.addEventListener('click',function(e){if(!inp.contains(e.target)&&!res.contains(e.target))res.innerHTML=''});
 })();`;

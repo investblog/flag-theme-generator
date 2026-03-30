@@ -18,7 +18,7 @@ export interface CountryPageData {
   regionSlug: string;
   tokens: Record<string, Record<string, string>>;   // { dark: ThemeTokens, light: ..., amoled: ... }
   defaultMode: string;
-  similarCountries: { name: string; slug: string; flagColors: string[] }[];
+  similarCountries: { name: string; slug: string; flagColors: string[]; href?: string }[];
   /** Inline SVG string of the country flag (3:2 ratio). */
   flagSvg?: string;
   /** Localized country name (e.g., "Japón" for ES). Defaults to name. */
@@ -168,7 +168,7 @@ ${d.similarCountries.length > 0 ? `    <section class="similar">
       <h2>${s.similarThemes}</h2>
       <div class="card-grid">
         ${d.similarCountries.map(c =>
-          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
+          `<a class="card" href="${c.href ?? `${prefix}/countries/${c.slug}/`}"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
         ).join('\n        ')}
       </div>
     </section>

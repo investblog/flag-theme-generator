@@ -18,6 +18,7 @@ import { homePage } from './templates/homepage.js';
 import { catalogPage } from './templates/catalog.js';
 import { regionPage } from './templates/region.js';
 import { privacyPage } from './templates/privacy.js';
+import { notFoundPage } from './templates/not-found.js';
 import { registerLang, getCountryName } from './i18n/countries.js';
 import { strings } from './i18n/strings.js';
 import type { HreflangEntry } from './templates/layout.js';
@@ -147,6 +148,19 @@ for (const entry of localizedEntries) {
   countryLangMap.set(entry.palette.countryCode, entry.lang);
 }
 
+// Map: slug → primary non-EN lang for link routing on localized pages
+const slugLangMap = new Map<string, string>();
+for (const { palette, lang } of localizedEntries) {
+  slugLangMap.set(slugify(palette.name_en), lang);
+}
+
+/** Correct country page href for a given slug and display language.
+ *  Falls back to EN when no localized page exists. */
+function countryHref(slug: string, lang: string): string {
+  if (lang === 'en') return `/countries/${slug}/`;
+  return slugLangMap.get(slug) === lang ? `/${lang}/countries/${slug}/` : `/countries/${slug}/`;
+}
+
 // --- track sitemap ---
 interface SitemapEntry {
   loc: string;
@@ -242,11 +256,15 @@ for (const { palette, lang, localizedName } of localizedEntries) {
   const similar = (regionMap.get(region) || [])
     .filter(p => p.countryCode !== palette.countryCode)
     .slice(0, 6)
-    .map(p => ({
-      name: getCountryName(p.countryCode, lang, p.name_en),
-      slug: slugify(p.name_en),
-      flagColors: p.flagColors as string[],
-    }));
+    .map(p => {
+      const s = slugify(p.name_en);
+      return {
+        name: getCountryName(p.countryCode, lang, p.name_en),
+        slug: s,
+        flagColors: p.flagColors as string[],
+        href: countryHref(s, lang),
+      };
+    });
 
   const hreflang: HreflangEntry[] = [
     { lang: 'x-default', href: `${SITE_URL}/countries/${slug}/` },
@@ -337,6 +355,10 @@ writeFileSync(resolve(DIST, 'privacy', 'index.html'), privacyPage({}));
 sitemapEntries.push({ loc: `${SITE_URL}/privacy/` });
 console.log('  Privacy page generated');
 
+// --- 404 page ---
+writeFileSync(resolve(DIST, '404.html'), notFoundPage());
+console.log('  404 page generated');
+
 // --- localized homepage, catalog, region pages ---
 const nonEnLangs = [...SUPPORTED_LANGS].filter(l => l !== 'en');
 for (const lang of nonEnLangs) {
@@ -345,9 +367,9 @@ for (const lang of nonEnLangs) {
   // Homepage
   ensureDir(langPrefix);
   writeFileSync(resolve(langPrefix, 'index.html'), homePage({
-    popularCountries: popular,
+    popularCountries: popular.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
     regions: regionList,
-    allCountries,
+    allCountries: allCountries.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
     totalCount: palettes.length,
     lang,
     hreflang: homeHreflang,
@@ -357,7 +379,8 @@ for (const lang of nonEnLangs) {
   // Catalog
   ensureDir(resolve(langPrefix, 'countries'));
   writeFileSync(resolve(langPrefix, 'countries', 'index.html'), catalogPage({
-    ...catalogData,
+    countries: catalogData.countries.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
+    regions: catalogData.regions,
     lang,
     hreflang: catalogHreflang,
   }));
@@ -374,11 +397,15 @@ for (const lang of nonEnLangs) {
     writeFileSync(resolve(rDir, 'index.html'), regionPage({
       name: rName,
       slug: rSlug,
-      countries: members.map(p => ({
-        name: getCountryName(p.countryCode, lang, p.name_en),
-        slug: slugify(p.name_en),
-        flagColors: p.flagColors as string[],
-      })),
+      countries: members.map(p => {
+        const s = slugify(p.name_en);
+        return {
+          name: getCountryName(p.countryCode, lang, p.name_en),
+          slug: s,
+          flagColors: p.flagColors as string[],
+          href: countryHref(s, lang),
+        };
+      }),
       allRegions: regionList,
       lang,
       hreflang: rHreflangL,

@@ -7,7 +7,7 @@ import type { HreflangEntry } from './layout.js';
 import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 
 export interface CatalogPageData {
-  countries: { name: string; slug: string; flagColors: string[]; region: string }[];
+  countries: { name: string; slug: string; flagColors: string[]; region: string; href?: string }[];
   regions: { name: string; slug: string; count: number }[];
   lang?: string;
   hreflang?: HreflangEntry[];
@@ -29,7 +29,7 @@ export function catalogPage(d: CatalogPageData): string {
       </div>
       <div class="catalog-grid">
         ${d.countries.map(c =>
-          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
+          `<a class="card" href="${c.href ?? `${prefix}/countries/${c.slug}/`}"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
         ).join('\n        ')}
       </div>
     </section>`;

@@ -9,7 +9,7 @@ import { type SiteStrings, t, getStrings } from '../i18n/strings.js';
 export interface RegionPageData {
   name: string;
   slug: string;
-  countries: { name: string; slug: string; flagColors: string[] }[];
+  countries: { name: string; slug: string; flagColors: string[]; href?: string }[];
   allRegions: { name: string; slug: string; count: number }[];
   lang?: string;
   hreflang?: HreflangEntry[];
@@ -38,7 +38,7 @@ export function regionPage(d: RegionPageData): string {
     <section>
       <div class="catalog-grid">
         ${d.countries.map(c =>
-          `<a class="card" href="${prefix}/countries/${c.slug}/"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
+          `<a class="card" href="${c.href ?? `${prefix}/countries/${c.slug}/`}"><span class="card__colors">${c.flagColors.slice(0, 5).map(col => `<i style="background:${col}"></i>`).join('')}</span><span class="card__name">${esc(c.name)}</span></a>`
         ).join('\n        ')}
       </div>
     </section>

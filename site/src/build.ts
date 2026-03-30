@@ -300,6 +300,7 @@ const catalogData = {
     slug: slugify(p.name_en),
     flagColors: p.flagColors as string[],
     region: p.region || 'Other',
+    code: p.countryCode,
   })),
   regions: regionList,
 };
@@ -335,7 +336,7 @@ console.log(`  ${regionMap.size - 1} region pages generated`);
 const popular = POPULAR_CODES
   .map(code => palettes.find(p => p.countryCode === code))
   .filter(Boolean)
-  .map(p => ({ name: p!.name_en, slug: slugify(p!.name_en), flagColors: p!.flagColors as string[] }));
+  .map(p => ({ name: p!.name_en, slug: slugify(p!.name_en), flagColors: p!.flagColors as string[], code: p!.countryCode }));
 const allCountries = palettes.map(p => ({ name: p.name_en, slug: slugify(p.name_en), code: p.countryCode }));
 
 const homeHreflang = buildFullHreflang(lang => lang === 'en' ? '/' : `/${lang}/`);
@@ -367,9 +368,9 @@ for (const lang of nonEnLangs) {
   // Homepage
   ensureDir(langPrefix);
   writeFileSync(resolve(langPrefix, 'index.html'), homePage({
-    popularCountries: popular.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
+    popularCountries: popular.map(c => ({ ...c, name: getCountryName(c.code, lang, c.name), href: countryHref(c.slug, lang) })),
     regions: regionList,
-    allCountries: allCountries.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
+    allCountries: allCountries.map(c => ({ ...c, name: getCountryName(c.code, lang, c.name), href: countryHref(c.slug, lang) })),
     totalCount: palettes.length,
     lang,
     hreflang: homeHreflang,
@@ -379,7 +380,7 @@ for (const lang of nonEnLangs) {
   // Catalog
   ensureDir(resolve(langPrefix, 'countries'));
   writeFileSync(resolve(langPrefix, 'countries', 'index.html'), catalogPage({
-    countries: catalogData.countries.map(c => ({ ...c, href: countryHref(c.slug, lang) })),
+    countries: catalogData.countries.map(c => ({ ...c, name: getCountryName(c.code, lang, c.name), href: countryHref(c.slug, lang) })),
     regions: catalogData.regions,
     lang,
     hreflang: catalogHreflang,

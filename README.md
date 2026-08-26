@@ -130,6 +130,23 @@ Store credentials are this repo's **GitHub Actions secrets** (`CHROME_*`,
 investblog extensions; only the per-extension IDs (`CHROME_EXTENSION_ID`,
 `FIREFOX_EXTENSION_ID`, `EDGE_PRODUCT_ID`) differ.
 
+**`EDGE_API_KEY` expires — current key valid until 2026-11-06.** Edge Add-ons
+v1.1 keys live roughly 72 days; when one lapses the `edge` job fails with
+`401 API Key is Invalid` mid-release. There is no REST endpoint to mint a key
+(chicken-and-egg), so renewal is manual: Partner Center -> Microsoft Edge ->
+**Publish API** -> **Create API credentials**, then roll the new key into every
+investblog extension repo (the creds are account-level, so a lapsed key breaks
+all of them at once):
+
+```bash
+printf '%s' "$KEY" | gh secret set EDGE_API_KEY -R investblog/<repo>
+gh workflow run submit.yml -f tag=vX.Y.Z -f stores=edge -f dry_run=true   # verify
+```
+
+Note the expiry shown next to the key in Partner Center and update the date
+above. Pipe the key in rather than letting `gh secret set` prompt — a bare
+`gh secret set` with no stdin silently stores an empty string.
+
 **Before changing the release/CI flow:** confirm the reusable-workflow ref still
 resolves and the secrets exist (`gh secret list`). Store publishing here depends
 on the external `investblog/geo-tier-builder` workflow — it is a cross-repo
